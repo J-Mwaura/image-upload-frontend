@@ -1,0 +1,29 @@
+<div class="content-div">
+  <ul>
+    <a routerLink="home" routerLinkActive="active" mat-list-item class="p-2 text-dark">Home</a>
+
+    <li *ngIf="isLoggedIn"> <a routerLink="admin" routerLinkActive="active" mat-list-item
+        class="p-2 text-dark">Admin Product</a>
+    </li>
+
+    <li>
+      <a routerLink="profile" routerLinkActive="active" mat-list-item class="p-2 text-dark">{{ username }}</a>
+    </li>
+
+    <li *ngIf="isLoggedIn">
+      <a routerLink="user" routerLinkActive="active" mat-list-item class="p-2 text-dark">User</a>
+    </li>
+    <ul >
+      <li>
+        <a href="#" (click)="logout()" mat-list-item class="p-2 text-dark">LogOut</a>
+      </li>
+    </ul>
+    <li *ngIf="!isLoggedIn">
+      <a routerLink="register" routerLinkActive="active" mat-list-item class="p-2 text-dark">Register</a>
+    </li>
+
+    <li *ngIf="!isLoggedIn">
+      <a routerLink="login" routerLinkActive="active" mat-list-item class="p-2 text-dark">Login</a>
+    </li>
+  </ul>
+</div>
