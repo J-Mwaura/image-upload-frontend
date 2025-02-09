@@ -71,16 +71,4 @@ delete(productImageId: number): Observable<any> {  // Takes the ID
   );
 }
 
-
-
-  // public delete(productImage: ProductImage): void {
-  //   const url = `${this.host}api/images/${productImage.id}`;
-  //   console.log("Deleted image with id " + productImage.id);
-  //   this.http.delete(url).subscribe((response: any) => {
-  //     console.log("Deleted image with id " + productImage.id + " " + response);
-  //     //this.refreshImageTable();
-  //     this.getImageList();
-  //   })
-  // }
-
 }

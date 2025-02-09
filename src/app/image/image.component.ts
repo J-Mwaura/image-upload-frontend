@@ -2,13 +2,13 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, ViewChild, ElementRef  } from '@angular/core';
 import {NgForm,
-  FormBuilder, FormControl, FormGroup, FormsModule,
+  FormBuilder, FormGroup, FormsModule,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
 import { ProductImage } from '../model/ProductImage.model';
 import { ImageService } from '../services/image.service';
-import { BehaviorSubject, catchError, Observable, Subject, Subscription, takeUntil, tap, throwError } from 'rxjs';
+import { BehaviorSubject, Subject, Subscription, takeUntil } from 'rxjs';
 import { MatTableModule } from '@angular/material/table';
 import { environment } from '../../environments/environment';
 import { PagedResponse } from '../model/paged-response-model';
@@ -46,15 +46,14 @@ export class ImageComponent implements OnInit {
   private subscriptions: Subscription[] = [];
   private destroy$ = new Subject<void>();
   public term!: string;
-  //productImages: Array<ProductImage> = [];
-  productImages: ProductImage[] = [];
+  productImages: Array<ProductImage> = [];
+  //productImages: ProductImage[] = [];
   public imageName!: string;
   public fileName!: string;
   public location!: File[];
   public productImage  = new ProductImage();
 
 
-  
   dialogConfig = new MatDialogConfig();
   @ViewChild('editModal') editModal!: ElementRef;
   
@@ -77,7 +76,6 @@ export class ImageComponent implements OnInit {
     });
   }
 
-
   onChange(event: any):void {
     const files: FileList = event.target.files;
     if (event.target.files) {
@@ -99,23 +97,6 @@ export class ImageComponent implements OnInit {
           this.getImageList();
         }),
       ));
-  }
-
-  public saveNewImage(): void {
-    this.clickButton(`new-image-save`);
-    this.refreshImageTable();
-  }
-
-  private clickButton(buttonId: string): void {
-    document.getElementById(buttonId)?.click();
-  }
-
-  loadProductImages(event: PageEvent): PageEvent {
-    this.page = event.pageIndex;
-    this.size = event.pageSize;
-
-    this.refreshImageTable(this.page, this.size);
-    return event;
   }
 
   private refreshImageTable(page?: number, size?: number): void {
@@ -233,9 +214,12 @@ deleteImage(id: number) {
   });
 }
 
-onNameChange(productImage: any) {
-  console.log('Name changed:', productImage.name);
-  // You can add additional logic here, such as auto-saving the changes
+loadProductImages(event: PageEvent): PageEvent {
+  this.page = event.pageIndex;
+  this.size = event.pageSize;
+
+  this.refreshImageTable(this.page, this.size);
+  return event;
 }
 
 }
