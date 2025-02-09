@@ -52,7 +52,7 @@ updateImage(productImage: ProductImage): Observable<any> { // For FULL updates (
 
 updateImagePartial(id: number, productImage: Partial<ProductImage>): Observable<any> { // For PARTIAL updates (PATCH)
   const url = `${this.host}api/images/${id}`; // id is passed separately
-  return this.http.patch(url, productImage).pipe(
+  return this.http.put(url, productImage).pipe(
       catchError(this.handleError)
   );
 }

@@ -4,6 +4,7 @@ import { Component, OnInit, ViewChild, ElementRef  } from '@angular/core';
 import {NgForm,
   FormBuilder, FormControl, FormGroup, FormsModule,
   ReactiveFormsModule,
+  Validators,
 } from '@angular/forms';
 import { ProductImage } from '../model/ProductImage.model';
 import { ImageService } from '../services/image.service';
@@ -21,12 +22,6 @@ import { MatDialog, MatDialogConfig, MatDialogModule } from '@angular/material/d
 //eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { ConfirmDeleteDialogComponent } from '../component/dialog/confirm-delete-dialog-component/confirm-delete-dialog-component.component';
 
-interface ImageToUpdate {
-  id: number | null;
-  name: string;
-  location: string; // Or File[]
-}
-
 @Component({
   selector: 'app-image',
   imports: [ReactiveFormsModule, FormsModule, CommonModule, MatTableModule, MatIconModule, MatPaginatorModule, 
@@ -38,11 +33,8 @@ interface ImageToUpdate {
 })
 
 export class ImageComponent implements OnInit {
-  imageToUpdate: ImageToUpdate = {
-    id: null,
-    name: "",
-    location: ""
-  };
+  selectedImage: ProductImage | null = null;
+  imageEditForm: FormGroup; 
   private host = environment.apiUrl;
   displayedColumns: string[] = ['name', 'location', 'id', 'action', 'edit'];
   page: number = 0;
@@ -54,25 +46,26 @@ export class ImageComponent implements OnInit {
   private subscriptions: Subscription[] = [];
   private destroy$ = new Subject<void>();
   public term!: string;
-  productImages: Array<ProductImage> = [];
+  //productImages: Array<ProductImage> = [];
+  productImages: ProductImage[] = [];
   public imageName!: string;
   public fileName!: string;
   public location!: File[];
-  public selectedImage = new ProductImage();
+  public productImage  = new ProductImage();
 
-  imageEditForm = new FormGroup({
-    name: new FormControl(),
-    //location: new FormControl(),
-  });
 
   
   dialogConfig = new MatDialogConfig();
   @ViewChild('editModal') editModal!: ElementRef;
   
-  constructor(private imageService: ImageService, private formbuilder: FormBuilder, private http: HttpClient,
-    private dialog: MatDialog, private fb: FormBuilder,
+  constructor(private imageService: ImageService, private http: HttpClient,
+    private dialog: MatDialog, private fb: FormBuilder, 
   ) 
-  {this.refreshImageTable();}
+  {
+    this.imageEditForm = this.fb.group({
+      name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]], // No validation
+    });
+    this.refreshImageTable();}
 
   ngOnInit(): void {
     this.getImageList();
@@ -138,79 +131,76 @@ export class ImageComponent implements OnInit {
     });
   }
 
+  openEditModal(image: ProductImage) {
+    const index = this.productImages.findIndex(img => img.id === image.id);
+    if (index > -1) {
+      this.selectedImage = this.productImages[index]; // Direct reference!
 
-  // edit(image: any) {
-  //   this.imageToUpdate = image;
-  // }
+      this.imageEditForm.patchValue({
+        name: this.selectedImage.name,
+        location: this.selectedImage.location,
+        // ... patch other form controls
+      });
 
-  opeEediModal(image: any){
-    const modal = document.getElementById("editModal");
-    if(modal !=null){
-      modal.style.display="block";
+      // Subscribe to value changes for live updates
+      this.imageEditForm.get('name')?.valueChanges.subscribe(value => {
+        if (this.selectedImage) {
+          this.selectedImage.name = value; // Update selectedImage directly
+        }
+      });
+
+      const modal = document.getElementById('editModal');
+      if (modal != null) {
+        modal.style.display = 'block';
+      }
+    } else {
+      console.error("Image not found in productImages array.");
     }
-    this.imageToUpdate = image;
   }
 
-  closeEditModal(){
-    const modal = document.getElementById("editModal");
-    if(modal !=null){
-      modal.style.display="none";
-    }
+closeEditModal() {
+  const modal = document.getElementById('editModal');
+  if (modal != null) {
+    modal.style.display = 'none';
   }
+  this.imageEditForm.reset();
+  this.selectedImage = null; // Reset selectedImage
 
-  // updateImage() {
-  //   this.imageService.updateImage(this.imageToUpdate).subscribe(
-  //     (resp) => {
-  //       console.log(resp);
-  //     },
-  //     (err) => {
-  //       console.log(err);
-  //     }
-  //   );
-  // }
-
-//   updateImage() {
-//     if (!this.imageToUpdate || !this.imageToUpdate.id) { // Check for image and ID
-//         console.error("Image or image ID is missing.");
-//         return; // Or display an error message to the user
-//     }
-
-//     this.imageService.updateImage(this.imageToUpdate.id, this.imageToUpdate).subscribe({ // Pass id and image data
-//         next: (resp) => {
-//             console.log("Update successful:", resp);
-//             // Handle success (e.g., refresh the image list, display a success message)
-//         },
-//         error: (err) => {
-//             console.error("Update error:", err);
-//             // Handle error (e.g., display an error message to the user)
-//         }
-//     });
-// }
+}
 
 updateSelectedImage() {
-  if (!this.imageToUpdate || !this.imageToUpdate.id) {
-      console.error("Image or image ID is missing.");
-      return;
+  if (!this.selectedImage || !this.selectedImage.id) {
+    console.error('Image or image ID is missing.');
+    return;
   }
 
-  const imageForUpdate: Partial<ProductImage> = {}; // Partial object
+  if (this.imageEditForm.valid) {
+    const index = this.productImages.findIndex(img => img.id === this.selectedImage!.id);
+    if (index > -1) {
+      // Create a *new* ProductImage object with the updated values
+      const updatedImage = new ProductImage(
+        this.selectedImage.id,
+        this.imageEditForm.value.name,
+        this.imageEditForm.value.location
+        // ... other updated properties
+      );
 
-  if (this.imageEditForm.controls['name'].dirty) {
-    
-  console.log("Id being deleted is: " +imageForUpdate.id);
-      imageForUpdate.name = this.imageToUpdate.name;
+      this.productImages[index] = updatedImage; // Update the array with the new object
+    }
+
+    this.imageService.updateImagePartial(this.selectedImage.id, this.imageEditForm.value).subscribe({
+      next: (resp) => {
+        console.log('Update successful:', resp);
+        this.closeEditModal();
+        this.getImageList(); // Refresh the image list
+      },
+      error: (err) => {
+        console.error('Update error:', err);
+      },
+    });
   }
-
-  if (Object.keys(imageForUpdate).length === 0) {
-      console.warn("No changes to update");
-      return;
-  }
-
-  this.imageService.updateImagePartial(this.imageToUpdate.id, imageForUpdate).subscribe({ // Call the partial method
-      next: (resp) => { console.log( "Update successful:", resp); },
-      error: (err) => { console.error("Update error:", err);}
-  });
 }
+
 
 delete(productImage: ProductImage) {
   const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent, {
@@ -233,13 +223,19 @@ deleteImage(id: number) {
   this.imageService.delete(id).pipe(takeUntil(this.destroy$)).subscribe({
     next: (response) => {
       console.log("Image deleted successfully:", response);
-      this.refreshImageTable(); // Refresh the table
+      //this.refreshImageTable(); // Refresh the table
+      this.getImageList();
     },
     error: (error) => {
       console.error("Error deleting image:", error);
       // Handle error
     }
   });
+}
+
+onNameChange(productImage: any) {
+  console.log('Name changed:', productImage.name);
+  // You can add additional logic here, such as auto-saving the changes
 }
 
 }

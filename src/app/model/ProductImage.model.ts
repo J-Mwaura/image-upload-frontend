@@ -4,9 +4,9 @@ export class ProductImage {
     location: string;
 
     constructor(
-        id?: number, // Optional parameter for id
-        name?: string, // Optional parameter for name
-        location: string = '' // Default value for location
+        id?: number, 
+        name?: string,
+        location: string = '' 
     ) {
         this.id = id;
         this.name = name;
