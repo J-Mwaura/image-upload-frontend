@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit, ViewChild, ElementRef  } from '@angular/core';
 import {NgForm,
   FormBuilder, FormGroup, FormsModule,
@@ -11,7 +11,6 @@ import { ImageService } from '../services/image.service';
 import { BehaviorSubject, Subject, Subscription, takeUntil } from 'rxjs';
 import { MatTableModule } from '@angular/material/table';
 import { environment } from '../../environments/environment';
-import { PagedResponse } from '../model/paged-response-model';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import {
@@ -19,9 +18,10 @@ import {
 } from '@angular/material/form-field';
 import { MatInputModule} from '@angular/material/input';
 import { MatDialog, MatDialogConfig, MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 //eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { ConfirmDeleteDialogComponent } from '../component/dialog/confirm-delete-dialog-component/confirm-delete-dialog-component.component';
-
+import { MessageResponse } from '../model/MessageResponse';
 @Component({
   selector: 'app-image',
   imports: [ReactiveFormsModule, FormsModule, CommonModule, MatTableModule, MatIconModule, MatPaginatorModule, 
@@ -37,17 +37,18 @@ export class ImageComponent implements OnInit {
   imageEditForm: FormGroup; 
   private host = environment.apiUrl;
   displayedColumns: string[] = ['name', 'location', 'id', 'action', 'edit'];
-  page: number = 0;
-  size: number = 4;
-  totalCount: number = 0;
   private titleSubject = new BehaviorSubject<string>('Images');
   public titleAction$ = this.titleSubject.asObservable();
 
   private subscriptions: Subscription[] = [];
   private destroy$ = new Subject<void>();
   public term!: string;
-  productImages: Array<ProductImage> = [];
-  //productImages: ProductImage[] = [];
+  productImages: ProductImage[] = []
+  totalCount: number = 0;
+  pageIndex: number = 0;
+  pageSize: number = 10;
+  page: number = 0;
+  size: number = 4;
   public imageName!: string;
   public fileName!: string;
   public location!: File[];
@@ -58,23 +59,35 @@ export class ImageComponent implements OnInit {
   @ViewChild('editModal') editModal!: ElementRef;
   
   constructor(private imageService: ImageService, private http: HttpClient,
-    private dialog: MatDialog, private fb: FormBuilder, 
+    private dialog: MatDialog, private fb: FormBuilder, private snackBar: MatSnackBar
   ) 
   {
     this.imageEditForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]], // No validation
     });
-    this.refreshImageTable();}
+    this.loadImages();}
 
   ngOnInit(): void {
-    this.getImageList();
+    this.loadImages();
   }
 
-  getImageList() {
-    this.imageService.getImageList().subscribe(data => {
-      this.productImages = data;
-    });
-  }
+  loadImages(event?: PageEvent) {
+    if (event) {
+        this.pageIndex = event.pageIndex;
+        this.pageSize = event.pageSize;
+    }
+
+    this.imageService.getImageList(this.pageIndex, this.pageSize).subscribe(
+        (response: any) => { // Type the response appropriately
+            this.productImages = response.content;
+            this.totalCount = response.totalElements;
+        },
+        (error) => {
+          this.snackBar.open('Error loading images:', 'Close',{duration: 3000,
+          });
+        }
+    );
+}
 
   onChange(event: any):void {
     const files: FileList = event.target.files;
@@ -88,28 +101,37 @@ export class ImageComponent implements OnInit {
 
   public onAddNewImage(imageForm: NgForm): void {
     const formData = this.imageService.postUserData(imageForm.value, this.location);
-    this.subscriptions.push(
-      this.imageService.addImage(formData).subscribe(
-        ((response: ProductImage) => {
-          if (!!response) {
-            console.log("Created Product image ");
+    this.imageService.addImage(formData).subscribe(
+      (response: MessageResponse) => {
+          this.snackBar.open(response.message, 'Close', { duration: 3000 });
+          console.log("Image operation successful:", response.message);
+          this.loadImages();
+          imageForm.resetForm();
+      },
+      (error: HttpErrorResponse) => {
+          let errorMessage = "An error occurred.";
+  
+          if (error.error instanceof Object && error.error.message) {
+            errorMessage = error.error.message;
+          } else if (typeof error.error === 'string') {
+            errorMessage = error.error;
           }
-          this.getImageList();
-        }),
-      ));
-  }
+  
+          this.snackBar.open(errorMessage, 'Close', { duration: 5000, panelClass: ['error-snackbar'] });
+      }
+  );
 
-  private refreshImageTable(page?: number, size?: number): void {
-    this.productImages = [];
-    // append page number and page size
-    const suffix: string = (page !== undefined && size != undefined)
-      ? "?page=" + page + "&size=" + size
-      : "";
-
-    this.http.get<PagedResponse<ProductImage>>(`${this.host}api/images/allImages` + suffix).subscribe((response: PagedResponse<ProductImage>) => {
-      this.productImages = !!response.content ? response.content : [];
-      this.totalCount = !!response.totalCount ? response.totalCount : 0;
-    });
+    // this.subscriptions.push(
+    //   this.imageService.addImage(formData).subscribe(
+    //     ((response: ProductImage) => {
+    //       if (!!response) {
+    //         this.snackBar.open('Image saved', 'Close',{duration: 3000,
+    //         });
+    //         console.log("Created Product image ");
+    //       }
+    //       this.loadImages();
+    //     }),
+    //   ));
   }
 
   openEditModal(image: ProductImage) {
@@ -135,7 +157,8 @@ export class ImageComponent implements OnInit {
         modal.style.display = 'block';
       }
     } else {
-      console.error("Image not found in productImages array.");
+      this.snackBar.open('Image not found in productImages array.', 'Close',{duration: 3000,
+      });
     }
   }
 
@@ -151,7 +174,8 @@ closeEditModal() {
 
 updateSelectedImage() {
   if (!this.selectedImage || !this.selectedImage.id) {
-    console.error('Image or image ID is missing.');
+    this.snackBar.open('Image or image ID is missing.', 'Close',{duration: 3000,
+    });
     return;
   }
 
@@ -171,12 +195,15 @@ updateSelectedImage() {
 
     this.imageService.updateImagePartial(this.selectedImage.id, this.imageEditForm.value).subscribe({
       next: (resp) => {
-        console.log('Update successful:', resp);
+        this.snackBar.open(`${resp.message}`, 'Close',{duration: 3000,
+        });
         this.closeEditModal();
-        this.getImageList(); // Refresh the image list
+        this.loadImages(); // Refresh the image list
       },
       error: (err) => {
-        console.error('Update error:', err);
+        this.snackBar.open(`${err.message}`, 'Close', {
+          duration: 3000,
+      });
       },
     });
   }
@@ -203,23 +230,15 @@ deleteImage(id: number) {
 
   this.imageService.delete(id).pipe(takeUntil(this.destroy$)).subscribe({
     next: (response) => {
-      console.log("Image deleted successfully:", response);
-      //this.refreshImageTable(); // Refresh the table
-      this.getImageList();
+      this.snackBar.open('Image deleted successfully', 'Close',{duration: 3000,
+      });
+      this.loadImages();
     },
     error: (error) => {
-      console.error("Error deleting image:", error);
-      // Handle error
+      this.snackBar.open('Error deleting image:', 'Close',{duration: 3000,
+      });
     }
   });
-}
-
-loadProductImages(event: PageEvent): PageEvent {
-  this.page = event.pageIndex;
-  this.size = event.pageSize;
-
-  this.refreshImageTable(this.page, this.size);
-  return event;
 }
 
 }

@@ -64,4 +64,10 @@
   max-height: 100%; /* Or a specific height */
 }
 
+/* Alternative, more specific approach */
+.mat-drawer-backdrop {
+  background-color: rebeccapurple;
+  height: 100vh;
+}
+
 

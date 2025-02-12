@@ -1,8 +1,9 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { ProductImage } from "../model/ProductImage.model";
 import { environment } from "../../environments/environment";
 import { catchError, Observable, tap, throwError } from "rxjs";
+import { MessageResponse } from "../model/MessageResponse";
 
 
 @Injectable({
@@ -13,9 +14,13 @@ export class ImageService {
   
   constructor(private http: HttpClient) { }
 
-  public addImage(formData: FormData): Observable<ProductImage> {
-    return this.http.post<ProductImage>(`${this.host}api/file/saveFile`, formData);
+  public addImage(formData: FormData): Observable<MessageResponse> { // Correct return type
+    return this.http.post<MessageResponse>(`${this.host}api/file/saveFile`, formData); // Correct type in post
   }
+
+  // public addImage(formData: FormData): Observable<ProductImage> {
+  //   return this.http.post<ProductImage>(`${this.host}api/file/saveFile`, formData);
+  // }
 
   postUserData(productImages: ProductImage, files: File[]): FormData {
     
@@ -30,8 +35,11 @@ export class ImageService {
     return formData;
   }
 
-  getImageList(): Observable<ProductImage[]> {
-    return this.http.get<ProductImage[]>(`${this.host}api/images/allImages`).pipe(
+  getImageList(page: number, size: number): Observable<ProductImage[]> {
+    let params = new HttpParams()
+            .set('page', page.toString())
+            .set('size', size.toString());
+    return this.http.get<ProductImage[]>(`${this.host}api/images/allImages`, { params }).pipe(
       catchError(this.handleError)
     );
   }
@@ -50,6 +58,7 @@ updateImage(productImage: ProductImage): Observable<any> { // For FULL updates (
   );
 }
 
+// http.patch currently throws an error of CORS on backeend API
 updateImagePartial(id: number, productImage: Partial<ProductImage>): Observable<any> { // For PARTIAL updates (PATCH)
   const url = `${this.host}api/images/${id}`; // id is passed separately
   return this.http.put(url, productImage).pipe(

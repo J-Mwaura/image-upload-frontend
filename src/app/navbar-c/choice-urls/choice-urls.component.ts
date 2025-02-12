@@ -1,58 +1,56 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatListModule } from '@angular/material/list';
-import { RouterLink, RouterLinkActive, Router } from '@angular/router'; // Import Router
-
+import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { TokenStorageService } from '../../services/tokenStorageService';
+import { BehaviorSubject, Observable, takeUntil, of, Subject } from 'rxjs';
 
 const USER_ROLE = 'USER';
 const ADMIN_ROLE = 'ADMIN';
 
 @Component({
-  standalone: true,
-  selector: 'app-choice-urls',
-  templateUrl: './choice-urls.component.html',
-  styleUrls: ['./choice-urls.component.css'],
-  imports: [CommonModule, MatListModule, RouterLink, RouterLinkActive]
+    standalone: true,
+    selector: 'app-choice-urls',
+    templateUrl: './choice-urls.component.html',
+    styleUrls: ['./choice-urls.component.css'],
+    imports: [CommonModule, MatListModule, RouterLink, RouterLinkActive]
 })
 
-export class ChoiceUrlsComponent implements OnInit {
-  isLoggedIn = false;
-  showAdminBoard = false;
-  showUserBoard = false;
-  username: string | null = null;
+export class ChoiceUrlsComponent implements OnInit, OnDestroy {
+    private destroy$ = new Subject<void>();
+    isLoggedIn$ = new BehaviorSubject<boolean>(false);
+    showAdminBoard$?: Observable<boolean> ;
+    showUserBoard$?: Observable<boolean>;
+    username$?: Observable<string | null>; // Make username an Observable
 
-  constructor(private tokenStorageService: TokenStorageService, private router: Router) { } // Inject Router
+    constructor(private tokenStorageService: TokenStorageService, private router: Router) { }
 
-  ngOnInit(): void {
-    console.log("Before getToken():", this.isLoggedIn); // Check when getToken is called
-    this.isLoggedIn = !!this.tokenStorageService.getToken();
-    console.log("After getToken(): isLoggedIn =", this.isLoggedIn); // Check the value
+    ngOnInit(): void {
+      const initialLoginStatus = !!this.tokenStorageService.getToken(); // Get initial status *synchronously*
+      this.isLoggedIn$ = new BehaviorSubject<boolean>(initialLoginStatus); // Set the initial value
 
+      this.isLoggedIn$.pipe(takeUntil(this.destroy$)).subscribe(isLoggedIn => { // Subscribe as before
+          if (isLoggedIn) {
+              const user = this.tokenStorageService.getUser();
+              this.showAdminBoard$ = of(user?.roles?.includes(ADMIN_ROLE) ?? false);
+              this.showUserBoard$ = of((user?.roles?.includes(ADMIN_ROLE) || user?.roles?.includes(USER_ROLE)) ?? false);
+              this.username$ = of(user?.username ?? null);
+          } else {
+            this.showAdminBoard$ = of(false);
+            this.showUserBoard$ = of(false);
+            this.username$ = of(null);
+          }
+      });
+  }
 
-    // if (this.isLoggedIn) {
-    //   const user = this.tokenStorageService.getUser();
-
-    //   this.showAdminBoard = user?.roles?.includes(ADMIN_ROLE) ?? false;
-    //   this.showUserBoard = user?.roles?.includes(USER_ROLE) ?? false;
-    //   // this.showUserBoard = this.showAdminBoard || (user?.roles?.includes(USER_ROLE) ?? false); // Simplified and more efficient
-
-    //   this.username = user?.username ?? null;
-    // }
-    if (this.isLoggedIn) {
-      const user = this.tokenStorageService.getUser();
-      // Use optional chaining and nullish coalescing to handle potential null values
-      this.showAdminBoard = user?.roles?.includes(ADMIN_ROLE) ?? false;
-      this.showUserBoard = user?.roles?.includes(ADMIN_ROLE) ?? false; // Admin has access
-      if (!this.showUserBoard) { // If not an admin, check for user role
-        this.showUserBoard = user?.roles?.includes(USER_ROLE) ?? false; // User has access
-      }
-      this.username = user?.username ?? null; // Set username, handle potential null
+    logout(): void {
+        this.tokenStorageService.signOut();
+        this.isLoggedIn$.next(false);
+        this.router.navigate(['/login']);
     }
-  }
 
-  logout(): void {
-    this.tokenStorageService.signOut();
-    this.router.navigate(['/login']); // Use router.navigate instead of reload
-  }
+    ngOnDestroy(): void {
+      this.destroy$.next();
+      this.destroy$.complete();
+    }
 }

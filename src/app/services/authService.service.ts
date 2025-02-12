@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { catchError, Observable, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, Observable, tap, throwError } from 'rxjs';
 import { LoginRequest } from '../model/LoginRequest ';
 import { JwtResponse } from '../model/JwtResponse ';
 import { environment } from '../../environments/environment';
 import { RegisterRequest } from '../model/RegisterRequest';
 import { TokenStorageService } from './tokenStorageService';
+import { User } from '../model/user';
 
 
 const httpOptions = {
@@ -17,15 +18,33 @@ const httpOptions = {
 })
 export class AuthService {
   private baseUrl = environment.apiUrl + 'api/auth';
+  private isLoggedInSubject = new BehaviorSubject<boolean>(false); // Initialize to false
+  public isLoggedIn$: Observable<boolean> = this.isLoggedInSubject.asObservable(); // Expose as Observable
 
-  constructor(private http: HttpClient, private tokenStorage: TokenStorageService) { }
+
+  constructor(private http: HttpClient, private tokenStorage: TokenStorageService,) { 
+     // Check local storage or wherever you store the login status on initialization
+     const storedLoginStatus = tokenStorage.getToken(); // Or sessionStorage
+     this.isLoggedInSubject.next(storedLoginStatus === 'true'); // Set the initial value 
+  }
+
+  updateLoginStatus(status: boolean) {
+    this.isLoggedInSubject.next(status); // Correct: Use next() on the BehaviorSubject
+}
 
   login(loginRequest: LoginRequest): Observable<JwtResponse> {
-      return this.http.post<JwtResponse>(`${this.baseUrl}/login`, loginRequest, { withCredentials: true, headers: this.headerOptions })
-        .pipe(
-          catchError(this.handleError)
-        );
-    }
+    return this.http.post<JwtResponse>(`${this.baseUrl}/login`, loginRequest, { withCredentials: true, headers: this.headerOptions })
+      .pipe(
+        tap((jwtResponse: JwtResponse) => {
+          if (jwtResponse && jwtResponse.token && jwtResponse.user) { // Check for token and user
+            this.tokenStorage.saveToken(jwtResponse.token); // Use TokenStorageService
+            this.tokenStorage.saveUser(jwtResponse.user); // Use TokenStorageService
+            this.isLoggedInSubject.next(true);
+          }
+        }),
+        catchError(this.handleError)
+      );
+  }
 
     private handleError(error: HttpErrorResponse) {
       let errorMessage = 'Login failed. Please try again.';
