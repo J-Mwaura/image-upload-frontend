@@ -1,4 +1,4 @@
-<div class="content-div">
+<!-- <div class="content-div">
   <ul>
       <a routerLink="home" routerLinkActive="active" mat-list-item class="p-2 text-dark">Home</a>
 
@@ -23,4 +23,37 @@
           <a routerLink="login" routerLinkActive="active" mat-list-item class="p-2 text-dark">Login</a>
       </li>
   </ul>
-</div>
+</div> -->
+
+<div *ngIf="isLoggedIn$ | async">
+    <p *ngIf="username$ | async as username">Welcome, {{ username }}!</p>
+  
+    <mat-list>
+      <mat-list-item *ngIf="showAdminBoard$ | async">
+        <a [routerLink]="['admin']">Admin Panel</a>
+      </mat-list-item>
+      <mat-list-item *ngIf="showUserBoard$ | async">
+        <a [routerLink]="['/user-profile']">User Profile</a>
+      </mat-list-item>
+      <mat-list-item *ngIf="showUserBoard$ | async">
+        <a [routerLink]="['user']">All Users</a>
+      </mat-list-item>
+      </mat-list>
+  
+    <button (click)="logout()">Logout</button>
+  </div>
+  
+  <div *ngIf="!(isLoggedIn$ | async)">
+    <a [routerLink]="['register']">Register</a>
+    <p>Please log in to see available options.</p>
+    <a [routerLink]="['/login']">Login</a>
+  </div>
+  
+  
+  <div *ngIf="hasAdminAccess()">
+    <p>Admin content</p>
+  </div>
+  
+  <div *ngIf="hasUserAccess()">
+    <p>User content</p>
+  </div>

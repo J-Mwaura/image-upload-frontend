@@ -7,14 +7,19 @@ import { RegisterComponent } from './register/register.component';
 import { BoardUserComponent } from './component/board-user/board-user.component';
 import { ProfileComponent } from './component/profile/profile.component';
 import { BoardAdminComponent } from './component/admin/board-admin.component';
+import { authGuard } from './guards/auth-guard.guard';
+import { adminGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
-    { path: 'images', component: ImageComponent },
+    { path: 'images', component: ImageComponent, canActivate: [authGuard]},
     { path: 'product', component: ProductComponent },
     { path: 'login', component: LoginComponent },
     { path: 'home', component: HomeComponent },
     { path: 'register', component: RegisterComponent },
-    { path: 'user', component: BoardUserComponent },
-    { path: 'admin', component: BoardAdminComponent },
-    { path: 'profile', component: ProfileComponent },
+    { path: 'user', component: BoardUserComponent, canActivate: [authGuard] },
+    { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
+
+    { 
+        path: 'admin', component: BoardAdminComponent, canActivate: [authGuard, adminGuard] 
+    },
 ];

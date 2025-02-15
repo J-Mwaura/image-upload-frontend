@@ -1,4 +1,4 @@
-import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
+import { HttpInterceptorFn, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { inject } from '@angular/core'; // Import inject
 import { Router } from '@angular/router'; // Import Router
 import { MatSnackBar } from '@angular/material/snack-bar'; // Import MatSnackBar
@@ -6,10 +6,10 @@ import { catchError, throwError } from 'rxjs';
 import { TokenStorageService } from '../services/tokenStorageService';
 import { AuthService } from '../services/authService.service';
 
-const TOKEN_KEY = 'auth-token';
-
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-    const publicUrls = ['/api/auth/login', '/api/auth/register', '/api/home/home'];
+    const publicUrls = ['/api/auth/login', '/api/auth/register', '/api/home/home',
+        '/api/images/{id}'
+    ];
 
     if (publicUrls.some((url) => req.url.includes(url))) {
         return next(req); // Skip interception for public URLs
@@ -22,14 +22,17 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     const token = tokenService.getToken();
 
     if (token) {
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${token}`
+        });
+        console.log("Token: " +token);
         req = req.clone({
             withCredentials: true, // Important for sending cookies with requests
-            setHeaders: {
-                Authorization: `Bearer ${token}`
-            }
+            headers: headers
         });
     }
 
+    // improve and cater for refresh token
     return next(req).pipe(
         catchError((error: HttpErrorResponse) => {
             if (error.status === 401) { // 401 Unauthorized - Token expired

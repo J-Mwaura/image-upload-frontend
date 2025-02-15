@@ -1,0 +1,14 @@
+/* admin-dashboard.component.css (Optional styling) */
+.container {
+    padding-top: 20px; /* Add some top padding */
+}
+
+/* Style the logout button as a link */
+.btn-link {
+    border: none; /* Remove default button border */
+    background: none; /* Remove default button background */
+    padding: 0;      /* Remove default button padding */
+    cursor: pointer; /* Make it look like a link */
+    color: #007bff; /* Set link color */
+    text-decoration: underline; /* Add underline */
+}

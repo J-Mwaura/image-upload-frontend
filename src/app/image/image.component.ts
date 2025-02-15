@@ -102,7 +102,7 @@ export class ImageComponent implements OnInit {
   public onAddNewImage(imageForm: NgForm): void {
     const formData = this.imageService.postUserData(imageForm.value, this.location);
     this.imageService.addImage(formData).subscribe(
-      (response: MessageResponse) => {
+      (response: MessageResponse) => { // Correct type: MessageResponse
           this.snackBar.open(response.message, 'Close', { duration: 3000 });
           console.log("Image operation successful:", response.message);
           this.loadImages();
