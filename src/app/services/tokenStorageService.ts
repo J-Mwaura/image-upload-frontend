@@ -2,18 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs'; // Import throwError
 import { User } from '../model/user';
 import { JwtResponse } from '../model/JwtResponse ';
-
-function mapJwtResponseToUser(jwtResponse: JwtResponse): User {
-    if (!jwtResponse.user) {
-        throw new Error("User data is missing in JwtResponse"); // Handle missing user
-    }
-    return {
-        id: jwtResponse.user.id,
-        username: jwtResponse.user.username,
-        email: jwtResponse.user.email,
-        roles: jwtResponse.user.roles || [],
-    };
-}
+import { JwtHelperService } from '@auth0/angular-jwt'; 
 
 interface JwtPayload {  // Define the interface here
     'authz.roles'?: string[];
@@ -29,6 +18,21 @@ const USER_KEY = 'auth-user';
 export class TokenStorageService {
 
     constructor() { }
+
+    private jwtHelper = new JwtHelperService(); // Create an instance
+
+  isTokenExpired(): boolean {
+    const token = this.getToken();
+    if (token) {
+      try {
+        return this.jwtHelper.isTokenExpired(token); // Use jwtHelper to check expiry
+      } catch (error) {
+        console.error("Error decoding or checking token expiry:", error);
+        return true; // Treat as expired in case of error
+      }
+    }
+    return true; // No token, treat as expired
+  }
 
     signOut(): void {
         localStorage.clear(); // Use localStorage consistently
@@ -46,7 +50,7 @@ export class TokenStorageService {
     //         return of(user);
     //       } catch (error) {
     //         console.error("Error parsing user data:", error);
-    //         return of(null); // Return null if parsing fails
+    //         return of(null); 
     //       }
     //     } else {
     //       return of(null);
@@ -60,30 +64,25 @@ export class TokenStorageService {
             const user = JSON.parse(userJson);
 
             // testing only
-            for (const role of user.roles) {
-                //console.log("user by dev: " +role.roleName);
-              }
+            // for (const role of user.roles) {
+            //     console.log("user by dev: " +role.roleName);
+            //   }
       
             const roleNamesFromUserObject = user.roles.map((role: { roleName: any; }) => role.roleName);
       
             // 2. Extract JWT:
-            const authToken = user['auth-token'];
+            const authToken = user[TOKEN_KEY];
     
             if (authToken) {
               // 3. Decode JWT:
               const decodedToken = jwt_decode(authToken);
-              const rolesFromToken = decodedToken!['authz.roles'];
-              
-              //console.log("Role requested by developer : " +rolesFromToken);
+              const rolesFromToken = decodedToken!['authz.roles'];             
       
               // 4. Update user object with roles from token OR from the original object:
-              user.roles = rolesFromToken || roleNamesFromUserObject; // Use roles from JWT if available, else from original object.
-              // If you always want the token roles use the line below
-              // user.roles = rolesFromToken; 
+              user.roles = rolesFromToken || roleNamesFromUserObject; 
       
             } else {
-              //console.warn("No auth-token found in user data. Using roles from user object.");
-              user.roles = roleNamesFromUserObject; // Fallback to roles from the user object
+              user.roles = roleNamesFromUserObject; 
             }
       
             return of(user);
@@ -99,7 +98,7 @@ export class TokenStorageService {
     saveToken(token: string): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             try {
-                localStorage.setItem(TOKEN_KEY, token); // Use localStorage
+                localStorage.setItem(TOKEN_KEY, token); 
                 resolve();
             } catch (error) {
                 reject(error);
@@ -110,13 +109,18 @@ export class TokenStorageService {
     saveUser(user: User): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             try {
-                localStorage.setItem(USER_KEY, JSON.stringify(user)); // Use localStorage
+                localStorage.setItem(USER_KEY, JSON.stringify(user)); 
                 resolve();
             } catch (error) {
                 reject(error);
             }
         });
     }
+
+getRefreshToken(): string | null {
+  const refreshToken = localStorage.getItem(USER_KEY);
+  return refreshToken ? refreshToken : null;
+}
 }
 
 function jwt_decode(jwt: any) {

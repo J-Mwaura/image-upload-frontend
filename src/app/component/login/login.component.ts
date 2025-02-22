@@ -7,7 +7,7 @@ import {
 import { CommonModule } from '@angular/common';
 
 import { TokenStorageService } from '../../services/tokenStorageService';
-import { AuthService } from '../../services/authService.service';
+import { AuthService } from '../../services/authService';
 import { Router } from '@angular/router';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -48,7 +48,7 @@ export class LoginComponent implements OnInit {
         this.checkLoginStatus(); // Call the function to check login status
     }
 
-    private checkLoginStatus() {  // Function to handle login status check
+    private checkLoginStatus() { 
         const token = this.tokenStorage.getToken();
         if (token) {
             this.tokenStorage.getUser().pipe(take(1)).subscribe((user: User | null) => { // Use pipe and subscribe

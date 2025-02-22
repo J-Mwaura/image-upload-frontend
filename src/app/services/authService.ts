@@ -6,6 +6,7 @@ import { JwtResponse } from '../model/JwtResponse ';
 import { environment } from '../../environments/environment';
 import { RegisterRequest } from '../model/RegisterRequest';
 import { TokenStorageService } from './tokenStorageService';
+import { User } from '../model/user';
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -15,15 +16,18 @@ const httpOptions = {
   providedIn: 'root'
 })
 export class AuthService {
+
   private baseUrl = environment.apiUrl + 'api/auth';
   private isLoggedInSubject = new BehaviorSubject<boolean>(false); // Initialize to false
-  // Nollar sign used to indicate an observable. Not a must
-  public isLoggedIn$: Observable<boolean> = this.isLoggedInSubject.asObservable(); // Expose as Observable. Emits two values true or false
+  // Dollar sign used to indicate an observable. Not a must
+  public isLoggedIn$: Observable<boolean> = this.isLoggedInSubject.asObservable();
+  private showAdminBoardSubject = new BehaviorSubject<boolean>(false);
+  public showAdminBoard$ = this.showAdminBoardSubject.asObservable();
+  private readonly ADMIN_ROLE = 'ADMIN';
 
   constructor(private http: HttpClient, private tokenStorage: TokenStorageService,) { 
-     // Check local storage or wherever you store the login status on initialization
-     const storedLoginStatus = tokenStorage.getToken(); // Or sessionStorage
-     this.isLoggedInSubject.next(storedLoginStatus === 'true'); // Set the initial value 
+     const storedLoginStatus = tokenStorage.getToken(); 
+     this.isLoggedInSubject.next(storedLoginStatus === 'true'); 
   }
 
   updateLoginStatus(status: boolean) {
@@ -42,6 +46,10 @@ export class AuthService {
         }),
         catchError(this.handleError)
       );
+  }
+
+  isAdmin(user: User | null): boolean {
+    return user?.roles?.includes('ADMIN') ?? false;
   }
 
     private handleError(error: HttpErrorResponse) {
@@ -107,9 +115,19 @@ export class AuthService {
           }
         }
 
-          return throwError(() => new Error(errorMessage)); // Re-throw the error with the formatted message
+          return throwError(() => new Error(errorMessage)); 
         })
       );
     }
 
+    refreshToken(refreshToken: string): Observable<any> { 
+      const headers = new HttpHeaders({
+          'Content-Type': 'application/json'
+      });
+
+      return this.http.post(`${this.baseUrl}/refresh-token`, { refreshToken }, { withCredentials: true, headers })
+          .pipe( 
+              catchError(this.handleError) 
+          );
+  }
 }

@@ -5,9 +5,13 @@
     <mat-nav-list (click)="drawer.toggle()">
       <a routerLink="login" routerLinkActive="active" mat-list-item class="p-2 text-dark">Login</a>
       <a routerLink="images" routerLinkActive="active" mat-list-item class="p-2 text-dark">Images</a>
-      <li>
-        <div><app-choice-urls /></div>
-      </li>
+      <a routerLink="choice" routerLinkActive="active" mat-list-item class="p-2 text-dark">Choices</a>
+      <mat-list-item style="height: 50px; color: rgb(0, 255, 98);" *ngIf="isLoggedIn$ | async">
+        <a  *ngIf="username$ | async as username">Welcome, {{ username }}!</a>
+      </mat-list-item>
+      <mat-list-item style="height: 50px; color: rgb(0, 255, 98);">
+        <a (click)="logout()">Logout</a>
+      </mat-list-item>
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>
@@ -22,5 +26,3 @@
     <!-- Add Content Here -->
   </mat-sidenav-content>
 </mat-sidenav-container>
-
-`
