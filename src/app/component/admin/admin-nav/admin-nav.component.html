@@ -1,0 +1,35 @@
+<mat-sidenav-container class="sidenav-container">
+    <mat-sidenav #drawer mode="push" mode="over" class="sidenav" fixedInViewport
+        [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
+        
+        [opened]="(isHandset$ | async) === false">
+      <mat-toolbar>
+        <button type="button" aria-label="Toggle sidenav" mat-icon-button (click)="drawer.toggle()">
+          <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+        </button>
+      </mat-toolbar>
+      <mat-nav-list (click)="drawer.toggle()">
+        <a [routerLink]="['register']">Register</a>
+        <a routerLink="images" routerLinkActive="active" mat-list-item class="p-2 text-dark">Images</a>
+        <a routerLink="user" routerLinkActive="active" mat-list-item class="p-2 text-dark">User area</a>
+      </mat-nav-list>
+    </mat-sidenav>
+    <mat-sidenav-content>
+      <mat-toolbar color="primary">
+        <!-- @if (isHandset$ | async) { -->
+          <button
+            type="button"
+            aria-label="Toggle sidenav"
+            mat-icon-button
+            (click)="drawer.toggle()">
+            <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+          </button>
+        <!-- } -->
+      </mat-toolbar>
+      <!-- Add Content Here -->
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+
+  <div>
+    <router-outlet></router-outlet>
+  </div>

@@ -10,7 +10,6 @@ import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
 import { catchError, filter, map, shareReplay, takeUntil } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { ChoiceUrlsComponent } from "../navbar-c/choice-urls/choice-urls.component";
 import { TokenStorageService } from '../services/tokenStorageService';
 import { AuthService } from '../services/authService';
 import { User } from '../model/user';
@@ -31,7 +30,6 @@ const ADMIN_ROLE = 'ADMIN';
     MatIconModule,
     AsyncPipe,
     RouterLink, RouterLinkActive,
-    ChoiceUrlsComponent,
     CommonModule
 ]
 })

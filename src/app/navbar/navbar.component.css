@@ -32,7 +32,7 @@
   }
 
   .sidenav-container { /* Needed if using position: absolute on the sidenav */
-    padding-right: 300px; /* Or margin-right if you prefer */
+    padding-right: 500px; /* Or margin-right if you prefer */
   }
 
   /* Optional: If you want the toolbar to also have some right padding */

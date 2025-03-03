@@ -52,6 +52,10 @@ export class AuthService {
     return user?.roles?.includes('ADMIN') ?? false;
   }
 
+  isUser(user: User | null): boolean {
+    return user?.roles?.includes('USER') ?? false;
+  }
+
     private handleError(error: HttpErrorResponse) {
       let errorMessage = 'Login failed. Please try again.';
   

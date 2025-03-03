@@ -1,11 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { UserService } from '../services/user.service';
+import { RouterLink, RouterLinkActive, RouterModule } from '@angular/router';
+import { NavbarComponent } from '../navbar/navbar.component';
 
 @Component({
   standalone: true,
   selector: 'app-home',
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css']
+  styleUrls: ['./home.component.css'],
+  imports: [RouterLink, RouterLinkActive, RouterModule, NavbarComponent]
 })
 export class HomeComponent implements OnInit {
 

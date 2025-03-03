@@ -1,11 +1,15 @@
 <mat-sidenav-container class="sidenav-container">
   <mat-sidenav #drawer class="sidenav" fixedInViewport [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
     [mode]="(isHandset$ | async) ? 'over' : 'side'" [opened]="(isHandset$ | async) === false" [opened]="opened">
-    <mat-toolbar>Menu</mat-toolbar>
+    <mat-toolbar>Menu
+      <button type="button" aria-label="Toggle sidenav" mat-icon-button (click)="drawer.toggle()">
+        <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+      </button>
+    </mat-toolbar>
     <mat-nav-list (click)="drawer.toggle()">
       <a routerLink="login" routerLinkActive="active" mat-list-item class="p-2 text-dark">Login</a>
-      <a routerLink="images" routerLinkActive="active" mat-list-item class="p-2 text-dark">Images</a>
-      <a routerLink="choice" routerLinkActive="active" mat-list-item class="p-2 text-dark">Choices</a>
+      <!-- <a routerLink="images" routerLinkActive="active" mat-list-item class="p-2 text-dark">Images</a>
+      <a routerLink="choice" routerLinkActive="active" mat-list-item class="p-2 text-dark">Choices</a> -->
       <mat-list-item style="height: 50px; color: rgb(0, 255, 98);" *ngIf="isLoggedIn$ | async">
         <a  *ngIf="username$ | async as username">Welcome, {{ username }}!</a>
       </mat-list-item>
@@ -21,7 +25,6 @@
         <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
       </button>
       <!-- } -->
-      <span>skmsys</span>
     </mat-toolbar>
     <!-- Add Content Here -->
   </mat-sidenav-content>

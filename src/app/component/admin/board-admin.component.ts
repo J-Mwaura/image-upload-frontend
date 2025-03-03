@@ -4,13 +4,14 @@ import { AuthService } from '../../services/authService';
 import { Router, RouterModule } from '@angular/router';
 import { TokenStorageService } from '../../services/tokenStorageService';
 import { CommonModule } from '@angular/common';
+import { AdminNavComponent } from "./admin-nav/admin-nav.component";
 
 @Component({
   standalone: true,
   selector: 'app-board-admin',
   templateUrl: './board-admin.component.html',
   styleUrls: ['./board-admin.component.css'],
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, AdminNavComponent],
 })
 export class BoardAdminComponent implements OnInit {
   content?: string;

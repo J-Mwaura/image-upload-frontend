@@ -6,30 +6,34 @@ import { HomeComponent } from './home/home.component';
 import { RegisterComponent } from './register/register.component';
 import { BoardUserComponent } from './component/board-user/board-user.component';
 import { ProfileComponent } from './component/profile/profile.component';
-import { BoardAdminComponent } from './component/admin/board-admin.component';
 import { authGuard } from './guards/auth-guard.guard';
 import { adminGuard } from './guards/admin.guard';
-import { ChoiceUrlsComponent } from './navbar-c/choice-urls/choice-urls.component';
+import { AdminNavComponent } from './component/admin/admin-nav/admin-nav.component';
 
 export const routes: Routes = [
-    { path: 'images', component: ImageComponent, canActivate: [authGuard]},
     { path: 'product', component: ProductComponent },
     { path: 'login', component: LoginComponent },
-    { path: 'home', component: HomeComponent },
+    { path: '', redirectTo: '/login', pathMatch: 'full' },
     { path: 'user', component: BoardUserComponent, canActivate: [authGuard] },
     { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
 
     {
-        path: 'choice',
-        component: ChoiceUrlsComponent,
-        canActivate: [authGuard, adminGuard],
+        path: 'home', component: HomeComponent, canActivate: [authGuard],
         children: [
             {
-                path: 'admin',
-                component: BoardAdminComponent,
-                canActivate: [authGuard, adminGuard]
+                path: 'admin', component: AdminNavComponent, canActivate: [authGuard, adminGuard],
+                children: [
+                    { path: 'images', component: ImageComponent},
+                    { path: 'register', component: RegisterComponent },
+                    { path: 'user', component: BoardUserComponent}
+                ]
             },
-            { path: 'register', component: RegisterComponent }
+            {
+                path: 'user', component: BoardUserComponent, canActivate: [authGuard]
+            }
         ]
     },
+    
+    { path: '**', redirectTo: '/login' }, // redirect unknown urls to login page
+    
 ];

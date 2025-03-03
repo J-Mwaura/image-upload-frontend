@@ -1,0 +1,43 @@
+.sidenav-container {
+    height: 100%;
+    display: flex;
+    background-color: aqua;
+  }
+  
+  .sidenav {
+    width: 200px;
+  }
+  
+  .sidenav .mat-toolbar {
+    background: inherit;
+  }
+  
+  .mat-toolbar.mat-primary {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  mat-sidenav {
+    width: 200px;
+    background-color: aquamarine;
+    margin-top: 118px;
+    
+  }
+  #drawer{
+    margin-top: 200px;
+  }
+
+  /* Media query for larger screens */
+@media (min-width: 768px) { /* Adjust breakpoint as needed - 768px is a common tablet/desktop breakpoint */
+  .sidenav {
+    position: fixed; /* Or absolute, depending on your preference */
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 300px; /* Adjust as needed */
+    /* Optional: Add a background color or other styles */
+    background-color: #f0f0f0; /* Example */
+    z-index: 1000; /* Ensure it's above other content */
+  }
+}
