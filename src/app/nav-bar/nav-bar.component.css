@@ -1,0 +1,27 @@
+.sidenav-container {
+  height: 100%;
+}
+
+.sidenav {
+  width: 200px;
+  background: rgb(0, 94, 255); /* Change the sidenav background to blue */
+  color: white; /* Optional: Change the text color for better contrast */
+}
+
+.sidenav .mat-toolbar {
+  background: inherit;
+}
+
+.mat-toolbar.mat-primary {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.mat-toolbar.mat-primary {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: rgb(0, 94, 255); /* Change the background color to blue */
+  color: white; /* Optional: Change the text color to white for better contrast */
+}

@@ -1,0 +1,21 @@
+/* You can add global styles to this file, and also import other style files */
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.error-snackbar {
+    color: white;
+    --mdc-snackbar-container-color: rgb(244, 106, 108) !important;
+}
+
+.success-snackbar {
+    color: white; 
+    --mdc-snackbar-container-color: rgb(143, 248, 143) !important;
+}
+
+/* Hide mat-sidenav on iPad screen sizes */
+@media only screen and (min-width: 768px) and (max-width: 1368px) {
+    .sidenav {
+        display: none;
+    }
+}

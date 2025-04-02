@@ -1,0 +1,19 @@
+.mat-dialog-container {
+    background-color: lightgray;
+    color: rgb(12, 45, 233);
+}
+
+.mat-dialog-title {
+    color: darkred;
+}
+
+.mat-dialog-actions button {
+    background-color: darkred;
+    color: white;
+}
+
+.delete-button {
+    margin-left: 8px;
+    background-color: red;
+    color: white;
+}
