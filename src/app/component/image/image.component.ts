@@ -100,7 +100,7 @@ loadImages(event?: PageEvent) {
 
   public async onAddNewImage(imageForm: NgForm): Promise<void> {
     try {
-      const formData = this.imageService.postUserData(imageForm.value, this.url); 
+      const formData = this.imageService.postData(imageForm.value, this.url); 
 
       const response: MessageResponse = await firstValueFrom(this.imageService.addImage(formData));
 
