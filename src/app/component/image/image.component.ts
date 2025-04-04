@@ -172,7 +172,6 @@ updateSelectedImage() {
   if (this.imageEditForm.valid) {
     const index = this.productImages.findIndex(img => img.id === this.selectedImage!.id);
     if (index > -1) {
-      // Create a *new* ProductImage object with the updated values
       const updatedImage: ProductImage = {
         id: this.selectedImage.id,
         name: this.imageEditForm.value.name,
