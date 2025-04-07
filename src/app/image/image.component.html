@@ -11,7 +11,7 @@
             (change)="onChange($event)"/>
           </div>
           </div>
-          <button type="button" class="btn btn-primary" type="submit">Save</button>
+          <button class="btn btn-primary" type="submit">Save</button>
         </form>
       </div>
       <div class="btn-group mr-2">
@@ -73,7 +73,7 @@
             <button
             class="btn btn-danger"
               (click)="delete(productImage)"
-              mat-icon-button 
+              mat-icon-button
               aria-label="Delete" [attr.aria-label]="'Delete ' + productImage.name"
               color="warn"
             >
@@ -109,14 +109,14 @@
       ></mat-paginator>
     </div>
 
-    
+
 </div>
 
 
 
   <!-- The Modal -->
   <div id="editModal" class="modal">
-  
+
     <!-- Modal content -->
     <div class="modal-content">
       <div class="modal-header">
@@ -144,10 +144,10 @@
               </small>
             </div>
           </div>
-      
+
           <div class="row">
             <div class="col-sm-12 text-center">
-              <button class="update editButton" 
+              <button class="update editButton"
               [disabled]="imageEditForm.invalid"
               mat-raised-button type="submit">
                 Update
@@ -157,6 +157,6 @@
         </form>
 </div>
     </div>
-  
+
   </div>
 

@@ -22,9 +22,11 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 //eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { ConfirmDeleteDialogComponent } from '../component/dialog/confirm-delete-dialog-component/confirm-delete-dialog-component.component';
 import { MessageResponse } from '../model/MessageResponse';
+import { firstValueFrom } from 'rxjs'; // Import firstValueFrom
+
 @Component({
   selector: 'app-image',
-  imports: [ReactiveFormsModule, FormsModule, CommonModule, MatTableModule, MatIconModule, MatPaginatorModule, 
+  imports: [ReactiveFormsModule, FormsModule, CommonModule, MatTableModule, MatIconModule, MatPaginatorModule,
     MatFormFieldModule, MatInputModule, MatDialogModule, ConfirmDeleteDialogComponent],
   standalone: true,
 
@@ -34,7 +36,7 @@ import { MessageResponse } from '../model/MessageResponse';
 
 export class ImageComponent implements OnInit {
   selectedImage: ProductImage | null = null;
-  imageEditForm: FormGroup; 
+  imageEditForm: FormGroup;
   private host = environment.apiUrl;
   displayedColumns: string[] = ['name', 'location', 'id', 'action', 'edit'];
   private titleSubject = new BehaviorSubject<string>('Images');
@@ -57,10 +59,10 @@ export class ImageComponent implements OnInit {
 
   dialogConfig = new MatDialogConfig();
   @ViewChild('editModal') editModal!: ElementRef;
-  
+
   constructor(private imageService: ImageService, private http: HttpClient,
     private dialog: MatDialog, private fb: FormBuilder, private snackBar: MatSnackBar
-  ) 
+  )
   {
     this.imageEditForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]], // No validation
@@ -78,7 +80,7 @@ export class ImageComponent implements OnInit {
     }
 
     this.imageService.getImageList(this.pageIndex, this.pageSize).subscribe(
-        (response: any) => { // Type the response appropriately
+        (response: any) => {
             this.productImages = response.content;
             this.totalCount = response.totalElements;
         },
@@ -99,39 +101,55 @@ export class ImageComponent implements OnInit {
     }
   }
 
-  public onAddNewImage(imageForm: NgForm): void {
-    const formData = this.imageService.postUserData(imageForm.value, this.location);
-    this.imageService.addImage(formData).subscribe(
-      (response: MessageResponse) => { // Correct type: MessageResponse
-          this.snackBar.open(response.message, 'Close', { duration: 3000 });
-          console.log("Image operation successful:", response.message);
-          this.loadImages();
-          imageForm.resetForm();
-      },
-      (error: HttpErrorResponse) => {
-          let errorMessage = "An error occurred.";
-  
-          if (error.error instanceof Object && error.error.message) {
-            errorMessage = error.error.message;
-          } else if (typeof error.error === 'string') {
-            errorMessage = error.error;
-          }
-  
-          this.snackBar.open(errorMessage, 'Close', { duration: 5000, panelClass: ['error-snackbar'] });
-      }
-  );
+  public async onAddNewImage(imageForm: NgForm): Promise<void> {
+    try {
+      const formData = this.imageService.postUserData(imageForm.value, this.location); // Assuming 'this.location' contains the files
 
-    // this.subscriptions.push(
-    //   this.imageService.addImage(formData).subscribe(
-    //     ((response: ProductImage) => {
-    //       if (!!response) {
-    //         this.snackBar.open('Image saved', 'Close',{duration: 3000,
-    //         });
-    //         console.log("Created Product image ");
-    //       }
-    //       this.loadImages();
-    //     }),
-    //   ));
+      const response: MessageResponse = await firstValueFrom(this.imageService.addImage(formData));
+
+      this.snackBar.open(response.message, 'Close', { duration: 3000 });
+      this.loadImages();
+      imageForm.resetForm();
+    } catch (error) {
+      let errorMessage = "An error occurred.";
+
+      if (error instanceof HttpErrorResponse) {
+        if (error.error instanceof Object && error.error.message) {
+          errorMessage = error.error.message;
+        } else if (typeof error.error === 'string') {
+          errorMessage = error.error;
+        }
+      } else {
+        errorMessage = "A network or unexpected error occurred";
+        console.error("An unexpected error has occurred:", error);
+      }
+
+      this.snackBar.open(errorMessage, 'Close', { duration: 5000, panelClass: ['error-snackbar'] });
+      console.error("Image upload failed:", error);
+    }
+  }
+
+  public onAddNewImage1(imageForm: NgForm): void {
+    const formData = this.imageService.postUserData(imageForm.value, this.location);
+    this.imageService.addImage(formData).subscribe({
+      next: (response: MessageResponse) => {
+        this.snackBar.open(response.message, 'Close', { duration: 3000 });
+        console.log('Image operation successful:', response.message);
+        this.loadImages();
+        imageForm.resetForm();
+      },
+      error: (error: HttpErrorResponse) => {
+        let errorMessage = 'An error occurred.';
+
+        if (error.error instanceof Object && error.error.message) {
+          errorMessage = error.error.message;
+        } else if (typeof error.error === 'string') {
+          errorMessage = error.error;
+        }
+
+        this.snackBar.open(errorMessage, 'Close', { duration: 5000, panelClass: ['error-snackbar'] });
+      },
+    });
   }
 
   openEditModal(image: ProductImage) {
@@ -142,13 +160,12 @@ export class ImageComponent implements OnInit {
       this.imageEditForm.patchValue({
         name: this.selectedImage.name,
         location: this.selectedImage.location,
-        // ... patch other form controls
       });
 
       // Subscribe to value changes for live updates
       this.imageEditForm.get('name')?.valueChanges.subscribe(value => {
         if (this.selectedImage) {
-          this.selectedImage.name = value; // Update selectedImage directly
+          this.selectedImage.name = value;
         }
       });
 
@@ -187,7 +204,6 @@ updateSelectedImage() {
         this.selectedImage.id,
         this.imageEditForm.value.name,
         this.imageEditForm.value.location
-        // ... other updated properties
       );
 
       this.productImages[index] = updatedImage; // Update the array with the new object
@@ -223,10 +239,6 @@ delete(productImage: ProductImage) {
 }
 
 deleteImage(id: number) {
-  if (!id) {
-    console.error("Product image ID is missing.");
-    return;
-  }
 
   this.imageService.delete(id).pipe(takeUntil(this.destroy$)).subscribe({
     next: (response) => {

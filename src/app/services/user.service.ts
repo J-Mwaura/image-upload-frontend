@@ -21,11 +21,12 @@ export class UserService {
 
   getUsers(): Observable<User[]> {
     return this.http.get<User[]>(`${this.host}/user`).pipe(
-      tap(users => console.log('Fetched users')), // Optional: Log fetched users
-      catchError(this.handleError<User[]>('getUsers', [])) // Handle errors
+      tap(users => console.log('Fetched users')),
+      catchError(this.handleError<User[]>('getUsers', []))
     );
   }
-  handleError<T>(arg0: string, arg1: never[]): (err: any, caught: Observable<User[]>) => import("rxjs").ObservableInput<any> {
+  handleError<T>(arg0: string, arg1: never[]): (err: any, caught: Observable<User[]>) =>
+    import("rxjs").ObservableInput<any> {
     throw new Error('Method not implemented.');
   }
 

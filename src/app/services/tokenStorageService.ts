@@ -2,12 +2,11 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs'; // Import throwError
 import { User } from '../model/user';
 import { JwtResponse } from '../model/JwtResponse ';
-import { JwtHelperService } from '@auth0/angular-jwt'; 
+import { JwtHelperService } from '@auth0/angular-jwt';
 
-interface JwtPayload {  // Define the interface here
-    'authz.roles'?: string[];
-    // ... other claims (e.g., sub, iat, exp)
-  }
+// interface JwtPayload {
+//     'authz.roles'?: string[];
+//   }
 
 const TOKEN_KEY = 'auth-token';
 const USER_KEY = 'auth-user';
@@ -25,7 +24,7 @@ export class TokenStorageService {
     const token = this.getToken();
     if (token) {
       try {
-        return this.jwtHelper.isTokenExpired(token); // Use jwtHelper to check expiry
+        return this.jwtHelper.isTokenExpired(token);
       } catch (error) {
         console.error("Error decoding or checking token expiry:", error);
         return true; // Treat as expired in case of error
@@ -35,27 +34,12 @@ export class TokenStorageService {
   }
 
     signOut(): void {
-        localStorage.clear(); // Use localStorage consistently
+        localStorage.clear();
     }
 
     getToken(): string | null { // Return null if no token
         return localStorage.getItem(TOKEN_KEY); // Use localStorage
     }
-
-    // getUser(): Observable<User | null> {
-    //     const userJson = localStorage.getItem(USER_KEY); // Use localStorage
-    //     if (userJson) {
-    //       try {
-    //         const user = JSON.parse(userJson);
-    //         return of(user);
-    //       } catch (error) {
-    //         console.error("Error parsing user data:", error);
-    //         return of(null); 
-    //       }
-    //     } else {
-    //       return of(null);
-    //     }
-    // }
 
     getUser(): Observable<User | null> {
         const userJson = localStorage.getItem(USER_KEY);
@@ -67,24 +51,24 @@ export class TokenStorageService {
             // for (const role of user.roles) {
             //     console.log("user by dev: " +role.roleName);
             //   }
-      
+
             const roleNamesFromUserObject = user.roles.map((role: { roleName: any; }) => role.roleName);
-      
+
             // 2. Extract JWT:
             const authToken = user[TOKEN_KEY];
-    
+
             if (authToken) {
               // 3. Decode JWT:
               const decodedToken = jwt_decode(authToken);
-              const rolesFromToken = decodedToken!['authz.roles'];             
-      
-              // 4. Update user object with roles from token OR from the original object:
-              user.roles = rolesFromToken || roleNamesFromUserObject; 
-      
+              const rolesFromToken = decodedToken!['authz.roles'];
+
+              // 4. Update user object with roles from token.
+              user.roles = rolesFromToken || roleNamesFromUserObject;
+
             } else {
-              user.roles = roleNamesFromUserObject; 
+              user.roles = roleNamesFromUserObject;
             }
-      
+
             return of(user);
           } catch (error) {
             console.error("Error parsing user data or JWT:", error);
@@ -98,7 +82,7 @@ export class TokenStorageService {
     saveToken(token: string): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             try {
-                localStorage.setItem(TOKEN_KEY, token); 
+                localStorage.setItem(TOKEN_KEY, token);
                 resolve();
             } catch (error) {
                 reject(error);
@@ -109,7 +93,7 @@ export class TokenStorageService {
     saveUser(user: User): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             try {
-                localStorage.setItem(USER_KEY, JSON.stringify(user)); 
+                localStorage.setItem(USER_KEY, JSON.stringify(user));
                 resolve();
             } catch (error) {
                 reject(error);

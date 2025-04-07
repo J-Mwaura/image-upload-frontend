@@ -36,9 +36,9 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
                 const refreshToken = tokenService.getRefreshToken();
 
                 if (refreshToken) {
-                    return authService.refreshToken(refreshToken).pipe( // Call refresh token API
-                        switchMap((newToken: any) => { // Use switchMap to chain observables
-                            tokenService.saveToken(newToken.accessToken); // Save the new token
+                    return authService.refreshToken(refreshToken).pipe(
+                        switchMap((newToken: any) => {
+                            tokenService.saveToken(newToken.accessToken);
                             authReq = authReq.clone({ // Clone the original request with the new token
                                 withCredentials: true,
                                 setHeaders: {
@@ -47,23 +47,25 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
                             });
                             return next(authReq); // Retry the request
                         }),
-                        catchError((refreshError) => { // Handle refresh token errors
+                        catchError((refreshError) => {
                             authService.updateLoginStatus(false);
                             tokenService.signOut();
-                            router.navigate(['/login']);
-                            snackBar.open('Your session has expired. Please log in again.', 'Close', { duration: 5000 });
-                            return throwError(() => refreshError); // Throw refresh error
+                            router.navigate(['/login']).then(() => {
+                              snackBar.open('Your session has expired. Please log in again.', 'Close', { duration: 5000 });
+                            });
+                            return throwError(() => refreshError);
                         })
                     );
                 } else {
                     authService.updateLoginStatus(false);
                     tokenService.signOut();
-                    router.navigate(['/login']);
-                    snackBar.open('Your session has expired. Please log in again.', 'Close', { duration: 5000 });
-                    return throwError(() => error); // Throw original error
+                    router.navigate(['/login']).then(() => {
+                      snackBar.open('Your session has expired. Please log in again.', 'Close', { duration: 5000 });
+                    });
+                    return throwError(() => error);
                 }
             }
-            return throwError(() => error); // Re-throw other errors
+            return throwError(() => error);
         })
     );
 };

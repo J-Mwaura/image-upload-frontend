@@ -29,9 +29,8 @@ const ADMIN_ROLE = 'ADMIN';
     MatListModule,
     MatIconModule,
     AsyncPipe,
-    RouterLink, RouterLinkActive,
-    CommonModule
-]
+    RouterLink, CommonModule, RouterLinkActive
+  ]
 })
 export class NavbarComponent implements OnInit {
   private breakpointObserver = inject(BreakpointObserver);
@@ -42,7 +41,7 @@ export class NavbarComponent implements OnInit {
       private destroy$ = new Subject<void>();
       user: User | null = null;
 
-  constructor(private tokenStorageService: TokenStorageService, private authService: AuthService, private router: Router) { 
+  constructor(private tokenStorageService: TokenStorageService, private authService: AuthService, private router: Router) {
           this.isLoggedIn$ = new BehaviorSubject<boolean>(!!this.authService.isLoggedIn$); // Initialize with current status
       }
 
@@ -50,7 +49,7 @@ export class NavbarComponent implements OnInit {
               const initialLoginStatus = !!this.tokenStorageService.getToken();
               console.log("token is: " +initialLoginStatus);
               this.isLoggedIn$.next(initialLoginStatus);
-      
+
               this.isLoggedIn$.pipe(takeUntil(this.destroy$)).subscribe(isLoggedIn => {
                   if (isLoggedIn) {
                       this.initializeUserObservables();
@@ -82,30 +81,30 @@ export class NavbarComponent implements OnInit {
                       }
                   });
               }
-          
+
               private resetUserStatus() {
                   this.showAdminBoard$ = of(false); // Correct assignment
                   this.showUserBoard$ = of(false); // Correct assignment
                   this.username$ = of(null); // Correct assignment
                   this.user = null;
               }
-          
+
               logout(): void {
                   this.tokenStorageService.signOut();
                   this.isLoggedIn$.next(false);
                   this.router.navigate(['/login']);
                   this.resetUserStatus();
               }
-          
+
               ngOnDestroy(): void {
                   this.destroy$.next();
                   this.destroy$.complete();
               }
-          
+
               hasAdminAccess(): boolean {
                   return !!this.user?.roles?.includes(ADMIN_ROLE);
               }
-          
+
               hasUserAccess(): boolean {
                   return !!this.user?.roles?.includes(USER_ROLE) || !!this.user?.roles?.includes(ADMIN_ROLE);
               }

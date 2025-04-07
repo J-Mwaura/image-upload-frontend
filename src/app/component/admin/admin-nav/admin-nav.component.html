@@ -1,7 +1,7 @@
 <mat-sidenav-container class="sidenav-container">
     <mat-sidenav #drawer mode="push" mode="over" class="sidenav" fixedInViewport
         [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
-        
+
         [opened]="(isHandset$ | async) === false">
       <mat-toolbar>
         <button type="button" aria-label="Toggle sidenav" mat-icon-button (click)="drawer.toggle()">

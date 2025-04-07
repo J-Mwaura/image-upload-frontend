@@ -4,7 +4,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 * {
 	box-sizing: border-box;
 	margin: 0;
-	padding: 0;	
+	padding: 0;
 	font-family: Raleway, sans-serif;
 }
 
@@ -27,3 +27,12 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     color: #000;
 }
 /* CSS fro mat snackbar */
+.error-snackbar {
+  color: white;
+  --mdc-snackbar-container-color: rgb(244, 106, 108) !important;
+}
+
+.success-snackbar {
+  color: white;
+  --mdc-snackbar-container-color: rgb(143, 248, 143) !important;
+}
