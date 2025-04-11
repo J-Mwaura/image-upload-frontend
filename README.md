@@ -14,6 +14,9 @@
 
 [Serving app on public domain](#serving-app-on-public-domain)
 
+[Enhancement](#enhancement)
+
+
 # Getting started
 
 Pay attention to the format of this README file.
@@ -73,4 +76,10 @@ On netlify go to 'Add new site' and click on 'Import an existing project'
 Import your project from a Git repository.
 
 If all the above steps have been met, the app should open on the browser.
+
+# Enhancement
+
+Added component ResponsiveLayoutComponent service to detect media query matches, 
+allowing you to adapt your application's behavior based on screen size or other media features.
+Not sure whether it works 
 

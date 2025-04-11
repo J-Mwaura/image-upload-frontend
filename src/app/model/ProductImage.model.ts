@@ -1,15 +1,15 @@
 export class ProductImage {
     id: number | undefined;
     name: string | undefined;
-    location: string;
+    url: string;
 
     constructor(
-        id?: number, 
+        id?: number,
         name?: string,
-        location: string = '' 
+        url: string = ''
     ) {
         this.id = id;
         this.name = name;
-        this.location = location;
+        this.url = url;
     }
 }

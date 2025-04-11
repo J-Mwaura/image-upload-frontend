@@ -3,15 +3,15 @@
     display: flex;
     background-color: aqua;
   }
-  
+
   .sidenav {
     width: 200px;
   }
-  
+
   .sidenav .mat-toolbar {
     background: inherit;
   }
-  
+
   .mat-toolbar.mat-primary {
     position: sticky;
     top: 0;
@@ -22,11 +22,25 @@
     width: 200px;
     background-color: aquamarine;
     margin-top: 118px;
-    
+
   }
   #drawer{
     margin-top: 200px;
   }
+
+.sticky-top-nav {
+  position: sticky;
+  top: 0;
+  z-index: 1000; /* Ensure it stays above other content */
+}
+
+/*.sticky-below-nav {*/
+/*  position: sticky;*/
+/*  top: 64px; !* Adjust this value based on your toolbar's height *!*/
+/*  z-index: 10; !* Ensure it stays above other content if needed *!*/
+/*  background-color: white; !* Optional: Add a background color *!*/
+/*  !* Add any other styling you want for the sticky element *!*/
+/*}*/
 
   /* Media query for larger screens */
 @media (min-width: 768px) { /* Adjust breakpoint as needed - 768px is a common tablet/desktop breakpoint */

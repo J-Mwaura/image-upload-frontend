@@ -47,13 +47,13 @@
           </td>
         </ng-container> -->
 
-        <ng-container matColumnDef="location">
+        <ng-container matColumnDef="url">
           <th mat-header-cell *matHeaderCellDef>IMAGE</th>
           <td mat-cell *matCellDef="let productImage">
             <img
               height="100"
               width="100"
-              src="{{ productImage?.location }}"
+              ngSrc="{{ productImage?.url }}"
               class="rounded-circle img-fluid img-thumbnail"
               alt=""
             />

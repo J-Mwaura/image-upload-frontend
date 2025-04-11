@@ -11,6 +11,8 @@
       <mat-nav-list (click)="drawer.toggle()">
         <a [routerLink]="['register']">Register</a>
         <a routerLink="images" routerLinkActive="active" mat-list-item class="p-2 text-dark">Images</a>
+<!--        <a routerLink="categories" routerLinkActive="active" mat-list-item class="p-2 text-dark">Categories</a>-->
+        <a routerLink="category" routerLinkActive="active" mat-list-item class="p-2 text-dark">Category Edit</a>
         <a routerLink="user" routerLinkActive="active" mat-list-item class="p-2 text-dark">User area</a>
       </mat-nav-list>
     </mat-sidenav>
@@ -30,6 +32,6 @@
     </mat-sidenav-content>
   </mat-sidenav-container>
 
-  <div>
-    <router-outlet></router-outlet>
-  </div>
+<div class="admin-content">
+  <router-outlet></router-outlet>
+</div>

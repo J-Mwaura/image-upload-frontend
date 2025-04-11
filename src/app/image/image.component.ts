@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import {CommonModule, NgOptimizedImage} from '@angular/common';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit, ViewChild, ElementRef  } from '@angular/core';
 import {NgForm,
@@ -8,26 +8,26 @@ import {NgForm,
 } from '@angular/forms';
 import { ProductImage } from '../model/ProductImage.model';
 import { ImageService } from '../services/image.service';
-import { BehaviorSubject, Subject, Subscription, takeUntil } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { MatTableModule } from '@angular/material/table';
-import { environment } from '../../environments/environment';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import {
   MatFormFieldModule,
 } from '@angular/material/form-field';
 import { MatInputModule} from '@angular/material/input';
-import { MatDialog, MatDialogConfig, MatDialogModule } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 //eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { ConfirmDeleteDialogComponent } from '../component/dialog/confirm-delete-dialog-component/confirm-delete-dialog-component.component';
 import { MessageResponse } from '../model/MessageResponse';
-import { firstValueFrom } from 'rxjs'; // Import firstValueFrom
+import { firstValueFrom } from 'rxjs';
+import {MatButton, MatIconButton} from '@angular/material/button';
 
 @Component({
   selector: 'app-image',
   imports: [ReactiveFormsModule, FormsModule, CommonModule, MatTableModule, MatIconModule, MatPaginatorModule,
-    MatFormFieldModule, MatInputModule, MatDialogModule, ConfirmDeleteDialogComponent],
+    MatFormFieldModule, MatInputModule, MatDialogModule, NgOptimizedImage, MatIconButton, MatButton],
   standalone: true,
 
   templateUrl: './image.component.html',
@@ -37,27 +37,16 @@ import { firstValueFrom } from 'rxjs'; // Import firstValueFrom
 export class ImageComponent implements OnInit {
   selectedImage: ProductImage | null = null;
   imageEditForm: FormGroup;
-  private host = environment.apiUrl;
-  displayedColumns: string[] = ['name', 'location', 'id', 'action', 'edit'];
-  private titleSubject = new BehaviorSubject<string>('Images');
-  public titleAction$ = this.titleSubject.asObservable();
-
-  private subscriptions: Subscription[] = [];
+  displayedColumns: string[] = ['name', 'url', 'id', 'action', 'edit'];
   private destroy$ = new Subject<void>();
-  public term!: string;
   productImages: ProductImage[] = []
   totalCount: number = 0;
   pageIndex: number = 0;
   pageSize: number = 10;
   page: number = 0;
   size: number = 4;
-  public imageName!: string;
   public fileName!: string;
-  public location!: File[];
-  public productImage  = new ProductImage();
-
-
-  dialogConfig = new MatDialogConfig();
+  public url!: File[];
   @ViewChild('editModal') editModal!: ElementRef;
 
   constructor(private imageService: ImageService, private http: HttpClient,
@@ -94,17 +83,16 @@ export class ImageComponent implements OnInit {
   onChange(event: any):void {
     const files: FileList = event.target.files;
     if (event.target.files) {
-      const location  = event.target.files;
+      const url  = event.target.files;
       const fileName = event.target.files.name;
-      this.location = location;
+      this.url = url;
       this.fileName =  fileName;
     }
   }
 
   public async onAddNewImage(imageForm: NgForm): Promise<void> {
     try {
-      const formData = this.imageService.postUserData(imageForm.value, this.location); // Assuming 'this.location' contains the files
-
+      const formData = this.imageService.postUserData(imageForm.value, this.url);
       const response: MessageResponse = await firstValueFrom(this.imageService.addImage(formData));
 
       this.snackBar.open(response.message, 'Close', { duration: 3000 });
@@ -129,29 +117,6 @@ export class ImageComponent implements OnInit {
     }
   }
 
-  public onAddNewImage1(imageForm: NgForm): void {
-    const formData = this.imageService.postUserData(imageForm.value, this.location);
-    this.imageService.addImage(formData).subscribe({
-      next: (response: MessageResponse) => {
-        this.snackBar.open(response.message, 'Close', { duration: 3000 });
-        console.log('Image operation successful:', response.message);
-        this.loadImages();
-        imageForm.resetForm();
-      },
-      error: (error: HttpErrorResponse) => {
-        let errorMessage = 'An error occurred.';
-
-        if (error.error instanceof Object && error.error.message) {
-          errorMessage = error.error.message;
-        } else if (typeof error.error === 'string') {
-          errorMessage = error.error;
-        }
-
-        this.snackBar.open(errorMessage, 'Close', { duration: 5000, panelClass: ['error-snackbar'] });
-      },
-    });
-  }
-
   openEditModal(image: ProductImage) {
     const index = this.productImages.findIndex(img => img.id === image.id);
     if (index > -1) {
@@ -159,7 +124,7 @@ export class ImageComponent implements OnInit {
 
       this.imageEditForm.patchValue({
         name: this.selectedImage.name,
-        location: this.selectedImage.location,
+        url: this.selectedImage.url,
       });
 
       // Subscribe to value changes for live updates
@@ -203,7 +168,7 @@ updateSelectedImage() {
       const updatedImage = new ProductImage(
         this.selectedImage.id,
         this.imageEditForm.value.name,
-        this.imageEditForm.value.location
+        this.imageEditForm.value.url
       );
 
       this.productImages[index] = updatedImage; // Update the array with the new object
@@ -228,7 +193,8 @@ updateSelectedImage() {
 
 delete(productImage: ProductImage) {
   const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent, {
-    data: { imageName: productImage.name }
+    width: '400px',
+    data: { itemName: productImage.name }
   });
 
   dialogRef.afterClosed().subscribe(result => {

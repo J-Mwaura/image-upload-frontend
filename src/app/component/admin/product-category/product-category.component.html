@@ -1,0 +1,74 @@
+<div class="container">
+  <mat-card>
+    <mat-card-title>Categories</mat-card-title>
+    <mat-card-content>
+      <div *ngIf="loading">
+        <mat-spinner></mat-spinner>
+        <p>Loading product categories...</p>
+      </div>
+
+      <div *ngIf="errorMessage" class="error">
+        {{ errorMessage }}
+      </div>
+
+      <mat-card-title>
+        Categories
+        <button mat-raised-button color="accent" (click)="openCreateCategoryDialog()">
+          Add New Category
+        </button>
+      </mat-card-title>
+
+      <div *ngIf="!loading && !errorMessage && productCategories.length > 0">
+        <table mat-table [dataSource]="productCategories" class="mat-elevation-z1">
+
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef>ID</th>
+            <td mat-cell *matCellDef="let category">{{ category.id }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>Name</th>
+            <td mat-cell *matCellDef="let category">{{ category.name }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="url">
+            <th mat-header-cell *matHeaderCellDef>Image</th>
+            <td mat-cell *matCellDef="let category">
+              <img *ngIf="category.url" ngSrc="{{category.url}}" alt="{{ category.name }} image" width="50" height="50">
+              <span *ngIf="!category.url">No Image</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let category">
+              <button mat-icon-button color="primary" aria-label="Edit" (click)="openEditCategoryDialog(category)">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button
+                class="btn btn-danger" mat-icon-button color="warn" aria-label="Delete" (click)="delete(category)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+        <mat-paginator
+          [length]="totalCount"
+          [pageSize]="pageSize"
+          [pageIndex]="pageIndex"
+          [pageSizeOptions]="[5, 10, 25, 100]"
+          (page)="handlePageEvent($event)"
+          aria-label="Select page">
+        </mat-paginator>
+      </div>
+
+      <div *ngIf="!loading && !errorMessage && productCategories.length === 0">
+        <p>No product categories found.</p>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

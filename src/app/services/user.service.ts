@@ -20,7 +20,7 @@ export class UserService {
   constructor(private http: HttpClient) { }
 
   getUsers(): Observable<User[]> {
-    return this.http.get<User[]>(`${this.host}/user`).pipe(
+    return this.http.get<User[]>(`${this.host}user`).pipe(
       tap(users => console.log('Fetched users')),
       catchError(this.handleError<User[]>('getUsers', []))
     );
@@ -29,7 +29,6 @@ export class UserService {
     import("rxjs").ObservableInput<any> {
     throw new Error('Method not implemented.');
   }
-
 
   getPublicContent(): Observable<any> {
     return this.http.get(`${this.baseUrl}home`, { responseType: 'text' });

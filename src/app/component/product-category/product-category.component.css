@@ -1,0 +1,60 @@
+.container {
+  text-align: center; /* Centers inline and inline-block children */
+}
+
+.jumbotron {
+  /* Your jumbotron styles */
+}
+
+app-product-category {
+  display: block; /* Ensure it's a block-level element to take full width */
+  margin: 0 auto; /* Center block-level elements horizontally */
+}
+
+div > p { /* Targeting the <p> element */
+  display: inline-block; /* Allows it to be centered by text-align */
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Adjust minmax width as needed */
+  gap: 16px; /* Adjust the gap between cards */
+  margin-top: 16px; /* Add some top margin */
+}
+
+.category-card {
+  /* You can add additional styling for the individual cards here */
+}
+
+.category-card mat-card-title {
+  margin-bottom: 8px;
+}
+
+.category-card mat-card-content {
+  margin-top: 8px;
+}
+
+.category-card mat-card-actions {
+  margin-top: 16px;
+}
+
+/* Optional: Style the container for better layout */
+.container {
+  padding: 16px;
+}
+
+.error {
+  color: red;
+  margin-top: 16px;
+}
+
+mat-spinner {
+  margin: 20px auto;
+}
+
+.category-card .mat-card-image {
+  width: 100px; /* Or any desired width */
+  height: 100px; /* Or any desired height */
+  object-fit: cover; /* Ensures the image covers the area without distortion (may crop) */
+  /* object-fit: contain; /* Ensures the entire image is visible within the area (may have empty space) */
+}

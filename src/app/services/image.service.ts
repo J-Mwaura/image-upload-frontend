@@ -31,7 +31,7 @@ export class ImageService {
     let params = new HttpParams()
             .set('page', page.toString())
             .set('size', size.toString());
-    return this.http.get<ProductImage[]>(`${this.host}api/images/allImages`, { params }).pipe(
+    return this.http.get<ProductImage[]>(`${this.host}api/file/allFiles`, { params }).pipe(
       catchError(this.handleError)
     );
   }
@@ -41,15 +41,15 @@ export class ImageService {
       return throwError(() => new Error("Error deleting or updating image. Please try again later.")); // Return an observable with the error
     }
 
-updateImage(productImage: ProductImage): Observable<any> {
-  const url = `${this.host}api/images/${productImage.id}`;
-  return this.http.put(url, productImage).pipe(
-      catchError(this.handleError)
-  );
-}
+// updateImage(productImage: ProductImage): Observable<any> {
+//   const url = `${this.host}api/file/${productImage.id}`;
+//   return this.http.put(url, productImage).pipe(
+//       catchError(this.handleError)
+//   );
+// }
 
 updateImagePartial(id: number, productImage: Partial<ProductImage>): Observable<any> { // For PARTIAL updates (PATCH)
-  const url = `${this.host}api/images/${id}`;
+  const url = `${this.host}api/file/${id}`;
   return this.http.put(url, productImage).pipe(
       catchError(this.handleError)
   );
@@ -60,7 +60,7 @@ delete(productImageId: number): Observable<any> {
       return throwError(() => new Error("Product image ID cannot be undefined or null."));
   }
 
-  const url = `${this.host}api/images/${productImageId}`;
+  const url = `${this.host}api/file/${productImageId}`;
   return this.http.delete(url).pipe(
       tap((response: any) => {
           console.log(`Deleted image with id ${productImageId}:`, response);

@@ -1,3 +1,16 @@
-.role-navDiv{
-    height: 20px;
+.container {
+  display: flex; /* Or grid, depending on your layout needs */
+  flex-direction: column; /* Stack navigation and content vertically */
+}
+
+.main-nav {
+  /* Style your navigation bar */
+  background-color: #f8f9fa;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+}
+
+.main-content {
+  /* Style your main content area */
+  padding: 20px;
 }
