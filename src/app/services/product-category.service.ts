@@ -16,7 +16,10 @@ export class ProductCategoryService {
   constructor(private http: HttpClient) { }
 
   saveProductCategory(productCategoryDto: ProductCategory): Observable<ApiResponse<ProductCategory>> {
-    return this.http.post<ApiResponse<ProductCategory>>(`${this.host}api/category/saveCategory`, productCategoryDto);
+    return this.http.post<ApiResponse<ProductCategory>>(
+      `${this.host}api/category/saveCategory`,
+      productCategoryDto
+    );
   }
 
   getProductCategories(page: number, size: number): Observable<ApiResponse<ProductCategory[]>> {
@@ -46,7 +49,7 @@ export class ProductCategoryService {
     return throwError(() => new Error(errorMessage));
   }
 
-  updateProductCategory(id: number, updatePayload: UpdateProductCategoryDTO): Observable<ApiResponse<ProductCategory>> {
+  updateProductCategory(id: number | null | undefined, updatePayload: UpdateProductCategoryDTO): Observable<ApiResponse<ProductCategory>> {
     return this.http.put<ApiResponse<ProductCategory>>(`${this.host}api/category/${id}`, updatePayload);
   }
 

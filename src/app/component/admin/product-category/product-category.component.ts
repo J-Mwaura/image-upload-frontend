@@ -16,18 +16,21 @@ import {
 } from '../../dialog/confirm-delete-dialog-component/confirm-delete-dialog-component.component';
 import {MatDialog,MatDialogModule} from '@angular/material/dialog';
 import {ProductCategoryFormComponent} from '../product-category-form/product-category-form.component';
+import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {MatError, MatFormField} from '@angular/material/form-field';
+import {MatInput} from '@angular/material/input';
+import {ProductImage} from '../../../model/ProductImage.model';
 
 @Component({
   selector: 'app-product-category',
   imports: [CommonModule, NgOptimizedImage, MatCardModule, MatProgressSpinner, MatTableModule,
-    MatPaginator, MatTable, MatIconModule, MatButtonModule, MatDialogModule],
+    MatPaginator, MatError, MatTable, MatIconModule, MatButtonModule, MatDialogModule, MatFormField, MatInput, ReactiveFormsModule],
   templateUrl: './product-category.component.html',
   styleUrl: `./product-category.component.css`,
   standalone: true,
 })
 export class AdminProductCategoryComponent implements OnInit {
 
-  private host = environment.apiUrl;
   displayedColumns: string[] = ['id', 'name', 'url', 'actions'];
 
   totalCount: number = 0;
@@ -38,9 +41,23 @@ export class AdminProductCategoryComponent implements OnInit {
   productCategories: ProductCategory[] = [];
   loading = false;
   errorMessage = '';
+  editingCategoryId: number | null | undefined = null;
+
+  categoryEditForm: FormGroup<{
+    name: FormControl<string | null>
+  }>;
 
   constructor(private productCategoryService: ProductCategoryService, private dialog: MatDialog,
-              private snackBar: MatSnackBar) {
+              private snackBar: MatSnackBar, private fb: FormBuilder
+  )
+  {
+    this.categoryEditForm = this.fb.group({
+      name: new FormControl<string | null>('', Validators.required)
+    });
+  }
+
+  get nameControl(): FormControl<string | null> {
+    return this.categoryEditForm.controls.name;
   }
 
   ngOnInit(): void {
@@ -162,17 +179,39 @@ export class AdminProductCategoryComponent implements OnInit {
     });
   }
 
-  openEditCategoryDialog(category: ProductCategory): void {
-    const dialogRef = this.dialog.open(ProductCategoryFormComponent, {
-      width: '500px',
-      data: category // Pass the category data for editing
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.loadProductCategories(); // Refresh the list after editing
+  openEditCategoryDialog(category: ProductCategory) {
+    this.editingCategoryId = category.id;
+    this.categoryEditForm.patchValue({ name: category.name });
+    this.categoryEditForm.get('name')?.valueChanges.subscribe(value => {
+      const index = this.productCategories.findIndex(c => c.id === this.editingCategoryId);
+      if (index > -1) {
+        this.productCategories[index].name = value;
       }
     });
+  }
+
+  saveCategoryEdit(category: ProductCategory) {
+    if (this.categoryEditForm.valid && this.editingCategoryId === category.id) {
+      const updateData: { name: string } = {
+        name: this.categoryEditForm.value.name || '' // Fallback for null
+      };
+      this.productCategoryService.updateProductCategory(category.id, updateData)
+        .subscribe({
+          next: (response) => {
+            this.snackBar.open('Category updated successfully', 'Close', { duration: 3000 });
+            this.editingCategoryId = null; // Exit edit mode
+            this.loadProductCategories(); // Reload the list
+          },
+          error: (error) => {
+            this.snackBar.open('Error updating category', 'Close', { duration: 3000 });
+          }
+        });
+    }
+  }
+
+  cancelCategoryEdit() {
+    this.editingCategoryId = null;
+    this.loadProductCategories(); // Reload to discard changes
   }
 
 }

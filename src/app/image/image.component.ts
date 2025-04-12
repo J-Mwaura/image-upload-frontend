@@ -35,13 +35,14 @@ import {MatButton, MatIconButton} from '@angular/material/button';
 })
 
 export class ImageComponent implements OnInit {
+  productImage: ProductImage = new ProductImage();
   selectedImage: ProductImage | null = null;
   imageEditForm: FormGroup;
   displayedColumns: string[] = ['name', 'url', 'id', 'action', 'edit'];
   private destroy$ = new Subject<void>();
   productImages: ProductImage[] = []
   totalCount: number = 0;
-  pageIndex: number = 0;
+  pageIndex: number = 1;
   pageSize: number = 10;
   page: number = 0;
   size: number = 4;
@@ -92,12 +93,19 @@ export class ImageComponent implements OnInit {
 
   public async onAddNewImage(imageForm: NgForm): Promise<void> {
     try {
-      const formData = this.imageService.postUserData(imageForm.value, this.url);
+      const formData = this.imageService.postUserData(
+        this.productImage,
+        this.url,
+        this.productImage.entityType
+      );
+
       const response: MessageResponse = await firstValueFrom(this.imageService.addImage(formData));
 
       this.snackBar.open(response.message, 'Close', { duration: 3000 });
       this.loadImages();
       imageForm.resetForm();
+      this.url = [];
+      this.productImage = new ProductImage(); // Reset the model
     } catch (error) {
       let errorMessage = "An error occurred.";
 

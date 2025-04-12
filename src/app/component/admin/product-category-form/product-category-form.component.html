@@ -3,17 +3,54 @@
     <mat-form-field appearance="outline">
       <mat-label>Category Name</mat-label>
       <input matInput placeholder="Enter category name" formControlName="name" required>
-      <mat-error *ngIf="categoryForm.controls['name']?.invalid && (categoryForm.controls['name']?.dirty || categoryForm.controls['name']?.touched)">
+      <mat-error
+        *ngIf="categoryForm.controls['name']?.invalid && (categoryForm.controls['name']?.dirty || categoryForm.controls['name']?.touched)">
         Category name is required.
       </mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="outline">
-      <mat-label>Image ID (Optional)</mat-label>
-      <input matInput type="number" placeholder="Enter Image ID" formControlName="imageId">
+      <mat-label>Filter Images</mat-label>
+      <input matInput placeholder="Filter by name" [(ngModel)]="filterTerm" (input)="onFilterInputChange()">
     </mat-form-field>
 
-    <mat-checkbox formControlName="removeImage" *ngIf="isEditMode">Remove Image</mat-checkbox>
+    <div class="image-selection" *ngIf="allCategoryImages && allCategoryImages.length > 0">
+      <h3>Choose an Image</h3>
+      <div class="image-grid">
+        <div *ngFor="let image of allCategoryImages" class="image-item"
+             (click)="categoryForm.controls['imageId'].setValue(image.id)"
+             [class.selected]="categoryForm.controls['imageId'].value === image.id">
+          <img
+            [ngSrc]="image.url"
+            [alt]="image.name || 'Image ' + image.id"
+            width="50"
+            height="50"
+          >
+          <mat-radio-button [value]="image.id" [checked]="categoryForm.controls['imageId'].value === image.id">
+            {{ image.name || 'Image ' + image.id }}
+          </mat-radio-button>
+        </div>
+      </div>
+    </div>
+
+    <mat-paginator
+      [length]="totalImageCount"
+      [pageSize]="pageSize"
+      [pageIndex]="currentPage - 1"
+      [pageSizeOptions]="[4, 8, 20, 50]"
+      (page)="onPageChange($event)"
+      showFirstLastButtons
+      *ngIf="totalImageCount > 0">
+    </mat-paginator>
+
+    <div *ngIf="allCategoryImages && allCategoryImages.length === 0 && !isLoadingImages">
+      <p>No images available for the current filter.</p>
+    </div>
+
+    <div *ngIf="isLoadingImages">
+      <mat-spinner diameter="30"></mat-spinner>
+      <p>Loading images...</p>
+    </div>
 
     <div class="actions">
       <button mat-raised-button color="primary" type="submit" [disabled]="loading || categoryForm.invalid">
@@ -21,7 +58,9 @@
         <span *ngIf="!loading">{{ isEditMode ? 'Update Category' : 'Save Category' }}</span>
       </button>
       <button mat-button type="button" (click)="onCancel()">Cancel</button>
-      <button mat-button type="button" *ngIf="isEditMode && data?.imageId" (click)="onRemoveImage()">Remove Current Image</button>
+      <button mat-button type="button" *ngIf="isEditMode && data?.imageId && !categoryForm.controls['imageId'].value"
+              (click)="onRemoveImage()">Remove Current Image
+      </button>
     </div>
 
     <div *ngIf="errorMessage" class="error">

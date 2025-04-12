@@ -1,32 +1,80 @@
-.container {
+/* In your product-category-form.component.scss or a global style sheet */
+
+mat-card-content {
+  padding: 16px; /* Ensure some padding around the content */
+  overflow-x: auto; /* Add horizontal scroll if content overflows (as a fallback) */
+}
+
+.image-selection {
+  margin-top: 16px;
+  h3 {
+    font-size: 1.1em;
+    margin-bottom: 8px;
+  }
+}
+
+.image-grid {
   display: flex;
-  justify-content: center;
-  margin-top: 20px;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-height: 300px; /* Your desired max height */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
-mat-card {
-  width: 500px;
-  max-width: 90%;
+.image-item {
+  display: flex;
+  flex-wrap: wrap;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+
+  img {
+    margin-bottom: 4px;
+  }
+
+  .mat-radio-button {
+    margin-top: 4px;
+  }
 }
 
+/* Adjust mat-form-field for smaller screens */
 mat-form-field {
-  width: 100%;
-  margin-bottom: 15px;
+  width: 100%; /* Make form fields take full width on smaller screens */
+  margin-bottom: 12px;
 }
 
+/* Adjust the actions area */
 .actions {
-  margin-top: 20px;
+  display: flex;
+  flex-direction: column; /* Stack buttons vertically on smaller screens */
+  gap: 8px;
+  margin-top: 16px;
+  width: 100%; /* Ensure buttons take full width */
+
+  button {
+    width: 100%; /* Make buttons full width */
+  }
 }
 
-.actions button {
-  margin-right: 10px;
-}
+/* Responsive adjustments using media queries */
+@media (min-width: 600px) {
+  .actions {
+    flex-direction: row; /* Display buttons horizontally on larger screens */
+    justify-content: flex-end; /* Align buttons to the right */
+    button {
+      width: auto; /* Allow buttons to size based on content */
+      margin-left: 8px;
+    }
+  }
 
-.actions button:last-child {
-  margin-right: 0;
-}
-
-.error {
-  color: red;
-  margin-top: 15px;
+  .image-grid {
+    display: flex;
+    flex-wrap: wrap; /* Keep wrap for smaller screens */
+    gap: 8px;
+    /* Set a maximum height for the grid */
+    max-height: 300px; /* Adjust this value as needed */
+    /* Add vertical scrollbar when content exceeds max-height */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* Enable smooth scrolling on iOS */
+  }
 }

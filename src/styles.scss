@@ -1,9 +1,38 @@
-//@use '@angular/material' as mat;
-//
-//$primary-palette: mat.define-palette(mat.$indigo-palette, 500);
-//$accent-palette: mat.define-palette(mat.$pink-palette, A200, A100, A400);
-//$warn-palette: mat.define-palette(mat.$red-palette, 500);
-//
-//$theme: mat.define-light-theme($primary-palette, $accent-palette, $warn-palette);
-//
-//@include mat.all-component-themes($theme);
+/* You can add global styles to this file, and also import other style files */
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Raleway, sans-serif;
+}
+
+/* CSS fro mat snackbar */
+.cdk-global-overlay-wrapper{
+  padding-top: 50px;
+  align-items:start !important;
+}
+
+.mat-mdc-snack-bar-handset, .mat-mdc-snack-bar-container, .mat-mdc-snack-bar-label{
+  font-size: large !important;
+}
+.cdk-overlay-pane .mat-mdc-simple-snack-bar {
+  top: 10px;
+  background-color: #cbf1cf;
+  color: rgb(10, 10, 10);
+}
+
+.mdc-button__label {
+  color: #000;
+}
+/* CSS fro mat snackbar */
+.error-snackbar {
+  color: white;
+  --mdc-snackbar-container-color: rgb(244, 106, 108) !important;
+}
+
+.success-snackbar {
+  color: white;
+  --mdc-snackbar-container-color: rgb(143, 248, 143) !important;
+}
