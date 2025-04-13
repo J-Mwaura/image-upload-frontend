@@ -106,13 +106,14 @@ export class ProductCategoryFormComponent implements OnInit {
     });
   }
 
-  onFilterInputChange(): void {
-    console.log('Filter term changed:', this.filterTerm);
-    console.log('this.filterTerm:', this.filterTerm); // Add this line
-    // Reset to the first page when the filter changes
+  onFilterInputChange(event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    console.log('Filter term changed:', value);
     this.currentPage = 1;
-    this.loadCategoryImages(this.currentPage, this.pageSize, this.filterTerm);
+    this.loadCategoryImages(this.currentPage, this.pageSize, value);
+    this.filterTerm = value;
   }
+
 
   onPageChange(event: PageEvent): void {
     this.currentPage = event.pageIndex + 1;
@@ -131,33 +132,18 @@ export class ProductCategoryFormComponent implements OnInit {
       const formData = this.categoryForm.value;
 
       if (this.isEditMode && this.data?.id) {
+        // Existing update logic (unchanged)
         const updatePayload: UpdateProductCategoryDTO = {};
-        if (formData.name !== this.data.name) {
-          updatePayload.name = formData.name;
-        }
-        if (formData.imageId !== this.data.imageId) {
-          updatePayload.imageId = formData.imageId;
-        }
-        if (formData.removeImage) {
-          updatePayload.removeImage = true;
-        }
+        if (formData.name !== this.data.name) updatePayload.name = formData.name;
+        if (formData.imageId !== this.data.imageId) updatePayload.imageId = formData.imageId;
+        if (formData.removeImage) updatePayload.removeImage = true;
 
         this.productCategoryService.updateProductCategory(this.data.id, updatePayload).subscribe({
           next: (response) => {
-            this.loading = false;
-            if (response.success) {
-              this.snackBar.open(`Category "${response.data?.name}" updated successfully.`, 'Close', {duration: 3000});
-              this.dialogRef.close(response.data);
-            } else {
-              this.errorMessage = `Error updating category: ${response.message}`;
-              this.snackBar.open(this.errorMessage, 'Close', {duration: 5000});
-            }
+            this.handleSuccessResponse(response, 'updated');
           },
           error: (error) => {
-            this.loading = false;
-            this.errorMessage = 'An unexpected error occurred during update.';
-            this.snackBar.open(this.errorMessage, 'Close', {duration: 5000});
-            console.error('Error updating product category:', error);
+            this.handleError(error, 'update');
           }
         });
       } else {
@@ -167,28 +153,56 @@ export class ProductCategoryFormComponent implements OnInit {
           name: formData.name,
           imageId: formData.imageId
         };
+
         this.productCategoryService.saveProductCategory(categoryToSave).subscribe({
           next: (response) => {
-            this.loading = false;
-            if (response.success) {
-              this.snackBar.open(`Category "${response.data?.name}" saved successfully.`, 'Close', {duration: 3000});
-              this.dialogRef.close(response.data);
-            } else {
-              this.errorMessage = `Error saving category: ${response.message}`;
-              this.snackBar.open(this.errorMessage, 'Close', {duration: 5000});
-            }
+            this.handleSuccessResponse(response, 'saved');
           },
           error: (error) => {
-            this.loading = false;
-            this.errorMessage = 'An unexpected error occurred during save.';
-            this.snackBar.open(this.errorMessage, 'Close', {duration: 5000});
-            console.error('Error saving product category:', error);
+            this.handleError(error, 'save');
           }
         });
       }
     } else {
       this.errorMessage = 'Please fill out the required fields.';
+      this.snackBar.open(this.errorMessage, 'Close', { duration: 5000 });
     }
+  }
+
+// Helper method for successful responses
+  private handleSuccessResponse(response: ApiResponse<ProductCategory>, action: string): void {
+    this.loading = false;
+    if (response.success) {
+      const message = `Category "${response.data?.name}" ${action} successfully.`;
+      this.snackBar.open(message, 'Close', { duration: 3000 });
+      this.dialogRef.close(response.data);
+    } else {
+      this.errorMessage = `Error ${action}ing category: ${response.message}`;
+      this.snackBar.open(this.errorMessage, 'Close', { duration: 5000 });
+    }
+  }
+
+// Helper method for error responses
+  private handleError(error: any, action: string): void {
+    this.loading = false;
+    let userFriendlyMessage = 'An unexpected error occurred.';
+
+    // Handle duplicate key violation (409 Conflict)
+    if (error.status === 409) {
+      userFriendlyMessage = 'This image is already assigned to another category. Please choose a different image.';
+    }
+    // Handle other API errors with messages
+    else if (error.error?.message) {
+      userFriendlyMessage = error.error.message;
+    }
+    // Handle generic HTTP errors
+    else if (error.status) {
+      userFriendlyMessage = `Server error (${error.status}): Please try again later.`;
+    }
+
+    this.errorMessage = `Failed to ${action} category: ${userFriendlyMessage}`;
+    this.snackBar.open(this.errorMessage, 'Close', { duration: 5000 });
+    console.error(`Error ${action}ing category:`, error);
   }
 
   onRemoveImage(): void {

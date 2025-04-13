@@ -11,7 +11,9 @@
 
     <mat-form-field appearance="outline">
       <mat-label>Filter Images</mat-label>
-      <input matInput placeholder="Filter by name" [(ngModel)]="filterTerm" (input)="onFilterInputChange()">
+      <input matInput placeholder="Filter by name"
+             [(ngModel)]="filterTerm"
+             (input)="onFilterInputChange($event)">
     </mat-form-field>
 
     <div class="image-selection" *ngIf="allCategoryImages && allCategoryImages.length > 0">
