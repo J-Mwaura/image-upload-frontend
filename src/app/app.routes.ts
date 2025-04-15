@@ -26,7 +26,6 @@ export const routes: Routes = [
 
       {
         path: 'user', component: BoardUserComponent, canActivate: [authGuard],
-        // children: [{path: 'categories', component: ProductCategoryComponent},]
       },
 
       {
@@ -42,26 +41,6 @@ export const routes: Routes = [
     ],
 
   },
-
-  // {
-  //   path: 'admin',
-  //   component: AdminAreaComponent, // The container component
-  //   canActivate: [authGuard, adminGuard],
-  //   children: [
-  //     {
-  //       path: '', // Default child route when /admin is accessed
-  //       component: AdminNavComponent,
-  //       children: [
-  //         { path: 'images', component: ImageComponent },
-  //         { path: 'register', component: RegisterComponent },
-  //         { path: 'user', component: BoardUserComponent },
-  //         { path: 'categories', component: ProductCategoryComponent },
-  //         { path: 'category', component: AdminProductCategoryComponent },
-  //         { path: '', redirectTo: 'images', pathMatch: 'full' }, // Default nav child
-  //       ]
-  //     }
-  //   ]
-  // },
 
   {path: '**', redirectTo: '/login'},
 ];

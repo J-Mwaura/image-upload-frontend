@@ -23,6 +23,7 @@ import { ConfirmDeleteDialogComponent } from '../component/dialog/confirm-delete
 import { MessageResponse } from '../model/MessageResponse';
 import { firstValueFrom } from 'rxjs';
 import {MatButton, MatIconButton} from '@angular/material/button';
+import { ApiResponse } from '../model/ApiResponse';
 
 @Component({
   selector: 'app-image',
@@ -183,17 +184,14 @@ updateSelectedImage() {
     }
 
     this.imageService.updateImagePartial(this.selectedImage.id, this.imageEditForm.value).subscribe({
-      next: (resp) => {
-        this.snackBar.open(`${resp.message}`, 'Close',{duration: 3000,
-        });
+      next: (resp: ApiResponse<ProductImage>) => { 
+        this.snackBar.open(`${resp.data?.name || 'Image'}  ${resp.message}`, 'Close', { duration: 3000 });
         this.closeEditModal();
-        this.loadImages(); // Refresh the image list
+        this.loadImages(); 
       },
-      error: (err) => {
-        this.snackBar.open(`${err.message}`, 'Close', {
-          duration: 3000,
-      });
-      },
+      error: (err: { message: string }) => { 
+        this.snackBar.open(`${err.message}`, 'Close', { duration: 3000 });
+      }
     });
   }
 }
