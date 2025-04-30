@@ -27,7 +27,7 @@ export class ProductService {
   }
 
   createProduct(productDto: ProductDto): Observable<ProductDto> {
-    return this.http.post<ProductDto>(this.apiUrl, productDto);
+    return this.http.post<ProductDto>(`${this.apiUrl}/save`, productDto);
   }
 
   updateProduct(id: number, updateProductDto: UpdateProductDto): Observable<ProductDto | null> {
@@ -48,5 +48,9 @@ export class ProductService {
       .set('page', page.toString())
       .set('size', size.toString());
     return this.http.get<Page<ProductDto>>(`${this.apiUrl}/search`, { params });
+  }
+
+  getImageUrl(imageId: number): Observable<string> {
+    return this.http.get<string>(`${this.host}files/${imageId}`);
   }
 }

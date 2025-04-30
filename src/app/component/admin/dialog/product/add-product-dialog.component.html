@@ -1,0 +1,133 @@
+<h2 mat-dialog-title>Add New Product</h2>
+<mat-dialog-content>
+  <form [formGroup]="addProductForm">
+    <mat-form-field appearance="outline">
+      <mat-label>Name</mat-label>
+      <input matInput placeholder="Name" formControlName="name" required>
+      <mat-error *ngIf="addProductForm.controls['name'].hasError('required')">Name is required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Description</mat-label>
+      <textarea matInput placeholder="Description" formControlName="description"></textarea>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Price</mat-label>
+      <input matInput type="number" placeholder="Price" formControlName="price" required>
+      <mat-error *ngIf="addProductForm.controls['price'].hasError('required')">Price is required</mat-error>
+      <mat-error *ngIf="addProductForm.controls['price'].hasError('min')">Price must be non-negative</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>License Plate</mat-label>
+      <input matInput placeholder="License Plate" formControlName="licensePlate">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Item Type</mat-label>
+      <input matInput placeholder="Item Type" formControlName="itemType">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Make</mat-label>
+      <input matInput placeholder="Make" formControlName="make">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Model</mat-label>
+      <input matInput placeholder="Model" formControlName="model">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Serial Number</mat-label>
+      <input matInput placeholder="Serial Number" formControlName="serialNumber">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Notes</mat-label>
+      <textarea matInput placeholder="Notes" formControlName="notes"></textarea>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Department</mat-label>
+      <input matInput placeholder="Department" formControlName="department">
+    </mat-form-field>
+
+    <div>
+      <h3>Select Main Image</h3>
+      <div *ngIf="isLoadingProductImages">
+        <mat-spinner diameter="30"></mat-spinner> Loading images...
+      </div>
+      <div *ngIf="productImageErrorMessage" class="error">{{ productImageErrorMessage }}</div>
+      <div class="image-selection-grid" *ngIf="allProductImages.length > 0">
+        <div
+          *ngFor="let image of allProductImages"
+          class="image-item"
+          (click)="onMainImageSelected(image.id!)"
+          [class.selected]="isMainImageSelected(image.id!)"
+        >
+          <img [src]="image.url" alt="{{ image.name }}" width="50" height="50">
+        </div>
+      </div>
+      <button mat-button *ngIf="allProductImages.length < totalProductImageCount && !isLoadingProductImages" (click)="loadMoreProductImages()">Load More Images</button>
+    </div>
+
+    <div>
+      <h3>Select Other Images</h3>
+      <div *ngIf="isLoadingProductImages">
+        <mat-spinner diameter="30"></mat-spinner> Loading images...
+      </div>
+      <div *ngIf="productImageErrorMessage" class="error">{{ productImageErrorMessage }}</div>
+      <div class="image-selection-grid" *ngIf="allProductImages.length > 0">
+        <div
+          *ngFor="let image of allProductImages"
+          class="image-item"
+          (click)="onOtherImageToggled(image.id!)"
+          [class.selected]="isOtherImageSelected(image.id!)"
+        >
+          <img [src]="image.url" alt="{{ image.name }}" width="50" height="50">
+        </div>
+      </div>
+      <button mat-button *ngIf="allProductImages.length < totalProductImageCount && !isLoadingProductImages" (click)="loadMoreProductImages()">Load More Images</button>
+    </div>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-raised-button color="primary" [disabled]="addProductForm.invalid || !addProductForm.get('mainImageId')?.value" (click)="save()">Save</button>
+</mat-dialog-actions>
+
+<style>
+  .image-selection-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .image-item {
+    border: 1px solid #ccc;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+  }
+
+  .image-item img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+
+  .image-item.selected {
+    border-color: primary;
+    background-color: #e0f7fa; /* Light blue highlight */
+  }
+
+  .error {
+    color: red;
+    margin-bottom: 8px;
+  }
+</style>

@@ -37,7 +37,7 @@ export class LoginComponent implements OnInit {
 
     private readonly router = inject(Router);
 
-    constructor(private authService: AuthService, private http: HttpClient, private fb: FormBuilder,
+    constructor(private authService: AuthService, private fb: FormBuilder,
         private tokenStorage: TokenStorageService, private snackBar: MatSnackBar) { }
 
     ngOnInit(): void {
@@ -92,7 +92,11 @@ export class LoginComponent implements OnInit {
           this.tokenStorage.getUser().pipe(take(1)).subscribe((user: User | null) => {
             if (user && user.roles) {
               this.roles = user.roles;
-              this.router.navigate(['home']);
+              if (this.roles.includes('ADMIN')) {
+                this.router.navigate(['admin']); // Redirect admin to '/admin'
+              } else {
+                this.router.navigate(['home']);  // Redirect regular users to '/home'
+              }
               this.snackBar.open('Login successful!', 'Dismiss', {
                 duration: 3000,
                 panelClass: ['success-snackbar']
@@ -107,6 +111,25 @@ export class LoginComponent implements OnInit {
               });
             }
           });
+
+          // this.tokenStorage.getUser().pipe(take(1)).subscribe((user: User | null) => {
+          //   if (user && user.roles) {
+          //     this.roles = user.roles;
+          //     this.router.navigate(['home']);
+          //     this.snackBar.open('Login successful!', 'Dismiss', {
+          //       duration: 3000,
+          //       panelClass: ['success-snackbar']
+          //     });
+          //   } else {
+          //     console.error("User data not found after login.");
+          //     this.errorMessage = "An error occurred during login. Please try again.";
+          //     this.isLoginFailed = true;
+          //     this.snackBar.open(this.errorMessage, 'Dismiss', {
+          //       duration: 5000,
+          //       panelClass: ['error-snackbar']
+          //     });
+          //   }
+          // });
         }).catch(error => { // Catch any errors in the Promise chain (saveToken or saveUser)
           console.error("Error saving token/user:", error);
           this.isLoading = false;

@@ -1,0 +1,31 @@
+.image-selection-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.image-item {
+  border: 1px solid #ccc;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+}
+
+.image-item img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.image-item.selected {
+  border-color: primary;
+  background-color: #e0f7fa; /* Light blue highlight */
+}
+
+.error {
+  color: red;
+  margin-bottom: 8px;
+}

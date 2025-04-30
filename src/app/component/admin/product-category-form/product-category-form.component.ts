@@ -81,7 +81,7 @@ export class ProductCategoryFormComponent implements OnInit {
 
   loadCategoryImages(page: number = this.currentPage, size: number = this.pageSize, filter: string = this.filterTerm): void {
     this.isLoadingImages = true;
-    this.imageService.getImagesByEntityType('category', page, size, filter).subscribe({
+    this.imageService.getImagesByEntityType('CATEGORY', page, size, filter).subscribe({
       next: (response: ApiResponse<Page<ProductImage> | null>) => {
         this.isLoadingImages = false;
         if (response.success && response.data && response.data['page']) { // Check if 'page' exists

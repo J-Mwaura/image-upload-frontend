@@ -1,0 +1,61 @@
+<h2 mat-dialog-title>Edit Product</h2>
+<mat-dialog-content>
+  <form [formGroup]="editForm">
+    <mat-form-field appearance="outline">
+      <mat-label>Name</mat-label>
+      <input matInput placeholder="Name" formControlName="name" required>
+      <mat-error *ngIf="editForm.controls['name'].hasError('required')">Name is required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Description</mat-label>
+      <textarea matInput placeholder="Description" formControlName="description"></textarea>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Price</mat-label>
+      <input matInput type="number" placeholder="Price" formControlName="price" required>
+      <mat-error *ngIf="editForm.controls['price'].hasError('required')">Price is required</mat-error>
+      <mat-error *ngIf="editForm.controls['price'].hasError('min')">Price must be non-negative</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>License Plate</mat-label>
+      <input matInput placeholder="License Plate" formControlName="licensePlate">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Item Type</mat-label>
+      <input matInput placeholder="Item Type" formControlName="itemType">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Make</mat-label>
+      <input matInput placeholder="Make" formControlName="make">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Model</mat-label>
+      <input matInput placeholder="Model" formControlName="model">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Serial Number</mat-label>
+      <input matInput placeholder="Serial Number" formControlName="serialNumber">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Notes</mat-label>
+      <textarea matInput placeholder="Notes" formControlName="notes"></textarea>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Department</mat-label>
+      <input matInput placeholder="Department" formControlName="department">
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-raised-button color="primary" [disabled]="editForm.invalid" (click)="save()">Save</button>
+</mat-dialog-actions>

@@ -118,7 +118,7 @@
       <mat-paginator
         class="paginator"
         [length]="totalCount"
-        [pageIndex]="page"
+        [pageIndex]="page - 1"
         [pageSize]="size"
         [pageSizeOptions]="[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
         (page)="loadImages($event)"

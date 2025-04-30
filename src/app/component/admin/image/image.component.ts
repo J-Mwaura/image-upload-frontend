@@ -6,8 +6,8 @@ import {NgForm,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { ProductImage } from '../model/ProductImage.model';
-import { ImageService } from '../services/image.service';
+import { ProductImage } from '../../../model/ProductImage.model';
+import { ImageService } from '../../../services/image.service';
 import { Subject, takeUntil } from 'rxjs';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
@@ -19,11 +19,11 @@ import { MatInputModule} from '@angular/material/input';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 //eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { ConfirmDeleteDialogComponent } from '../component/dialog/confirm-delete-dialog-component/confirm-delete-dialog-component.component';
-import { MessageResponse } from '../model/MessageResponse';
+import { ConfirmDeleteDialogComponent } from '../../dialog/confirm-delete-dialog-component/confirm-delete-dialog-component.component';
+import { MessageResponse } from '../../../model/MessageResponse';
 import { firstValueFrom } from 'rxjs';
 import {MatButton, MatIconButton} from '@angular/material/button';
-import { ApiResponse } from '../model/ApiResponse';
+import { ApiResponse } from '../../../model/ApiResponse';
 
 @Component({
   selector: 'app-image',
@@ -44,7 +44,7 @@ export class ImageComponent implements OnInit {
   productImages: ProductImage[] = []
   totalCount: number = 0;
   pageIndex: number = 1;
-  pageSize: number = 10;
+  pageSize: number = 5;
   page: number = 0;
   size: number = 4;
   public fileName!: string;

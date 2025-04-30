@@ -17,7 +17,7 @@ export class ProductCategoryService {
 
   saveProductCategory(productCategoryDto: ProductCategory): Observable<ApiResponse<ProductCategory>> {
     return this.http.post<ApiResponse<ProductCategory>>(
-      `${this.host}api/category/saveCategory`,
+      `${this.host}api/category/save`,
       productCategoryDto
     );
   }
