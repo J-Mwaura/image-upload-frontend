@@ -1,12 +1,13 @@
 .main-content {
     text-align: center;
   }
-/*   
-  .user-content {
+  
+  /* .user-content {
     display: inline-block;
     text-align: left;
-    width: 100%; /* Ensure the div takes up full width so text-align works */
-  } */
+    width: 100%; 
+  }  **/
+  
   
   header app-navbar {
     z-index: 1;

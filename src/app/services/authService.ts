@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { BehaviorSubject, catchError, Observable, tap, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, map, Observable, of, Subject, Subscription, takeUntil, tap, throwError } from 'rxjs';
 import { LoginRequest } from '../model/LoginRequest ';
 import { JwtResponse } from '../model/response/JwtResponse ';
 import { environment } from '../../environments/environment';
@@ -140,4 +140,51 @@ export class AuthService {
               catchError(this.handleError)
           );
   }
+
+  getUserId(): Observable<number | null> {
+    //  Check if the user is logged in (you might have a more specific check)
+    // if (this.isLoggedInSubject.value) {
+    //   //  Use map to extract the user ID from the Observable
+        return this.tokenStorage.getUser().pipe(
+      map(user => user ? user.id : null)
+    );
+    // } else {
+    //   //  If not logged in, return an Observable that emits null
+    //   return of(null);
+    // }
+
+  }
+  private userIdSubscription: Subscription | undefined;
+
+  public currentUserId: number | null | undefined;
+
+  private destroy$ = new Subject<void>();
+
+getTheUserId() {
+  this.getUserId().pipe(
+    takeUntil(this.destroy$)
+  ).subscribe({
+    next: (userId) => {
+      this.currentUserId = userId;
+      if (userId !== null) {
+        console.log('User ID:', userId);
+        // Use the userId here (e.g., load user data)
+      } else {
+        console.log('User is not logged in.');
+        // Handle case where user is not logged in
+      }
+    },
+    error: (error) => {
+      console.error('Error fetching user ID:', error);
+      // Handle errors (e.g., show error message)
+    }
+  });
+}
+
+// Clean up in ngOnDestroy
+ngOnDestroy() {
+  this.destroy$.next();
+  this.destroy$.complete();
+}
+
 }

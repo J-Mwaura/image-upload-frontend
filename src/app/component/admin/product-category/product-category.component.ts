@@ -19,7 +19,6 @@ import {ProductCategoryFormComponent} from '../product-category-form/product-cat
 import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {MatError, MatFormField} from '@angular/material/form-field';
 import {MatInput} from '@angular/material/input';
-import {ProductImage} from '../../../model/ProductImage.model';
 
 @Component({
   selector: 'app-product-category',

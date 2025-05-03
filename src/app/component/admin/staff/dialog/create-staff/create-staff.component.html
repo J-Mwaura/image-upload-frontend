@@ -1,0 +1,80 @@
+<!-- create-staff-dialog.component.html -->
+<h2 mat-dialog-title>Create New Staff Member</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="staffForm">
+    <div class="form-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>First Name</mat-label>
+        <input matInput formControlName="firstName" required>
+        <mat-error *ngIf="staffForm.get('firstName')?.hasError('required')">
+          First name is required
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Last Name</mat-label>
+        <input matInput formControlName="lastName" required>
+        <mat-error *ngIf="staffForm.get('lastName')?.hasError('required')">
+          Last name is required
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Phone Number</mat-label>
+        <input matInput formControlName="phone" required>
+        <mat-error *ngIf="staffForm.get('phone')?.errors">
+          Valid phone number (10-15 digits) is required
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Position</mat-label>
+        <mat-select formControlName="staffType" required>
+          <mat-option *ngFor="let type of staffTypes" [value]="type">
+            {{ type | titlecase }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>4-Digit PIN</mat-label>
+        <input matInput formControlName="pinCode" type="password" maxlength="4" required>
+        <mat-error *ngIf="staffForm.get('pinCode')?.errors">
+          4-digit PIN is required
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Hourly Rate</mat-label>
+        <input matInput type="number" formControlName="hourlyRate" required>
+        <span matPrefix>$&nbsp;</span>
+        <mat-error *ngIf="staffForm.get('hourlyRate')?.errors">
+          Valid hourly rate is required
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Hire Date</mat-label>
+        <input matInput [matDatepicker]="hireDatePicker" formControlName="hireDate" required>
+        <mat-datepicker-toggle matSuffix [for]="hireDatePicker"></mat-datepicker-toggle>
+        <mat-datepicker #hireDatePicker></mat-datepicker>
+        <mat-error *ngIf="staffForm.get('hireDate')?.hasError('required')">
+          Hire date is required
+        </mat-error>
+      </mat-form-field>
+
+      <mat-slide-toggle formControlName="isActive" color="primary">
+        Active Staff Member
+      </mat-slide-toggle>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="staffForm.invalid || isLoading">
+    <span *ngIf="isLoading" class="spinner-border spinner-border-sm" role="status"></span>
+    Create
+  </button>
+</mat-dialog-actions>

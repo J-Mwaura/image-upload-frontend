@@ -12,6 +12,7 @@ import {ProductCategoryComponent} from './component/product-category/product-cat
 import {AdminProductCategoryComponent} from './component/admin/product-category/product-category.component';
 import {AdminAreaComponent} from './component/admin/board-admin.component';
 import { UserProductComponent } from './component/user/product/product.component';
+import { StaffComponent } from './component/admin/staff/list/staff.component';
 
 export const routes: Routes = [
   {path: 'login', component: LoginComponent},
@@ -20,7 +21,6 @@ export const routes: Routes = [
 
   {
     path: 'user', component: UserAreaComponent, canActivate: [authGuard],
-    // path: 'home', component: HomeComponent, canActivate: [authGuard],
     children: [
       {path: '', redirectTo: 'product', pathMatch: 'full'},
       {
@@ -38,6 +38,7 @@ export const routes: Routes = [
       {path: 'images', component: ImageComponent},
       {path: 'register', component: RegisterComponent},
       {path: 'user', component: UserAreaComponent},
+      {path: 'staff', component: StaffComponent},
       {path: 'categories', component: ProductCategoryComponent},
       {path: 'category', component: AdminProductCategoryComponent},
       {path: 'products', component: AdminProductComponent}, 
