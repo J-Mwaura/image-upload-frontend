@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, catchError, Observable, tap, throwError } from 'rxjs';
 import { LoginRequest } from '../model/LoginRequest ';
-import { JwtResponse } from '../model/JwtResponse ';
+import { JwtResponse } from '../model/response/JwtResponse ';
 import { environment } from '../../environments/environment';
 import { RegisterRequest } from '../model/RegisterRequest';
 import { TokenStorageService } from './tokenStorageService';

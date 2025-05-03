@@ -1,0 +1,51 @@
+<div class="container">
+  <mat-card>
+    <mat-card-title>Products</mat-card-title>
+    <mat-card-content>
+      <div *ngIf="loading">
+        <mat-spinner></mat-spinner>
+        <p>Loading products...</p>
+      </div>
+
+      <div *ngIf="errorMessage" class="error">
+        {{ errorMessage }}
+      </div>
+
+      <div class="products-container" *ngIf="!loading && !errorMessage && products.length > 0">
+        <mat-accordion class="product-accordion" *ngFor="let product of products">
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-title class="product-header">
+                <img *ngIf="mainImageUrls[product.id!]" class="product-image" ngSrc="{{mainImageUrls[product.id!]}}" alt="{{ product.name }} image" width="60" height="60">
+                <h3>{{ product.name }}</h3>
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="product-details">
+              <p>{{ product.description }}</p>
+              <p>Price: {{ product.price | currency }}</p>
+              <mat-card-actions>
+                <button mat-button>View Details</button>
+                <button mat-button>Add to Cart</button>
+              </mat-card-actions>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </div>
+
+      <mat-paginator
+        *ngIf="!loading && !errorMessage && products.length > 0"
+        [length]="totalCount"
+        [pageSize]="pageSize"
+        [pageIndex]="pageIndex"
+        [pageSizeOptions]="[4, 8, 12, 20]"
+        (page)="handlePageEvent($event)"
+        aria-label="Select page"
+      >
+      </mat-paginator>
+
+      <div *ngIf="!loading && !errorMessage && products.length === 0">
+        <p>No products found.</p>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

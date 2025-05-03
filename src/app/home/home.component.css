@@ -1,6 +1,7 @@
 .container {
   display: flex; /* Or grid, depending on your layout needs */
   flex-direction: column; /* Stack navigation and content vertically */
+  min-height: 100vh; /* Ensure the container takes at least full viewport height */
 }
 
 .main-nav {
@@ -13,4 +14,71 @@
 .main-content {
   /* Style your main content area */
   padding: 20px;
+  display: flex;          /* Enable flexbox for centering */
+  justify-content: center; /* Center content horizontally */
+  align-items: center;     /* Center content vertically */
+  flex-grow: 1;           /* Allow main-content to take remaining vertical space */
+}
+
+/* Your existing component-specific styles for the product list card */
+.product-list-container { /* You might need to wrap your <mat-card> in a div with this class */
+  width: 95%;           /* Or a specific width */
+  max-width: 1200px;    /* Optional: maximum width */
+}
+
+.mat-card-title {
+  margin-bottom: 16px;
+}
+
+.products-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.product-accordion {
+  width: 100%;
+}
+
+.mat-expansion-panel {
+  margin-bottom: 8px;
+}
+
+.mat-panel-title.product-header {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.mat-panel-title.product-header h3 {
+  margin-right: 16px;
+}
+
+.product-image {
+  width: 60px;
+  height: auto;
+  object-fit: cover;
+}
+
+.product-details {
+  padding: 16px;
+}
+
+mat-card-actions {
+  margin-top: 16px;
+}
+
+.mat-paginator {
+  margin-top: 16px;
+}
+
+.mat-spinner {
+  margin: 20px auto;
+}
+
+.error {
+  color: red;
+  margin-top: 10px;
 }

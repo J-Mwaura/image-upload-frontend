@@ -1,4 +1,4 @@
-import { JwtResponse } from "../JwtResponse ";
+import { JwtResponse } from "../response/JwtResponse ";
 import { User } from "../user";
 
 

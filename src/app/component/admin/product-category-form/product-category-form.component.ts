@@ -4,7 +4,7 @@ import {MatDialogRef, MAT_DIALOG_DATA, MatDialogModule} from '@angular/material/
 import {ProductCategory} from '../../../model/ProductCategory';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ProductCategoryService} from '../../../services/product-category.service';
-import {UpdateProductCategoryDTO} from '../../../model/update-product-category-dto.model';
+import {UpdateProductCategoryDTO} from '../../../model/dto/update-product-category-dto.model';
 import {CommonModule, NgOptimizedImage} from '@angular/common';
 import {MatCardModule} from '@angular/material/card';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
@@ -14,7 +14,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import {ProductImage} from '../../../model/ProductImage.model';
 import {ImageService} from '../../../services/image.service';
-import {ApiResponse} from '../../../model/ApiResponse';
+import {ApiResponse} from '../../../model/response/ApiResponse';
 import {MatRadioButton} from '@angular/material/radio';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {Page} from '../../../model/page';
@@ -132,11 +132,8 @@ export class ProductCategoryFormComponent implements OnInit {
       const formData = this.categoryForm.value;
 
       if (this.isEditMode && this.data?.id) {
-        // Existing update logic (unchanged)
         const updatePayload: UpdateProductCategoryDTO = {};
         if (formData.name !== this.data.name) updatePayload.name = formData.name;
-        if (formData.imageId !== this.data.imageId) updatePayload.imageId = formData.imageId;
-        if (formData.removeImage) updatePayload.removeImage = true;
 
         this.productCategoryService.updateProductCategory(this.data.id, updatePayload).subscribe({
           next: (response) => {
@@ -147,7 +144,6 @@ export class ProductCategoryFormComponent implements OnInit {
           }
         });
       } else {
-        // Create new category
         const categoryToSave: ProductCategory = {
           id: null,
           name: formData.name,

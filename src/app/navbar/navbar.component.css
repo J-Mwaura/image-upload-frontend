@@ -1,7 +1,7 @@
-
 .sidenav-container {
     height: 100%;
     display: flex; 
+    z-index: 1000;
   }
   
   .sidenav {

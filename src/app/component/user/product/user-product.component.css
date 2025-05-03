@@ -1,0 +1,70 @@
+.container {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+mat-card {
+  width: 95%;
+}
+
+mat-card-title {
+  margin-bottom: 16px;
+}
+
+.products-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Adjust minmax width for each accordion */
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.product-accordion {
+  width: 100%; /* Make each accordion take the full width of its grid cell */
+}
+
+.mat-expansion-panel {
+  margin-bottom: 8px;
+}
+
+.mat-expansion-panel-header {
+  /* Align items in the header */
+}
+
+.mat-panel-title.product-header {
+  display: flex;
+  align-items: center; /* Vertically align name and image */
+  width: 100%; /* Ensure full width */
+  justify-content: space-between; /* Put space between name and image */
+}
+
+.mat-panel-title.product-header h3 {
+  margin-right: 16px; /* Add some space between name and image */
+}
+
+.product-image {
+  width: 60px; /* Adjust image size in the header */
+  height: auto;
+  object-fit: cover;
+}
+
+.product-details {
+  padding: 16px;
+}
+
+mat-card-actions {
+  margin-top: 16px;
+}
+
+.mat-paginator {
+  margin-top: 16px;
+}
+
+.mat-spinner {
+  margin: 20px auto;
+}
+
+.error {
+  color: red;
+  margin-top: 10px;
+}

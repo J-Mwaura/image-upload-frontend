@@ -14,7 +14,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { User } from '../../model/user'; // Import your User type
 import { take } from 'rxjs/operators'; // Import take
-import { JwtResponse } from '../../model/JwtResponse ';
+import { JwtResponse } from '../../model/response/JwtResponse ';
 import { mapJwtResponseToUser } from '../../model/utils/mapJwtResponseToUser';
 import {MatSnackBar} from '@angular/material/snack-bar';
 
@@ -95,7 +95,7 @@ export class LoginComponent implements OnInit {
               if (this.roles.includes('ADMIN')) {
                 this.router.navigate(['admin']); // Redirect admin to '/admin'
               } else {
-                this.router.navigate(['home']);  // Redirect regular users to '/home'
+                this.router.navigate(['user']);  // Redirect regular users to '/home'
               }
               this.snackBar.open('Login successful!', 'Dismiss', {
                 duration: 3000,
@@ -112,24 +112,6 @@ export class LoginComponent implements OnInit {
             }
           });
 
-          // this.tokenStorage.getUser().pipe(take(1)).subscribe((user: User | null) => {
-          //   if (user && user.roles) {
-          //     this.roles = user.roles;
-          //     this.router.navigate(['home']);
-          //     this.snackBar.open('Login successful!', 'Dismiss', {
-          //       duration: 3000,
-          //       panelClass: ['success-snackbar']
-          //     });
-          //   } else {
-          //     console.error("User data not found after login.");
-          //     this.errorMessage = "An error occurred during login. Please try again.";
-          //     this.isLoginFailed = true;
-          //     this.snackBar.open(this.errorMessage, 'Dismiss', {
-          //       duration: 5000,
-          //       panelClass: ['error-snackbar']
-          //     });
-          //   }
-          // });
         }).catch(error => { // Catch any errors in the Promise chain (saveToken or saveUser)
           console.error("Error saving token/user:", error);
           this.isLoading = false;

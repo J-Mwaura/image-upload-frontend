@@ -10,7 +10,7 @@ import {MatProgressSpinner} from '@angular/material/progress-spinner';
 import {MatTable, MatTableModule} from '@angular/material/table';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
-import {ApiResponse} from '../../../model/ApiResponse';
+import {ApiResponse} from '../../../model/response/ApiResponse';
 import {
   ConfirmDeleteDialogComponent
 } from '../../dialog/confirm-delete-dialog-component/confirm-delete-dialog-component.component';

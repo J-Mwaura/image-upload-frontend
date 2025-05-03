@@ -3,8 +3,8 @@ import {catchError, Observable, throwError} from 'rxjs';
 import {HttpClient, HttpErrorResponse, HttpParams} from '@angular/common/http';
 import {ProductCategory} from '../model/ProductCategory';
 import {environment} from '../../environments/environment';
-import { ApiResponse} from '../model/ApiResponse';
-import {UpdateProductCategoryDTO} from '../model/update-product-category-dto.model';
+import { ApiResponse} from '../model/response/ApiResponse';
+import {UpdateProductCategoryDTO} from '../model/dto/update-product-category-dto.model';
 
 @Injectable({
   providedIn: 'root'

@@ -5,6 +5,7 @@ import{ProductDto} from '../model/dto/product-dto';
 import { UpdateProductDto } from '../model/dto/update-product-dto'; // Adjust the path to your update DTO model
 import { Page } from '../model/page'; // Assuming you have a Page model
 import {environment} from '../../environments/environment';
+import { ProductCategory } from '../model/ProductCategory';
 
 @Injectable({
   providedIn: 'root',
@@ -53,4 +54,5 @@ export class ProductService {
   getImageUrl(imageId: number): Observable<string> {
     return this.http.get<string>(`${this.host}files/${imageId}`);
   }
+  
 }

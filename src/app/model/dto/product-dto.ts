@@ -9,6 +9,7 @@ export interface ProductDto {
   serialNumber?: string; // Optional
   notes?: string;
   department?: string;
+  price?: number;
   mainImageId?: number;
   imageIds?: number[];
   mainImageUrl?: string | null; 

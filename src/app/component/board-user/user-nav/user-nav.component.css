@@ -1,0 +1,70 @@
+/* Main container */
+.sidenav-container {
+  height: 100vh;
+  background-color: #e6f7ff; /* Very light blue background */
+  /* margin-top: 5px; */
+}
+
+/* Sidenav styling */
+.sidenav {
+  margin-top: 100px;
+  width: 240px;
+  background-color: #b3e0ff; /* Light blue */
+  border-right: none;
+}
+
+.sidenav-toolbar {
+  background-color: #4da6ff; /* Medium blue */
+  color: white;
+  height: 64px;
+}
+
+/* Nav list items */
+.mat-nav-list .mat-list-item {
+  color: #003366; /* Dark blue text */
+}
+
+.nav-link:hover {
+  background-color: #99d6ff !important; /* Lighter blue on hover */
+}
+
+/* Main content area */
+.mat-sidenav-content {
+  background-color: #e6f7ff; /* Very light blue */
+}
+
+/* Header spacer for the 40px drop */
+.header-spacer {
+  height: 40px;
+  background-color: #4da6ff; /* Matches toolbar */
+}
+
+/* Main toolbar */
+.main-toolbar {
+  position: sticky;
+  top: 40px; /* Matches spacer height */
+  z-index: 2;
+  background-color: #4da6ff !important; /* Medium blue */
+  color: white;
+}
+
+/* Content container */
+.content-container {
+  padding: 20px;
+  margin-top: 20px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 599px) {
+  .header-spacer {
+    height: 56px; /* Adjust for mobile header */
+  }
+  
+  .main-toolbar {
+    top: 56px;
+  }
+  
+  .sidenav {
+    width: 200px;
+  }
+}

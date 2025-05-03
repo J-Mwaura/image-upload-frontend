@@ -1,3 +1,15 @@
-.user-toolbar{
-    background-color: beige;
-}
+.main-content {
+    text-align: center;
+  }
+/*   
+  .user-content {
+    display: inline-block;
+    text-align: left;
+    width: 100%; /* Ensure the div takes up full width so text-align works */
+  } */
+  
+  header app-navbar {
+    z-index: 1;
+    position: relative;
+  }
+  

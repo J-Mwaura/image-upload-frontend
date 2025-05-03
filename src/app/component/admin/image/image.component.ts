@@ -20,10 +20,10 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 //eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { ConfirmDeleteDialogComponent } from '../../dialog/confirm-delete-dialog-component/confirm-delete-dialog-component.component';
-import { MessageResponse } from '../../../model/MessageResponse';
+import { MessageResponse } from '../../../model/response/MessageResponse';
 import { firstValueFrom } from 'rxjs';
 import {MatButton, MatIconButton} from '@angular/material/button';
-import { ApiResponse } from '../../../model/ApiResponse';
+import { ApiResponse } from '../../../model/response/ApiResponse';
 
 @Component({
   selector: 'app-image',

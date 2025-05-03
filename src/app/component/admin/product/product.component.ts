@@ -15,9 +15,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatTableModule } from '@angular/material/table';
-import { catchError, forkJoin, of, take } from 'rxjs';
+import { BehaviorSubject, catchError, forkJoin, of, take } from 'rxjs';
 import { ImageService } from '../../../services/image.service'; // Import ImageService
-import { ApiResponse } from '../../../model/ApiResponse'; // Assuming you have this
+import { ApiResponse } from '../../../model/response/ApiResponse'; // Assuming you have this
 import { Page } from '../../../model/page'; // Assuming you have this
 import { ProductImage } from '../../../model/ProductImage.model'; // Assuming you have this
 
@@ -42,6 +42,9 @@ export class AdminProductComponent implements OnInit {
   additionalImageUrls: { [productId: number]: string[] | undefined } = {};
 
   // Properties for loading product images for selection (in add/edit dialogs)
+  isLoadingProductImagesSubject = new BehaviorSubject<boolean>(false);
+  isLoadingProductImages$ = this.isLoadingProductImagesSubject.asObservable();
+  
   allProductImagesForSelection: ProductImage[] = [];
   isLoadingProductImages: boolean = false;
   totalProductImageCount: number = 0;
@@ -125,52 +128,70 @@ export class AdminProductComponent implements OnInit {
     this.getProducts(event);
   }
 
-  addProduct(): void {
-    const dialogRef = this.dialog.open(AddProductDialogComponent, {
-      width: '600px', // Adjust width as needed
-      data: {
-        loadProductImages: this.loadProductImagesForSelection.bind(this),
-        allProductImages: this.allProductImagesForSelection,
-        isLoadingProductImages: this.isLoadingProductImages,
-        totalProductImageCount: this.totalProductImageCount,
-        currentProductImagePage: this.currentProductImagePage,
-        productImagePageSize: this.productImagePageSize,
-        productImageFilterTerm: this.productImageFilterTerm,
-        productImageErrorMessage: this.productImageErrorMessage,
-      }
-    });
+  async addProduct(): Promise<void> {
+    this.isLoadingProductImagesSubject.next(true); // Indicate loading before fetching
+    try {
+      await this.loadProductImagesForSelection(1, this.productImagePageSize, ''); // Load initial images
+      const dialogRef = this.dialog.open(AddProductDialogComponent, {
+        width: '600px',
+        data: {
+          loadProductImages: this.loadProductImagesForSelection.bind(this),
+          allProductImages: this.allProductImagesForSelection,
+          isLoadingProductImages$: this.isLoadingProductImages$, // Pass the Observable
+          totalProductImageCount: this.totalProductImageCount,
+          currentProductImagePage: this.currentProductImagePage,
+          productImagePageSize: this.productImagePageSize,
+          productImageFilterTerm: this.productImageFilterTerm,
+          productImageErrorMessage: this.productImageErrorMessage,
+        }
+      });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.getProducts(); // Refresh the product list after successful add
-      }
-    });
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          this.getProducts(); // Refresh the product list after successful add
+        }
+      });
+    } catch (error) {
+      this.isLoadingProductImagesSubject.next(false);
+      this.snackBar.open('Error loading images for the dialog', 'Close', { duration: 3000 });
+      console.error('Error loading images for dialog:', error);
+    }
   }
 
   editProduct(id: number): void {
     this.productService.getProductById(id).subscribe({
-      next: (product) => {
+      next: async (product) => {
         if (product) {
-          const dialogRef = this.dialog.open(EditProductDialogComponent, {
-            width: '600px', // Adjust width as needed
-            data: {
-              ...product,
-              loadProductImages: this.loadProductImagesForSelection.bind(this),
-              allProductImages: this.allProductImagesForSelection,
-              isLoadingProductImages: this.isLoadingProductImages,
-              totalProductImageCount: this.totalProductImageCount,
-              currentProductImagePage: this.currentProductImagePage,
-              productImagePageSize: this.productImagePageSize,
-              productImageFilterTerm: this.productImageFilterTerm,
-              productImageErrorMessage: this.productImageErrorMessage,
-            },
-          });
+          this.isLoadingProductImagesSubject.next(true);
+          try {
+            await this.loadProductImagesForSelection(1, this.productImagePageSize, '');
+            const dialogRef = this.dialog.open(EditProductDialogComponent, {
+              width: '600px',
+              data: {
+                ...product,
+                loadProductImages: this.loadProductImagesForSelection.bind(this),
+                allProductImages: this.allProductImagesForSelection,
+                isLoadingProductImages$: this.isLoadingProductImages$, // Pass the Observable
+                totalProductImageCount: this.totalProductImageCount,
+                currentProductImagePage: this.currentProductImagePage,
+                productImagePageSize: this.productImagePageSize,
+                productImageFilterTerm: this.productImageFilterTerm,
+                productImageErrorMessage: this.productImageErrorMessage,
+              },
+            });
 
-          dialogRef.afterClosed().subscribe(result => {
-            if (result) {
-              this.getProducts(); // Refresh the product list after successful edit
-            }
-          });
+            dialogRef.afterClosed().subscribe(result => {
+              if (result) {
+                this.getProducts(); // Refresh the product list after successful edit
+              }
+            });
+          } catch (error) {
+            this.isLoadingProductImagesSubject.next(false);
+            this.snackBar.open('Error loading images for the dialog', 'Close', { duration: 3000 });
+            console.error('Error loading images for dialog:', error);
+          } finally {
+            this.isLoadingProductImagesSubject.next(false);
+          }
         } else {
           this.snackBar.open('Product not found', 'Close', { duration: 3000 });
         }
@@ -206,10 +227,10 @@ export class AdminProductComponent implements OnInit {
   }
 
   loadProductImagesForSelection(page: number = this.currentProductImagePage, size: number = this.productImagePageSize, filter: string = this.productImageFilterTerm): void {
-    this.isLoadingProductImages = true;
+    this.isLoadingProductImagesSubject.next(true);
     this.imageService.getImagesByEntityType('PRODUCT', page, size, filter).subscribe({
       next: (response: ApiResponse<Page<ProductImage> | null>) => {
-        this.isLoadingProductImages = false;
+        this.isLoadingProductImagesSubject.next(false);
         if (response.success && response.data && response.data['page']) { // Check if 'page' exists
           this.allProductImagesForSelection = response.data.content;
           this.totalProductImageCount = response.data['page'].totalElements; // Access totalElements under 'page'
@@ -224,7 +245,7 @@ export class AdminProductComponent implements OnInit {
         }
       },
       error: (error) => {
-        this.isLoadingProductImages = false;
+        this.isLoadingProductImagesSubject.next(false);
         this.allProductImagesForSelection = [];
         this.totalProductImageCount = 0;
         this.productImageErrorMessage = 'Error fetching product images for selection.';

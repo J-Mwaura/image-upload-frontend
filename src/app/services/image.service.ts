@@ -3,8 +3,8 @@ import { Injectable } from "@angular/core";
 import { ProductImage } from "../model/ProductImage.model";
 import { environment } from "../../environments/environment";
 import { catchError, Observable, tap, throwError } from "rxjs";
-import { MessageResponse } from "../model/MessageResponse";
-import {ApiResponse} from '../model/ApiResponse';
+import { MessageResponse } from "../model/response/MessageResponse";
+import {ApiResponse} from '../model/response/ApiResponse';
 import {Page} from '../model/page';
 
 
