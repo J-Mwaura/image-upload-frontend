@@ -4,6 +4,17 @@
 <mat-dialog-content>
   <form [formGroup]="staffForm">
     <div class="form-grid">
+<mat-form-field appearance="outline">
+    <mat-label>Assign to User</mat-label>
+    <mat-select formControlName="userId" required>
+      <mat-option *ngFor="let user of availableUsers" [value]="user.id">
+        {{ user.email }} ({{ user.email }} {{ user.roles }})
+      </mat-option>
+    </mat-select>
+    <mat-error *ngIf="staffForm.get('userId')?.hasError('required')">
+      User assignment is required
+    </mat-error>
+  </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>First Name</mat-label>
         <input matInput formControlName="firstName" required>

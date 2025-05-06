@@ -12,6 +12,7 @@ export interface StaffDTO {
   hireDate: string;    // ISO format date
   terminationDate?: string | null;
   isActive: boolean;
+  isAvailable?: boolean; 
   pinCode?: string;    // Only for forms, not for display
   hourlyRate: number;
   deleted?: boolean;
@@ -20,4 +21,4 @@ export interface StaffDTO {
 }
 
 // Enum for Staff Types
-export type StaffType = 'ATTENDANT' | 'SUPERVISOR' | 'MANAGER';
+export type StaffType = 'attendant' | 'supervisor' | 'manager';

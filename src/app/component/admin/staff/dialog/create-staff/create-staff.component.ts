@@ -1,5 +1,5 @@
 // create-staff-dialog.component.ts
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
@@ -12,34 +12,51 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import { MatSelectModule } from '@angular/material/select';
+import { User } from '../../../../../model/user';
+import { UserService } from '../../../../../services/user.service';
+import { UserDTO } from '../../../../../model/dto/user-dto';
+import { Page } from '../../../../../model/page';
 
 @Component({
   selector: 'app-create-staff-dialog',
   templateUrl: './create-staff.component.html',
   styleUrls: ['./create-staff.component.css'],
   imports:[CommonModule,
-        ReactiveFormsModule,
-        MatButtonModule,
-        MatFormFieldModule,
-        MatInputModule,
-        MatDialogModule,
+    ReactiveFormsModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDialogModule,
     MatDatepickerModule,
     MatSelectModule,
   ],
   providers: [provideNativeDateAdapter()],
 })
-export class CreateStaffComponent {
-  staffForm: FormGroup;
+export class CreateStaffComponent implements OnInit{
+  availableUsers: User[] = [];
+  isLoadingUsers = false; 
+  staffForm!: FormGroup;
   isLoading = false;
-  staffTypes: StaffType[] = ['ATTENDANT', 'SUPERVISOR', 'MANAGER'];
+  staffTypes: StaffType[] = ['attendant', 'supervisor', 'manager'];
+  currentPage: any;
+  totalItems: any;
 
   constructor(
     private fb: FormBuilder,
     private staffService: StaffService,
+    private userService: UserService,
     private snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<CreateStaffComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { userId: number }
   ) {
+    this.initializeForm();
+  }
+
+  ngOnInit(): void {
+    this.loadAvailableUsers();
+  }
+
+  initializeForm(){
     this.staffForm = this.fb.group({
       firstName: ['', [Validators.required, Validators.maxLength(50)]],
       lastName: ['', [Validators.required, Validators.maxLength(50)]],
@@ -48,7 +65,8 @@ export class CreateStaffComponent {
       hireDate: ['', Validators.required],
       pinCode: ['', [Validators.required, Validators.pattern(/^[0-9]{4}$/)]],
       hourlyRate: ['', [Validators.required, Validators.min(0)]],
-      isActive: [true]
+      isActive: [true],
+      userId: [null, Validators.required],
     });
   }
 
@@ -84,4 +102,29 @@ export class CreateStaffComponent {
   onCancel(): void {
     this.dialogRef.close(false);
   }
+
+  loadAvailableUsers(): void {
+    this.isLoadingUsers = true;
+    this.userService.getAvailableUsers().subscribe({
+      next: (page: Page<UserDTO>) => {  // Correct type to Page<UserDTO>
+        this.availableUsers = page.content.map(convertUserDTOToUser); // Access .content
+        this.isLoadingUsers = false;
+        
+        // Optional: Store pagination info if needed
+        this.currentPage = page.number;
+        this.totalItems = page.totalElements;
+      },
+      error: (error) => {
+        console.error('Error loading users:', error);
+        this.isLoadingUsers = false;
+      }
+    });
+  }
+}
+
+function convertUserDTOToUser(dto: UserDTO): User {
+  return {
+    ...dto,
+    roles: dto.roles || [] // Provide empty array if undefined
+  };
 }

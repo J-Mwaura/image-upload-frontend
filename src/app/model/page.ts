@@ -1,5 +1,7 @@
 export interface Page<T> {
-  content: T[];         // The list of items on the current page
+  number: any;
+  totalElements: any;
+  content: T[];
   page: {
     size: number;
     number: number;
