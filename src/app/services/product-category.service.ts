@@ -5,6 +5,7 @@ import {ProductCategory} from '../model/ProductCategory';
 import {environment} from '../../environments/environment';
 import { ApiResponse} from '../model/response/ApiResponse';
 import {UpdateProductCategoryDTO} from '../model/dto/update-product-category-dto.model';
+import { ProductCategoryDTO } from '../model/dto/product-category-dto';
 
 @Injectable({
   providedIn: 'root'
@@ -15,8 +16,8 @@ export class ProductCategoryService {
 
   constructor(private http: HttpClient) { }
 
-  saveProductCategory(productCategoryDto: ProductCategory): Observable<ApiResponse<ProductCategory>> {
-    return this.http.post<ApiResponse<ProductCategory>>(
+  saveProductCategory(productCategoryDto: ProductCategoryDTO): Observable<ApiResponse<ProductCategoryDTO>> {
+    return this.http.post<ApiResponse<ProductCategoryDTO>>(
       `${this.host}api/category/save`,
       productCategoryDto
     );
@@ -49,8 +50,8 @@ export class ProductCategoryService {
     return throwError(() => new Error(errorMessage));
   }
 
-  updateProductCategory(id: number | null | undefined, updatePayload: UpdateProductCategoryDTO): Observable<ApiResponse<ProductCategory>> {
-    return this.http.put<ApiResponse<ProductCategory>>(`${this.host}api/category/${id}`, updatePayload);
+  updateProductCategory(id: number | null | undefined, updatePayload: UpdateProductCategoryDTO): Observable<ApiResponse<UpdateProductCategoryDTO>> {
+    return this.http.put<ApiResponse<UpdateProductCategoryDTO>>(`${this.host}api/category/${id}`, updatePayload);
   }
 
   public deleteProductCategory(id: number): Observable<ApiResponse<ProductCategory>> {

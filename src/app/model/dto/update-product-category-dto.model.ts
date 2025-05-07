@@ -1,5 +1,5 @@
 export interface UpdateProductCategoryDTO {
   name?: string;
-  // imageId?: number | null;
+  imageId?: number | null;
   // removeImage?: boolean;
 }

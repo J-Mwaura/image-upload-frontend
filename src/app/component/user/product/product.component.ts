@@ -17,6 +17,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
+import { BookingServiceImpl } from '../../../services/servicesImpl/booking-service-impl.service';
+import { BookingDTO } from '../../../model/dto/booking-dto';
+import { BookingStatus, PaymentStatus } from '../../../model/booking';
 
 
 @Component({
@@ -57,7 +60,8 @@ export class UserProductComponent implements OnInit {
     private productService: ProductService,
     private snackBar: MatSnackBar,
     private staffService: StaffService,
-    private customerService: CustomerService
+    private customerService: CustomerService,
+    private bookingService: BookingServiceImpl,
   ) {}
 
   ngOnInit(): void {
@@ -159,27 +163,28 @@ export class UserProductComponent implements OnInit {
         }
       );
       return;
-    }
-
-    const bookingData = {
-      customerId: selectedCustomer,
+    }// Construct the BookingDTO object
+    const bookingData: BookingDTO = {
       productId: productId,
-      staffId: selectedStaff,
-      price: enteredPrice,
+      customerId: selectedCustomer,
+      scheduledTime: undefined,
+      status: BookingStatus.PENDING,
+      paymentStatus: PaymentStatus.UNPAID,
+      notes: undefined,
+      // ... other optional fields you might collect
     };
-    console.log(bookingData);
 
-    // Send this data to your Spring backend using a service.  You'll need to create a booking service.
-    // this.bookingService.createBooking(bookingData).subscribe({
-    //  next: (response) => {
-    //    this.snackBar.open('Booking successful!', 'Close', { duration: 3000 });
-    //    console.log('Booking successful:', response);
-    //  },
-    //  error: (error) => {
-    //    this.snackBar.open('Booking failed!', 'Close', { duration: 3000 });
-    //    console.error('Booking failed:', error);
-    //  },
-    // });
+    //Send this data to your Spring backend using a service.  You'll need to create a booking service.
+    this.bookingService.createBooking(bookingData).subscribe({
+     next: (response) => {
+       this.snackBar.open('Booking successful!', 'Close', { duration: 3000 });
+       console.log('Booking successful:', response);
+     },
+     error: (error) => {
+       this.snackBar.open('Booking failed!', 'Close', { duration: 3000 });
+       console.error('Booking failed:', error);
+     },
+    });
   }
 
   onPriceChange(value: number | null, productId: number) {
