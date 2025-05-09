@@ -7,7 +7,6 @@ export interface Booking {
     scheduledTime?: string | null; 
     status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
     paymentStatus: 'UNPAID' | 'PAID' | 'PENDING' | 'FAILED';
-    notes?: string;
   }
   
   // Enums for better type safety
@@ -23,4 +22,11 @@ export interface Booking {
     PAID = 'PAID',
     PENDING = 'PENDING',
     FAILED = 'FAILED'
+  }
+
+  export enum PaymentMethodType {
+    CASH = 'CASH',
+    CARD = 'CARD',
+    MOBILE_MONEY = 'MOBILE_MONEY',
+    OTHER = 'OTHER'
   }

@@ -1,5 +1,6 @@
 export interface CustomerDto {
-    id: number;
+    id?: number;
     name: string;
-    email: string;
+    email?: string | null;
+    phone?: string | null;
 }

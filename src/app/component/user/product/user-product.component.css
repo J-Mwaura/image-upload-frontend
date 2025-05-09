@@ -68,3 +68,10 @@ mat-card-actions {
   color: red;
   margin-top: 10px;
 }
+
+.product-info {
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+  gap: 1rem;
+}

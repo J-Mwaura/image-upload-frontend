@@ -1,5 +1,3 @@
-// src/app/services/booking.service.ts (or interfaces/booking-service.interface.ts)
-
 import { Observable } from 'rxjs';
 import { BookingDTO } from '../model/dto/booking-dto'; // Import the DTO
 import { ApiResponse } from '../model/response/ApiResponse' ; 
@@ -16,7 +14,6 @@ export interface BookingService {
    * @returns An Observable of the API response containing the created BookingDTO.
    */
   createBooking(bookingDto: BookingDTO): Observable<ApiResponse<BookingDTO>>;
-
   /**
    * Sends a request to retrieve a booking by its ID.
    * @param bookingId The ID of the booking to retrieve.
@@ -44,6 +41,19 @@ export interface BookingService {
    * @returns An Observable of the API response containing a list of BookingDTOs.
    */
   getAllBookings(): Observable<ApiResponse<BookingDTO[]>>;
+
+  /**
+   * Sends a request to search for distinct license plates matching a search term.
+   * @param searchTerm The term to search for.
+   * @returns An Observable of the API response containing an array of matching license plate strings.
+   */
+  searchLicensePlates(searchTerm: string): Observable<ApiResponse<string[]>>; // Added method for license plate search
+
+  /**
+   * Sends a request to retrieve all distinct license plates from the system.
+   * @returns An Observable of the API response containing an array of all license plate strings.
+   */
+  getAllLicensePlates(): Observable<ApiResponse<string[]>>;
 
   // Add other methods as needed, e.g., getBookingsByCustomerId, updateBookingStatus, etc.
 }
