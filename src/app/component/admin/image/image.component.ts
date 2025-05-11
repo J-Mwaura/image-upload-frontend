@@ -8,7 +8,7 @@ import {NgForm,
 } from '@angular/forms';
 import { ProductImage } from '../../../model/ProductImage.model';
 import { ImageService } from '../../../services/image.service';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, Subscription, takeUntil } from 'rxjs';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
@@ -36,11 +36,11 @@ import { ApiResponse } from '../../../model/response/ApiResponse';
 })
 
 export class ImageComponent implements OnInit {
+  private dialogSub: Subscription | undefined;
   productImage: ProductImage = new ProductImage();
   selectedImage: ProductImage | null = null;
   imageEditForm: FormGroup;
   displayedColumns: string[] = ['name', 'url', 'id', 'action', 'edit'];
-  private destroy$ = new Subject<void>();
   productImages: ProductImage[] = []
   totalCount: number = 0;
   pageIndex: number = 1;
@@ -49,6 +49,8 @@ export class ImageComponent implements OnInit {
   size: number = 4;
   public fileName!: string;
   public url!: File[];
+  isLoading = false;
+
   @ViewChild('editModal') editModal!: ElementRef;
 
   constructor(private imageService: ImageService, private http: HttpClient,
@@ -63,24 +65,33 @@ export class ImageComponent implements OnInit {
   ngOnInit(): void {
     this.loadImages();
   }
+  
 
-  loadImages(event?: PageEvent) {
+  loadImages(event?: PageEvent): void {
+    // Update pagination if event exists
     if (event) {
-        this.pageIndex = event.pageIndex;
-        this.pageSize = event.pageSize;
+      this.pageIndex = event.pageIndex;
+      this.pageSize = event.pageSize;
     }
-
-    this.imageService.getImageList(this.pageIndex, this.pageSize).subscribe(
-        (response: any) => {
-            this.productImages = response.content;
-            this.totalCount = response.totalElements;
-        },
-        (error) => {
-          this.snackBar.open('Error loading images:', 'Close',{duration: 3000,
-          });
-        }
-    );
-}
+  
+    this.isLoading = true; // Add this line if you have a loading state
+  
+    this.imageService.getImageList(this.pageIndex, this.pageSize).subscribe({
+      next: (response: any) => {
+        this.productImages = response.content;
+        this.totalCount = response.totalElements;
+        this.isLoading = false;
+      },
+      error: (error) => {
+        this.snackBar.open('Error loading images: ' + (error.error?.message || ''), 'Close', {
+          duration: 3000,
+          panelClass: ['error-snackbar']
+        });
+        this.isLoading = false;
+        console.error('Image load error:', error);
+      }
+    });
+  }
 
   onChange(event: any):void {
     const files: FileList = event.target.files;
@@ -196,7 +207,6 @@ updateSelectedImage() {
   }
 }
 
-
 delete(productImage: ProductImage) {
   const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent, {
     width: '400px',
@@ -205,21 +215,31 @@ delete(productImage: ProductImage) {
 
   dialogRef.afterClosed().subscribe(result => {
     if (result) {
-      this.deleteImage(productImage.id!);
+      this.onDeleteImage(productImage.id!);
     }
   });
 }
 
-deleteImage(id: number) {
-
-  this.imageService.delete(id).pipe(takeUntil(this.destroy$)).subscribe({
+onDeleteImage(id: number): void {
+  this.imageService.deleteImage(id).subscribe({
     next: (response) => {
-      this.snackBar.open('Image deleted successfully', 'Close',{duration: 3000,
-      });
-      this.loadImages();
+      if (response.success) {
+        this.snackBar.open(response.message, 'Close', { 
+          duration: 3000,
+          panelClass: ['success-snackbar']
+        });
+        this.loadImages(); // Refresh your data
+      } else {
+        this.snackBar.open(response.message, 'Close', {
+          duration: 5000,
+          panelClass: ['error-snackbar']
+        });
+      }
     },
     error: (error) => {
-      this.snackBar.open('Error deleting image:', 'Close',{duration: 3000,
+      this.snackBar.open('An unexpected error occurred', 'Close', {
+        duration: 5000,
+        panelClass: ['error-snackbar']
       });
     }
   });

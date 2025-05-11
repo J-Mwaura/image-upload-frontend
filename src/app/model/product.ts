@@ -1,13 +1,14 @@
 export interface Product {
-    id?: number | null;
-    itemType: string;
-    name?: string;
-    make?: string;
-    model?: string;
-    licensePlate?: string;
-    description?: string;
-    serialNumber?: string;
-    notes?: string;
-    mainImageId?: number;     
-    imageIds?: number[]; 
-  }
+  id?: number | null;
+  price: number;
+  name: string;
+  description?: string | null;
+  mainImageId?: number | null;
+  imageIds?: number[];
+  categoryId?: number | null;
+  productType: string;
+  active?: boolean | null;
+  createdAt?: string;
+  updatedAt?: string;
+  itemType: string;
+}

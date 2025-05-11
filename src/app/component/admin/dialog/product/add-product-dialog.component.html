@@ -19,40 +19,16 @@
       <mat-error *ngIf="addProductForm.controls['price'].hasError('min')">Price must be non-negative</mat-error>
     </mat-form-field>
 
-    <mat-form-field appearance="outline">
-      <mat-label>License Plate</mat-label>
-      <input matInput placeholder="License Plate" formControlName="licensePlate">
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Item Type</mat-label>
-      <input matInput placeholder="Item Type" formControlName="itemType">
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Make</mat-label>
-      <input matInput placeholder="Make" formControlName="make">
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Model</mat-label>
-      <input matInput placeholder="Model" formControlName="model">
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Serial Number</mat-label>
-      <input matInput placeholder="Serial Number" formControlName="serialNumber">
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Notes</mat-label>
-      <textarea matInput placeholder="Notes" formControlName="notes"></textarea>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Department</mat-label>
-      <input matInput placeholder="Department" formControlName="department">
-    </mat-form-field>
+    <div class="form-group">
+      <label>Product Type</label>
+      <mat-radio-group formControlName="productType" required>
+        <mat-radio-button value="NON_VEHICLE" class="radio-button">Non-Vehicle</mat-radio-button>
+        <mat-radio-button value="VEHICLE" class="radio-button">Vehicle</mat-radio-button>
+      </mat-radio-group>
+      <mat-error *ngIf="addProductForm.get('productType')?.hasError('required')">
+        Product type is required
+      </mat-error>
+    </div>
 
     <div>
       <h3>Select Category</h3>
@@ -72,9 +48,9 @@
       </div>
       <mat-paginator
         [length]="totalCategories"
-        [pageSize]="pageSize"
+        [pageSize]="categoryPageSize" 
         [pageSizeOptions]="[5, 10, 25, 100]"
-        [pageIndex]="currentPage"
+        [pageIndex]="currentCategoryPage"
         (page)="handleCategoryPageEvent($event)"
         aria-label="Select page of categories"
         *ngIf="totalCategories > 0"
@@ -140,6 +116,6 @@
   </form>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
-  <button mat-button mat-dialog-close>Cancel</button>
-  <button mat-raised-button color="primary" [disabled]="addProductForm.invalid || !addProductForm.get('mainImageId')?.value || !selectedCategoryId || isLoadingCategories" (click)="save()">Save</button>
+  <button mat-button (click)="onNoClick()">Cancel</button>
+  <button mat-raised-button color="primary" [disabled]="addProductForm.invalid || !addProductForm.get('mainImageId')?.value || addProductForm.get('categoryId')?.value === null || isLoadingCategories" (click)="save()">Save</button>
 </mat-dialog-actions>

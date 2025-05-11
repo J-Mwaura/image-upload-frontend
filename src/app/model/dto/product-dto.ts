@@ -1,17 +1,15 @@
 export interface ProductDto {
   id?: number | null;
-  itemType: string;
-  name?: string;
-  make: string;
-  model: string;
-  licensePlate?: string; // Optional as per previous discussion
-  description?: string; // Optional
-  serialNumber?: string; // Optional
-  notes?: string;
-  department?: string;
-  price?: number;
-  mainImageId?: number;
+  price: number;
+  name: string;
+  description?: string | null;
+  mainImageId?: number | null;
   imageIds?: number[];
-  mainImageUrl?: string | null; 
-  otherImageUrls?: string[] | null; 
+  categoryId?: number | null;
+  productType: string;
+  active?: boolean | null;
+  createdAt?: string;
+  updatedAt?: string;
+  mainImageUrl?: string | null;
+  otherImageUrls?: string[] | null;
 }
