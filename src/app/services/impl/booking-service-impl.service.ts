@@ -35,6 +35,16 @@ export class BookingServiceImpl implements BookingService { // Implement the int
       );
   }
 
+  /**
+   * Sends a GET request to retrieve all bookings.
+   * @returns An Observable of the API response containing a list of BookingDTOs.
+   */
+  getAllBookings(): Observable<ApiResponse<BookingDTO[]>> {
+    // You might want to add pagination/sorting parameters here later
+    return this.http.get<ApiResponse<BookingDTO[]>>(`${this.apiUrl}`).pipe(
+      catchError(this.handleError) // Add error handling
+    );
+  }
 
   /**
    * Sends a GET request to retrieve a booking by its ID.
@@ -46,6 +56,18 @@ export class BookingServiceImpl implements BookingService { // Implement the int
       catchError(this.handleError) // Add error handling
     );
   }
+
+  /**
+ * Sends a GET request to search for license plates matching the search term.
+ * @param searchTerm The term to search for in license plates.
+ * @returns An Observable of the API response containing a Set of matching license plates.
+ */
+searchLicensePlates(): Observable<ApiResponse<Set<string>>> {
+  return this.http.get<ApiResponse<Set<string>>>(`${this.apiUrl}/license-plates`)
+    .pipe(
+      catchError(this.handleError)
+    );
+}
 
   /**
    * Sends a PUT request to update an existing booking.
@@ -73,40 +95,6 @@ export class BookingServiceImpl implements BookingService { // Implement the int
     );
   }
 
-  /**
-   * Sends a GET request to retrieve all bookings.
-   * @returns An Observable of the API response containing a list of BookingDTOs.
-   */
-  getAllBookings(): Observable<ApiResponse<BookingDTO[]>> {
-    // You might want to add pagination/sorting parameters here later
-    return this.http.get<ApiResponse<BookingDTO[]>>(`${this.apiUrl}`).pipe(
-      catchError(this.handleError) // Add error handling
-    );
-  }
-
-  getAllLicensePlates(): Observable<ApiResponse<string[]>> {
-    return this.http.get<ApiResponse<string[]>>(
-      `${this.apiUrl}/license-plates`
-    ).pipe(
-      catchError(this.handleError)
-    );
-  }
-
-  /**
-   * Sends a GET request to search for distinct license plates matching a search term.
-   * Calls the backend endpoint /api/bookings/license-plates/search.
-   * @param searchTerm The term to search for.
-   * @returns An Observable of the API response containing an array of matching license plate strings.
-   */
-  searchLicensePlates(searchTerm: string): Observable<ApiResponse<string[]>> {
-    // Create HttpParams to add the search term as a query parameter
-    const params = new HttpParams().set('term', searchTerm);
-
-    // Make the GET request to the search endpoint with the search term parameter
-    return this.http.get<ApiResponse<string[]>>(`${this.apiUrl}/license-plates/search`, { params }).pipe(
-      catchError(this.handleError) // Add error handling
-    );
-  }
 
   /**
    * Handles HTTP errors.

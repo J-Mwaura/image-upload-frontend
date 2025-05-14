@@ -1,0 +1,181 @@
+<h2>Booking Management</h2>
+
+<div class="booking-form">
+  <h3>Create New Booking</h3>
+  <form [formGroup]="bookingForm" (ngSubmit)="createBooking()">
+    <div class="form-group">
+      <label for="productId">Product ID:</label>
+      <input type="number" id="productId" formControlName="productId" required>
+    </div>
+
+    <div class="form-group">
+      <label>Customer:</label>
+      <div>
+        <label for="customerId">ID:</label>
+        <input type="number" id="customerId" formControlName="customerId">
+      </div>
+      <div>
+        <label for="customerName">Name:</label>
+        <input type="text" id="customerName" formControlName="customerName">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Vehicle:</label>
+      <div>
+        <label for="vehicleId">ID:</label>
+        <input type="number" id="vehicleId" formControlName="vehicleId">
+      </div>
+      <div>
+        <label for="licensePlate">License Plate:</label>
+        <input type="text" id="licensePlate" formControlName="licensePlate">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="staffId">Staff ID:</label>
+      <input type="number" id="staffId" formControlName="staffId">
+    </div>
+
+    <div class="form-group">
+      <label for="priceCharged">Price Charged:</label>
+      <input type="number" id="priceCharged" formControlName="priceCharged">
+    </div>
+
+    <div class="form-group">
+      <label for="jobType">Job Type:</label>
+      <input type="text" id="jobType" formControlName="jobType">
+    </div>
+
+    <div class="form-group">
+      <label for="status">Status:</label>
+      <select id="status" formControlName="status">
+        <option value="" disabled selected>Select Status</option>
+        <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="paymentStatus">Payment Status:</label>
+      <select id="paymentStatus" formControlName="paymentStatus">
+        <option value="" disabled selected>Select Payment Status</option>
+        <option *ngFor="let paymentStatus of paymentStatuses" [value]="paymentStatus">{{ paymentStatus }}</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="notes">Notes:</label>
+      <textarea id="notes" formControlName="notes"></textarea>
+    </div>
+
+    <button type="submit" [disabled]="bookingForm.invalid">Create Booking</button>
+    <button type="button" (click)="resetForm()">Reset Form</button>
+  </form>
+
+  <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+  <div *ngIf="successMessage" class="success-message">{{ successMessage }}</div>
+</div>
+
+<hr>
+
+<div class="search-section">
+  <h3>Search License Plates (Strings)</h3>
+  <div class="form-group">
+    <label for="searchPlateString">Search Term (min 2 chars):</label>
+    <input type="text" id="searchPlateString" #searchPlateStringBox (input)="searchLicensePlates(searchPlateStringBox.value)">
+    <span *ngIf="loadingLicensePlateSearch">Loading...</span>
+  </div>
+
+  <div *ngIf="(matchingLicensePlates$ | async) as response">
+    <div *ngIf="response.data && response.data.size > 0">
+      <h4>Matching Plates:</h4>
+      <ul>
+        <li *ngFor="let plate of response.data">{{ plate }}</li>
+      </ul>
+    </div>
+    <div *ngIf="response.data && response.data.size === 0 && searchPlateStringBox.value.trim() && searchPlateStringBox.value.trim().length >= 2">
+      <p>No matching license plates found.</p>
+    </div>
+    <div *ngIf="searchPlateStringBox.value.trim().length < 2 && searchPlateStringBox.value.trim().length > 0">
+      <p>Enter at least 2 characters to search.</p>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<div class="search-section">
+  <h3>Search Vehicles (by License Plate Containing)</h3>
+  <div class="form-group">
+    <label for="searchVehiclePlate">Search Term (min 2 chars):</label>
+    <input type="text" id="searchVehiclePlate" #searchVehiclePlateBox (input)="searchVehicles(searchVehiclePlateBox.value)">
+    <span *ngIf="loadingVehicleSearch">Loading...</span>
+  </div>
+
+  <div *ngIf="(matchingVehicles$ | async) as response">
+    <div *ngIf="response.data && response.data.size > 0">
+      <h4>Matching Vehicles:</h4>
+      <ul>
+        <li *ngFor="let vehicle of response.data">
+                ID: {{ vehicle.id }}, Plate: {{ vehicle.licensePlate }}, Make: {{ vehicle.make }}
+            </li>
+      </ul>
+    </div>
+    <div *ngIf="response.data && response.data.size === 0 && searchVehiclePlateBox.value.trim() && searchVehiclePlateBox.value.trim().length >= 2">
+      <p>No matching vehicles found.</p>
+    </div>
+    <div *ngIf="searchVehiclePlateBox.value.trim().length < 2 && searchVehiclePlateBox.value.trim().length > 0">
+      <p>Enter at least 2 characters to search.</p>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<div class="booking-list">
+  <h3>All Bookings</h3>
+  <button (click)="loadAllBookings()">Refresh List</button>
+  <span *ngIf="loadingBookings">Loading...</span>
+
+  <div *ngIf="(bookings$ | async) as response">
+    <div *ngIf="response.data && response.data.length > 0">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Product ID</th>
+            <th>Customer ID</th>
+            <th>Customer Name</th>
+            <th>Vehicle ID</th>
+            <th>License Plate</th>
+            <th>Staff ID</th>
+            <th>Price</th>
+            <th>Status</th>
+            <th>Payment Status</th>
+            <th>Job Type</th>
+            <th>Created At</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let booking of response.data">
+            <td>{{ booking.bookingId }}</td>
+            <td>{{ booking.productId }}</td>
+            <td>{{ booking.customerId }}</td>
+            <td>{{ booking.customerName }}</td>
+            <td>{{ booking.vehicleId }}</td>
+            <td>{{ booking.licensePlate }}</td>
+            <td>{{ booking.staffId }}</td>
+            <td>{{ booking.priceCharged }}</td>
+            <td>{{ booking.status }}</td>
+            <td>{{ booking.paymentStatus }}</td>
+            <td>{{ booking.jobType }}</td>
+            <td>{{ booking.createdAt | date:'short' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div *ngIf="response.data && response.data.length === 0 && !loadingBookings">
+      <p>No bookings found.</p>
+    </div>
+  </div>
+</div>

@@ -1,6 +1,6 @@
 <div class="container">
   <mat-card>
-    <mat-card-title>Products</mat-card-title>
+    <mat-card-title>Booking</mat-card-title>
     <mat-card-content>
       <div *ngIf="isLoading" class="loading-indicator">
         <mat-spinner></mat-spinner>
@@ -16,14 +16,8 @@
           <mat-expansion-panel *ngFor="let product of products">
             <mat-expansion-panel-header>
               <mat-panel-title class="product-header">
-                <img
-                  *ngIf="mainImageUrls[product.id!]"
-                  class="product-image"
-                  ngSrc="{{ mainImageUrls[product.id!] }}"
-                  alt="{{ product.name }} image"
-                  width="60"
-                  height="60"
-                />
+                <img *ngIf="mainImageUrls[product.id!]" class="product-image" ngSrc="{{ mainImageUrls[product.id!] }}"
+                  alt="{{ product.name }} image" width="60" height="60" />
                 <div class="product-info">
                   <h3>{{ product.name }}</h3>
                   <p class="product-price">{{ product.price | currency:'KES':'symbol':'1.0-0' }}</p>
@@ -44,71 +38,42 @@
 
               <mat-form-field appearance="fill">
                 <mat-label>Customer</mat-label>
-                <!-- Only change needed in template - add (focus) handler -->
-<input
-matInput
-type="text"
-[(ngModel)]="customerInput[product.id!]"
-(input)="onCustomerInputChange($event, product.id!)"
-(focus)="activeProductId = product.id!"
-name="customerInput_{{product.id}}"
-placeholder="Select or Enter Customer"
-maxlength="100"
-[matAutocomplete]="customerAuto"
-/>
-                <mat-autocomplete 
-                  #customerAuto="matAutocomplete" 
-                  
-                  (optionSelected)="onCustomerSelect($event.option.value, product.id!)"
-                  autoActiveFirstOption
-                >
+                <input matInput type="text" [(ngModel)]="customerInput[product.id!]"
+                  (input)="onCustomerInputChange($event, product.id!)" (focus)="activeProductId = product.id!"
+                  name="customerInput_{{product.id}}" placeholder="Select or Enter Customer" maxlength="100"
+                  [matAutocomplete]="customerAuto" />
+                <mat-autocomplete #customerAuto="matAutocomplete"
+                  (optionSelected)="onCustomerSelect($event.option.value, product.id!)" autoActiveFirstOption>
                   <mat-option *ngFor="let customer of filteredCustomers[product.id!]" [value]="customer">
                     {{ customer.name }}
                   </mat-option>
                 </mat-autocomplete>
               </mat-form-field>
+
               <mat-form-field appearance="fill">
                 <mat-label>License Plate</mat-label>
-                <input
-                  matInput
-                  type="text"
-                  [(ngModel)]="licensePlate[product.id!]"
-                  (input)="onLicensePlateChange($event, product.id!)"  
-                  name="licensePlateInput_{{product.id}}"
-                  placeholder="Enter License Plate"
-                  maxlength="50"
-                  [matAutocomplete]="auto" 
-                />
-                 <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayLicensePlate">
-                   <mat-option *ngFor="let option of filteredLicensePlates[product.id!]" [value]="option">
-                    {{ option }}
+                <input matInput type="text" [(ngModel)]="licensePlateInput[product.id!]"
+                  (input)="onLicensePlateInputChange($event, product.id!)" name="licensePlate_{{product.id}}"
+                  placeholder="Enter License Plate" [matAutocomplete]="autoLicensePlate">
+                <mat-autocomplete #autoLicensePlate="matAutocomplete"
+                  (optionSelected)="onLicensePlateSelect($event, product.id!)">
+                  <mat-option *ngFor="let plate of filteredLicensePlates[product.id!]" [value]="plate">
+                    {{ plate }}
                   </mat-option>
                 </mat-autocomplete>
               </mat-form-field>
 
-
               <mat-form-field appearance="fill">
                 <mat-label>Price</mat-label>
-                <input
-                  matInput
-                  type="number"
-                  [ngModel]="enteredPrice[product.id!]"
-                  (ngModelChange)="onPriceChange($event, product.id!)"
-                  min="0"
-                  name="price_{{product.id}}"
-                  placeholder="Enter Price"
-                />
+                <input matInput type="number" [ngModel]="enteredPrice[product.id!]"
+                  (ngModelChange)="onPriceChange($event, product.id!)" min="0" name="price_{{product.id}}"
+                  placeholder="Enter Price" />
               </mat-form-field>
 
               <mat-form-field appearance="fill" class="notes-field">
                 <mat-label>Notes</mat-label>
-                <textarea
-                  matInput
-                  [(ngModel)]="notes[product.id!]"
-                  name="notes_{{product.id}}"
-                  maxlength="255"
-                  placeholder="Add notes (optional)"
-                ></textarea>
+                <textarea matInput [(ngModel)]="notes[product.id!]" name="notes_{{product.id}}" maxlength="255"
+                  placeholder="Add notes (optional)"></textarea>
               </mat-form-field>
 
               <button mat-raised-button color="primary" (click)="bookWash(product.id!)">Book Wash</button>
@@ -117,15 +82,9 @@ maxlength="100"
         </mat-accordion>
       </div>
 
-      <mat-paginator
-        *ngIf="!isLoading && !errorMessage && products.length > 0"
-        [length]="totalCount"
-        [pageSize]="pageSize"
-        [pageIndex]="pageIndex"
-        [pageSizeOptions]="[4, 8, 12, 20]"
-        (page)="handlePageEvent($event)"
-        aria-label="Select page"
-      >
+      <mat-paginator *ngIf="!isLoading && !errorMessage && products.length > 0" [length]="totalCount"
+        [pageSize]="pageSize" [pageIndex]="pageIndex" [pageSizeOptions]="[4, 8, 12, 20]"
+        (page)="handlePageEvent($event)" aria-label="Select page">
       </mat-paginator>
 
       <div *ngIf="!isLoading && !errorMessage && products.length === 0">

@@ -10,6 +10,8 @@ export interface BookingDTO {
   productId: number; // Corresponds to 'product_id'
   customerId?: number; // Corresponds to 'customer_id' (optional)
   staffId?: number; // Corresponds to 'staff_id' (Attendant assigned, optional)
+  vehicleId?: number;
+  customerName?: string | null;
   licensePlate?: string | null; 
   scheduledTime?: string | null;
   createdAt?: string; // Corresponds to 'created_at' (Booking/Job creation time) - string for ISO 8601 timestamp

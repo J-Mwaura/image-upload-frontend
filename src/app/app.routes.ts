@@ -13,6 +13,7 @@ import {AdminProductCategoryComponent} from './component/admin/product-category/
 import {AdminAreaComponent} from './component/admin/board-admin.component';
 import { UserProductComponent } from './component/user/product/product.component';
 import { StaffComponent } from './component/admin/staff/list/staff.component';
+import { BookingComponent } from './component/user/booking/booking.component';
 
 export const routes: Routes = [
   {path: 'login', component: LoginComponent},
@@ -22,9 +23,11 @@ export const routes: Routes = [
   {
     path: 'user', component: UserAreaComponent, canActivate: [authGuard],
     children: [
-      {path: '', redirectTo: 'product', pathMatch: 'full'},
+      //{path: '', redirectTo: 'booking', pathMatch: 'full'},
+      //{path: '', redirectTo: 'product', pathMatch: 'full'},
       {
-        path: 'product', component: UserProductComponent
+        path: 'booking', component: BookingComponent
+        //path: 'product', component: UserProductComponent
       },
     ],
   },
@@ -37,11 +40,11 @@ export const routes: Routes = [
       {path: '', redirectTo: 'images', pathMatch: 'full'}, // Default admin route
       {path: 'images', component: ImageComponent},
       {path: 'register', component: RegisterComponent},
-      {path: 'user', component: UserAreaComponent},
       {path: 'staff', component: StaffComponent},
       {path: 'categories', component: ProductCategoryComponent},
       {path: 'category', component: AdminProductCategoryComponent},
       {path: 'products', component: AdminProductComponent}, 
+      {path: 'user', component: UserAreaComponent},
     ],
 
   },

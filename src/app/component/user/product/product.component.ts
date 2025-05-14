@@ -1,4 +1,4 @@
-import { Component, OnInit, DEFAULT_CURRENCY_CODE, ChangeDetectorRef  } from '@angular/core';
+import { Component, OnInit, DEFAULT_CURRENCY_CODE, ChangeDetectorRef } from '@angular/core';
 import { ProductService } from '../../../services/product.service';
 import { ProductDto } from '../../../model/dto/product-dto';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -17,13 +17,14 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select'; // Keep if needed elsewhere, but removed from customer
 import { FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
-import { BookingServiceImpl } from '../../../services/servicesImpl/booking-service-impl.service'; // Inject the concrete service implementation
+import { BookingServiceImpl } from '../../../services/impl/booking-service-impl.service'; // Inject the concrete service implementation
 import { BookingDTO } from '../../../model/dto/booking-dto'; // Assuming this is the updated DTO
 import { BookingStatus, PaymentStatus } from '../../../model/booking'; // Import Enums
 import { ApiResponse } from '../../../model/response/ApiResponse'; // Import ApiResponse
-import { Observable, of } from 'rxjs'; // Keep Observable, Added of (for catchError)
-import { catchError, tap } from 'rxjs/operators'; // Keep catchError, Added tap
-import { MatAutocompleteModule } from '@angular/material/autocomplete'; // Import MatAutocompleteModule
+import { Observable, of, Subject } from 'rxjs'; // Keep Observable, Added of (for catchError)
+import { catchError, debounceTime, distinctUntilChanged, switchMap, tap } from 'rxjs/operators'; // Keep catchError, Added tap
+import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete'; // Import MatAutocompleteModule
+import { VehicleService } from '../../../services/vehicle.service';
 
 // Removed locale registration as it's not directly related to the error fix
 // import localeEn from '@angular/common/locales/en'; // Default English locale
@@ -81,12 +82,12 @@ export class UserProductComponent implements OnInit {
   // Properties to hold entered price, notes, and license plate per product
   enteredPrice: { [productId: number]: number | null } = {};
   notes: { [productId: number]: string | undefined } = {}; // Property to store notes per product
-  licensePlate: { [productId: number]: string | undefined } = {}; // Added: Property to store license plate per product
+  // licensePlate: { [productId: number]: string | undefined } = {}; // Added: Property to store license plate per product
 
-  // Added property to store all loaded license plates (for autocomplete suggestions)
-  allLicensePlates: string[] = [];
-  // Added property to store filtered license plates per product (for autocomplete suggestions)
-  filteredLicensePlates: { [productId: number]: string[] } = {};
+  // Property to store all loaded license plates (for autocomplete suggestions)
+  licensePlateInput: { [productId: number]: string | undefined } = {}; // To hold the text entered in the license plate input
+  filteredLicensePlates: { [productId: number]: string[] } = {}; // To hold the filtered license plate suggestions
+  private licensePlateSearchTerms = new Subject<string>();
 
 
   constructor(
@@ -95,26 +96,66 @@ export class UserProductComponent implements OnInit {
     private staffService: StaffService, // Keep StaffService injection
     private customerService: CustomerService, // Keep CustomerService injection
     private bookingService: BookingServiceImpl, // Inject the concrete service implementation
+    private vehicleService: VehicleService,
     private cdr: ChangeDetectorRef,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
-    console.log('ngOnInit started. Loading initial data (Products, Staff, Customers, and License Plates)...');
     this.isLoading = true; // Set loading to true at the start
-
-    // Load data individually as requested, managing loading state
-    this.getProducts(); // This will set isLoading to false when products are loaded
-
-    // Load staff list
+    this.getProducts();
     this.loadStaff();
-
-    // Load customer list
     this.loadCustomers();
-
-    // Load all license plates using the refactored method
-    this.loadAllLicensePlates();
+    this.setupLicensePlateSearchSubscription();
   }
 
+  /**
+   * Added: Sets up the subscription for reactive license plate searching as the user types.
+   * This method does NOT load all license plates initially. It listens to the
+   * licensePlateSearchTerms Subject and triggers a search via VehicleService
+   * when the user types at least 2 characters.
+   */
+  setupLicensePlateSearchSubscription(): void {
+    this.licensePlateSearchTerms.pipe(
+      debounceTime(300), // Wait 300ms after keystroke
+      distinctUntilChanged(), // Only emit if the search term has changed
+      switchMap((term: string) => {
+        // Call the VehicleService search method
+        // Assuming vehicleService.findMatchingLicensePlates returns Observable<string[]>
+        if (term.trim().length >= 2) { // Only search if term is at least 2 characters
+          return this.vehicleService.findMatchingLicensePlates(term).pipe(
+            catchError(error => {
+              console.error('Error searching license plates:', error);
+              return of([]); // Return empty array on error
+            })
+          );
+        } else {
+          return of([]); // Return empty array if term is too short or empty
+        }
+      })
+    ).subscribe((plates: any) => {
+      // This subscription receives the search results (plates: string[]).
+      // However, it doesn't know *which* product's input triggered the search.
+      // The `onLicensePlateInputChange` method already handles updating the
+      // `filteredLicensePlates` for the specific product by calling the service directly.
+      // This subscription is currently redundant for updating the UI directly.
+      // It could be used for logging or other side effects, but it's not
+      // directly populating the `filteredLicensePlates[productId]` map.
+
+      // For this template-driven forms approach, handling the service call
+      // and updating the filtered list directly in `onLicensePlateInputChange`
+      // is simpler and ensures the correct product's list is updated.
+
+      console.log('License plate search results received (via setupLicensePlateSearchSubscription pipe):', plates);
+      // The actual update to filteredLicensePlates[productId] happens in onLicensePlateInputChange
+    });
+  }
+
+  onLicensePlateSelect(event: MatAutocompleteSelectedEvent, productId: number): void {
+    const plate = event.option.value;
+    this.licensePlateInput[productId] = plate;
+    console.log(`License Plate selected for product ${productId}: ${plate}`);
+    this.cdr.detectChanges();
+  }
   /**
    * Fetches products with pagination.
    * @param event Optional PageEvent for pagination.
@@ -141,11 +182,8 @@ export class UserProductComponent implements OnInit {
           this.filteredCustomers[productId] = [...this.customers]; // Initialize filtered customers with all customers
           this.enteredPrice[productId] = null;
           this.notes[productId] = undefined; // Initialize notes as undefined
-          this.licensePlate[productId] = undefined; // Added: Initialize license plate as undefined (input will be empty)
-
-          // Initialize filteredLicensePlates for this product with all available plates
-          // This ensures autocomplete works even if products load before allLicensePlates
-          this.filteredLicensePlates[productId] = [...this.allLicensePlates];
+          this.licensePlateInput[productId] = '';
+          this.filteredLicensePlates[productId] = [];;
         });
         this.isLoading = false; // Set loading false after products are processed
         console.log('Loaded products and initialized per-product fields.');
@@ -199,8 +237,8 @@ export class UserProductComponent implements OnInit {
         console.log('Loaded customers', this.customers);
         // Initialize filteredCustomers for all existing products after customers are loaded
         this.products.forEach(product => {
-           const productId = product.id!;
-           this.filteredCustomers[productId] = [...this.customers];
+          const productId = product.id!;
+          this.filteredCustomers[productId] = [...this.customers];
         });
         console.log('Initialized filteredCustomers for products after loading customers.');
       },
@@ -214,73 +252,61 @@ export class UserProductComponent implements OnInit {
   }
 
 
+
   /**
    * Added: Loads all distinct license plates from the backend. (Called in ngOnInit)
    * This is for autocomplete suggestions. Refactored to match loadStaff style.
    */
-  loadAllLicensePlates(): void { // Changed return type to void
-    console.log('Attempting to load all license plates...');
-    this.bookingService.getAllLicensePlates().subscribe({ // Subscribing directly
-      next: (response: ApiResponse<string[] | null>) => { // Expecting ApiResponse<string[]> based on your service
-        console.log('Raw license plates response from backend (getAll):', response); // Log the raw response
+  // loadAllLicensePlates(): void { // Changed return type to void
+  //   console.log('Attempting to load all license plates...');
+  //   this.vehicleService.getAllVehicles().subscribe({ // Subscribing directly
+  //     next: (response: ApiResponse<string[] | null>) => { // Expecting ApiResponse<string[]> based on your service
+  //       console.log('Raw license plates response from backend (getAll):', response); // Log the raw response
 
-        // Check if the response is successful and contains data which is an array
-        if (response && response.success && response.data && Array.isArray(response.data)) {
-           this.allLicensePlates = response.data;
-           console.log('Loaded all license plates successfully:', this.allLicensePlates);
+  //       // Check if the response is successful and contains data which is an array
+  //       if (response && response.success && response.data && Array.isArray(response.data)) {
+  //          this.allLicensePlates = response.data;
+  //          console.log('Loaded all license plates successfully:', this.allLicensePlates);
 
-           // Initialize filteredLicensePlates for all currently loaded products
-           // This ensures autocomplete suggestions are available once plates are loaded
-           this.products.forEach(product => {
-              const productId = product.id!;
-              this.filteredLicensePlates[productId] = [...this.allLicensePlates];
-           });
-           console.log('Initialized filteredLicensePlates for products.');
+  //          // Initialize filteredLicensePlates for all currently loaded products
+  //          // This ensures autocomplete suggestions are available once plates are loaded
+  //          this.products.forEach(product => {
+  //             const productId = product.id!;
+  //             this.filteredLicensePlates[productId] = [...this.allLicensePlates];
+  //          });
+  //          console.log('Initialized filteredLicensePlates for products.');
 
-        } else {
-           // Handle cases where response is null, not successful, or data is not an array
-           console.error('Backend returned unsuccessful or unexpected response format or null for loading all license plates:', response);
-           this.allLicensePlates = []; // Ensure array is empty on unexpected response
-           // Also ensure filtered lists are empty
-            this.products.forEach(product => {
-              const productId = product.id!;
-              this.filteredLicensePlates[productId] = [];
-           });
-           console.log('allLicensePlates and filteredLicensePlates set to empty array.');
-           // Optionally set an error message if this is critical for the user
-           // this.errorMessage = response?.message || 'Failed to load available license plates.';
-        }
-      },
-      error: (err) => {
-        // This block handles HTTP errors (like 404, 500)
-        console.error('Error loading all license plates (HTTP Error):', err); // More specific error log
-        this.allLicensePlates = []; // Ensure array is empty on error
-         // Also ensure filtered lists are empty
-         this.products.forEach(product => {
-              const productId = product.id!;
-              this.filteredLicensePlates[productId] = [];
-           });
-        console.log('allLicensePlates and filteredLicensePlates set to empty array due to error.');
-        this.snackBar.open('Error loading available license plates.', 'Close', { duration: 3000 }); // Optionally inform user
-      }
-    });
-  }
+  //       } else {
+  //          // Handle cases where response is null, not successful, or data is not an array
+  //          console.error('Backend returned unsuccessful or unexpected response format or null for loading all license plates:', response);
+  //          this.allLicensePlates = []; // Ensure array is empty on unexpected response
+  //          // Also ensure filtered lists are empty
+  //           this.products.forEach(product => {
+  //             const productId = product.id!;
+  //             this.filteredLicensePlates[productId] = [];
+  //          });
+  //          console.log('allLicensePlates and filteredLicensePlates set to empty array.');
+  //          // Optionally set an error message if this is critical for the user
+  //          // this.errorMessage = response?.message || 'Failed to load available license plates.';
+  //       }
+  //     },
+  //     error: (err) => {
+  //       // This block handles HTTP errors (like 404, 500)
+  //       console.error('Error loading all license plates (HTTP Error):', err); // More specific error log
+  //       this.allLicensePlates = []; // Ensure array is empty on error
+  //        // Also ensure filtered lists are empty
+  //        this.products.forEach(product => {
+  //             const productId = product.id!;
+  //             this.filteredLicensePlates[productId] = [];
+  //          });
+  //       console.log('allLicensePlates and filteredLicensePlates set to empty array due to error.');
+  //       this.snackBar.open('Error loading available license plates.', 'Close', { duration: 3000 }); // Optionally inform user
+  //     }
+  //   });
+  // }
 
 
-  /**
-   * Filters the locally loaded license plates based on the search term for a specific product.
-   * Updates the filteredLicensePlates array for that product.
-   * @param searchTerm The term to filter by.
-   * @param productId The ID of the product.
-   */
-  filterLicensePlates(searchTerm: string, productId: number): void {
-    const filterValue = searchTerm ? searchTerm.toLowerCase() : '';
-    // Filter against the locally stored allLicensePlates list and assign to the specific product's filtered list
-    this.filteredLicensePlates[productId] = this.allLicensePlates.filter(plate =>
-      plate.toLowerCase().includes(filterValue)
-    );
-    console.log(`Filtered license plates for product ${productId} with term "${searchTerm}":`, this.filteredLicensePlates[productId]);
-  }
+
 
   /**
    * Added: Handles input changes in the customer autocomplete input field.
@@ -289,39 +315,39 @@ export class UserProductComponent implements OnInit {
    * @param productId The ID of the product associated with this input.
    */
   // Add this property to track the active product
- activeProductId: number | null = null;
+  activeProductId: number | null = null;
 
-// Replace the existing onCustomerSelect method with:
-onCustomerSelect(customer: CustomerDto, productId: number): void {
-  console.log(`Customer selected for product ${productId}:`, customer);
-  
-  this.activeProductId = productId;
-  this.selectedCustomerId[productId] = customer?.id || null;
-  this.customerInput[productId] = customer ? customer.name : '';
-  this.filteredCustomers[productId] = [...this.customers];
-  this.cdr.detectChanges();
-}
+  // Replace the existing onCustomerSelect method with:
+  onCustomerSelect(customer: CustomerDto, productId: number): void {
+    console.log(`Customer selected for product ${productId}:`, customer);
 
-// Replace the existing onCustomerInputChange method with:
-onCustomerInputChange(event: Event, productId: number): void {
-  if (this.activeProductId !== productId) return;
-  
-  const value = (event.target as HTMLInputElement).value;
-  this.customerInput[productId] = value;
-  
-  const filterValue = value.toLowerCase();
-  this.filteredCustomers[productId] = this.customers.filter(c => 
-    c.name.toLowerCase().includes(filterValue) || 
-    (c.email && c.email.toLowerCase().includes(filterValue))
-  );
-  
-  if (!this.filteredCustomers[productId].some(c => c.id === this.selectedCustomerId[productId])) {
-    this.selectedCustomerId[productId] = null;
+    this.activeProductId = productId;
+    this.selectedCustomerId[productId] = customer?.id || null;
+    this.customerInput[productId] = customer ? customer.name : '';
+    this.filteredCustomers[productId] = [...this.customers];
+    this.cdr.detectChanges();
   }
-}
 
-// Replace the existing displayCustomer method with:
-displayCustomer = (customer: CustomerDto): string => customer?.name || '';
+  // Replace the existing onCustomerInputChange method with:
+  onCustomerInputChange(event: Event, productId: number): void {
+    if (this.activeProductId !== productId) return;
+
+    const value = (event.target as HTMLInputElement).value;
+    this.customerInput[productId] = value;
+
+    const filterValue = value.toLowerCase();
+    this.filteredCustomers[productId] = this.customers.filter(c =>
+      c.name.toLowerCase().includes(filterValue) ||
+      (c.email && c.email.toLowerCase().includes(filterValue))
+    );
+
+    if (!this.filteredCustomers[productId].some(c => c.id === this.selectedCustomerId[productId])) {
+      this.selectedCustomerId[productId] = null;
+    }
+  }
+
+  // Replace the existing displayCustomer method with:
+  displayCustomer = (customer: CustomerDto): string => customer?.name || '';
 
 
 
@@ -351,8 +377,8 @@ displayCustomer = (customer: CustomerDto): string => customer?.name || '';
    * @param productId The ID of the product.
    */
   onNotesChange(value: string | undefined, productId: number): void {
-      this.notes[productId] = value;
-      console.log(`Notes for product ${productId}: ${value}`);
+    this.notes[productId] = value;
+    console.log(`Notes for product ${productId}: ${value}`);
   }
 
   /**
@@ -362,12 +388,12 @@ displayCustomer = (customer: CustomerDto): string => customer?.name || '';
    * @param productId The ID of the product.
    */
   onLicensePlateChange(event: Event, productId: number): void {
-      // Extract the value from the input event
-      const value = (event.target as HTMLInputElement).value;
-      this.licensePlate[productId] = value;
-      console.log(`License Plate input changed for product ${productId}: ${value}`);
-      // Trigger local filtering when the input changes to update autocomplete suggestions
-      this.filterLicensePlates(value || '', productId); // Pass the extracted value to filterLicensePlates
+    // Extract the value from the input event
+    const value = (event.target as HTMLInputElement).value;
+    //this.licensePlate[productId] = value;
+    console.log(`License Plate input changed for product ${productId}: ${value}`);
+    // Trigger local filtering when the input changes to update autocomplete suggestions
+    //this.filterLicensePlates(value || '', productId); // Pass the extracted value to filterLicensePlates
   }
 
   /**
@@ -377,6 +403,41 @@ displayCustomer = (customer: CustomerDto): string => customer?.name || '';
    */
   displayLicensePlate(plate: string | undefined): string {
     return plate ? plate : '';
+  }
+
+  /**
+   * Added: Handles input changes in the license plate autocomplete input field.
+   * Triggers the search for license plate suggestions.
+   * @param event The input event.
+   * @param productId The ID of the product associated with this input.
+   */
+  onLicensePlateInputChange(event: Event, productId: number): void {
+    const value = (event.target as HTMLInputElement).value;
+    this.licensePlateInput[productId] = value; // Store the input value
+
+    // Trigger the license plate search Subject
+    // We need to associate the product ID with the search term
+    // A simple Subject doesn't carry extra data easily.
+    // Let's call the service directly here for simplicity in template-driven forms.
+
+    const searchTerm = value.trim();
+    if (searchTerm.length >= 2) {
+      this.vehicleService.findMatchingLicensePlates(searchTerm).subscribe({
+        next: (plates: string[]) => { // Assuming service returns string[]
+          this.filteredLicensePlates[productId] = plates;
+          this.cdr.detectChanges(); // Manually trigger change detection
+        },
+        error: (error) => {
+          console.error('Error filtering license plates:', error);
+          this.filteredLicensePlates[productId] = []; // Clear suggestions on error
+          this.snackBar.open('Error searching license plates.', 'Close', { duration: 3000 });
+          this.cdr.detectChanges();
+        }
+      });
+    } else {
+      this.filteredLicensePlates[productId] = []; // Clear suggestions if term is too short
+      this.cdr.detectChanges();
+    }
   }
 
 
@@ -391,7 +452,7 @@ displayCustomer = (customer: CustomerDto): string => customer?.name || '';
     const selectedCustomer = this.selectedCustomerId[productId]; // Get selected customer ID
     const enteredPrice = this.enteredPrice[productId] || 0; // Use 0 if null/undefined
     const enteredNotes = this.notes[productId]; // Get the notes for this product
-    const enteredLicensePlate = this.licensePlate[productId]; // Added: Get the entered license plate
+    //const enteredLicensePlate = this.licensePlate[productId]; // Added: Get the entered license plate
     const customerInputValue = this.customerInput[productId]; // Get the current value in the customer input field
 
     // Validate required selections
@@ -419,18 +480,6 @@ displayCustomer = (customer: CustomerDto): string => customer?.name || '';
       return; // Stop the booking process if validation fails
     }
 
-    // Validate license plate (optional based on your requirements, but good practice)
-    if (!enteredLicensePlate || enteredLicensePlate.trim() === '') {
-         this.snackBar.open(
-           'Please enter the vehicle license plate.',
-           'Close',
-           {
-             duration: 3000,
-           }
-         );
-         return; // Stop the booking process if validation fails
-    }
-
     // Determine customerId to use for the booking
     let customerIdForBooking: number | undefined = selectedCustomer || undefined; // Use selected ID if available
 
@@ -443,46 +492,46 @@ displayCustomer = (customer: CustomerDto): string => customer?.name || '';
     // A better approach is to create the customer first if not selected. Let's implement that.
 
     if (!selectedCustomer && customerInputValue && customerInputValue.trim() !== '') {
-        // Attempt to find customer by name first (optional, if backend supports it)
-        const existingCustomer = this.customers.find(c => c.name.toLowerCase() === customerInputValue.trim().toLowerCase());
+      // Attempt to find customer by name first (optional, if backend supports it)
+      const existingCustomer = this.customers.find(c => c.name.toLowerCase() === customerInputValue.trim().toLowerCase());
 
-        if (existingCustomer) {
-            customerIdForBooking = existingCustomer.id;
-            console.log(`Found existing customer by name: ${existingCustomer.name}, ID: ${customerIdForBooking}`);
-        } else {
-           // If no existing customer found by name, create a new one
-           console.log(`Customer with name "${customerInputValue.trim()}" not found. Attempting to create new customer.`);
-           const newCustomer: CustomerDto = { name: customerInputValue.trim() }; // Only name is required in your DTO
+      if (existingCustomer) {
+        customerIdForBooking = existingCustomer.id;
+        console.log(`Found existing customer by name: ${existingCustomer.name}, ID: ${customerIdForBooking}`);
+      } else {
+        // If no existing customer found by name, create a new one
+        console.log(`Customer with name "${customerInputValue.trim()}" not found. Attempting to create new customer.`);
+        const newCustomer: CustomerDto = { name: customerInputValue.trim() }; // Only name is required in your DTO
 
-           // Subscribe to the customer creation observable
-           this.customerService.createCustomer(newCustomer).subscribe({
-               next: (response: ApiResponse<CustomerDto | null>) => {
-                   if (response && response.success && response.data && response.data.id !== undefined && response.data.id !== null) {
-                       customerIdForBooking = response.data.id;
-                       console.log('New customer created successfully:', response.data);
-                       this.snackBar.open(`New customer "${response.data.name}" created.`, 'Close', { duration: 3000 });
-                       // Now proceed with booking using the new customer ID
-                       this.proceedWithBooking(productId, selectedStaff, customerIdForBooking, enteredPrice, enteredNotes, enteredLicensePlate);
-                   } else {
-                       console.error('Failed to create new customer:', response);
-                       const errorMessage = response?.message || 'Failed to create new customer.';
-                       this.snackBar.open(errorMessage, 'Close', { duration: 5000 });
-                       this.isLoading = false; // Ensure loading is off if creation fails
-                   }
-               },
-               error: (error) => {
-                   console.error('Error creating new customer:', error);
-                   this.snackBar.open('Error creating new customer. Please try again.', 'Close', { duration: 5000 });
-                   this.isLoading = false; // Ensure loading is off on error
-               }
-           });
-           return; // Exit bookWash for now, it will be called again after customer creation
-        }
+        // Subscribe to the customer creation observable
+        this.customerService.createCustomer(newCustomer).subscribe({
+          next: (response: ApiResponse<CustomerDto | null>) => {
+            if (response && response.success && response.data && response.data.id !== undefined && response.data.id !== null) {
+              customerIdForBooking = response.data.id;
+              console.log('New customer created successfully:', response.data);
+              this.snackBar.open(`New customer "${response.data.name}" created.`, 'Close', { duration: 3000 });
+              // Now proceed with booking using the new customer ID
+              this.proceedWithBooking(productId, selectedStaff, customerIdForBooking, enteredPrice, enteredNotes);
+            } else {
+              console.error('Failed to create new customer:', response);
+              const errorMessage = response?.message || 'Failed to create new customer.';
+              this.snackBar.open(errorMessage, 'Close', { duration: 5000 });
+              this.isLoading = false; // Ensure loading is off if creation fails
+            }
+          },
+          error: (error) => {
+            console.error('Error creating new customer:', error);
+            this.snackBar.open('Error creating new customer. Please try again.', 'Close', { duration: 5000 });
+            this.isLoading = false; // Ensure loading is off on error
+          }
+        });
+        return; // Exit bookWash for now, it will be called again after customer creation
+      }
     }
 
     // If we reached here, either a customer was selected, found by name, or the input was empty (already validated)
     // Now proceed with creating the booking
-    this.proceedWithBooking(productId, selectedStaff, customerIdForBooking, enteredPrice, enteredNotes, enteredLicensePlate);
+    this.proceedWithBooking(productId, selectedStaff, customerIdForBooking, enteredPrice, enteredNotes);
   }
 
 
@@ -495,58 +544,57 @@ displayCustomer = (customer: CustomerDto): string => customer?.name || '';
    * @param notes The notes for the booking.
    * @param licensePlate The license plate.
    */
-  private proceedWithBooking(productId: number, staffId: number | null, customerId: number | undefined, price: number, notes: string | 
-    undefined, licensePlate: string | undefined): void {
-      // Ensure customerId is valid before creating booking
-      if (customerId === undefined || customerId === null) {
-          console.error('Cannot proceed with booking: Customer ID is not determined.');
-          this.snackBar.open('Error: Could not determine customer for booking.', 'Close', { duration: 5000 });
-          this.isLoading = false;
-          return;
-      }
+  private proceedWithBooking(productId: number, staffId: number | null, customerId: number | undefined, price: number, notes: string |
+    undefined): void {
+    // Ensure customerId is valid before creating booking
+    if (customerId === undefined || customerId === null) {
+      console.error('Cannot proceed with booking: Customer ID is not determined.');
+      this.snackBar.open('Error: Could not determine customer for booking.', 'Close', { duration: 5000 });
+      this.isLoading = false;
+      return;
+    }
 
-      this.isLoading = true; // Start loading for the booking creation
+    this.isLoading = true; // Start loading for the booking creation
 
-      // Construct the BookingDTO object
-      const bookingData: BookingDTO = {
-        productId: productId,
-        customerId: customerId, // Use the determined customer ID
-        staffId: staffId || undefined, // Include the selected staff ID (use undefined if null)
-        licensePlate: licensePlate?.trim() || null, // Include the entered license plate (trimming whitespace, use null if empty)
+    // Construct the BookingDTO object
+    const bookingData: BookingDTO = {
+      productId: productId,
+      customerId: customerId, // Use the determined customer ID
+      staffId: staffId || undefined, // Include the selected staff ID (use undefined if null)
+      licensePlate: this.licensePlateInput[productId]?.trim() || null,
+      status: BookingStatus.PENDING,
+      paymentStatus: PaymentStatus.UNPAID,
 
-        status: BookingStatus.PENDING,
-        paymentStatus: PaymentStatus.UNPAID,
+      startedAt: null,
+      completedAt: null,
+      estimatedDurationMinutes: null,
+      actualDurationMinutes: null,
 
-        startedAt: null,
-        completedAt: null,
-        estimatedDurationMinutes: null,
-        actualDurationMinutes: null,
+      priceCharged: price,
+      notes: notes || null,
+      jobType: 'standard',
+    };
 
-        priceCharged: price,
-        notes: notes || null,
-        jobType: 'standard',
-      };
-
-      this.bookingService.createBooking(bookingData).subscribe({
-        next: (response: ApiResponse<BookingDTO>) => {
-            if (response.success && response.data) {
-                this.snackBar.open('Booking successful!', 'Close', { duration: 3000 });
-                console.log('Booking successful:', response.data);
-                this.resetProductFields(productId);
-                this.loadAllLicensePlates();
-                this.loadCustomers();
-            } else {
-                const errorMessage = response.message || 'Booking failed!';
-                this.snackBar.open(errorMessage, 'Close', { duration: 3000 });
-            }
-        },
-        error: (error) => {
-            this.snackBar.open('Booking failed! ' + error.error.message, 'Close', { duration: 3000 });
-            console.error('Booking failed:', error);
-        },
-        complete: () => {
-            this.isLoading = false;
+    this.bookingService.createBooking(bookingData).subscribe({
+      next: (response: ApiResponse<BookingDTO>) => {
+        if (response.success && response.data) {
+          this.snackBar.open('Booking successful!', 'Close', { duration: 3000 });
+          console.log('Booking successful:', response.data);
+          this.resetProductFields(productId);
+          //this.loadAllLicensePlates();
+          this.loadCustomers();
+        } else {
+          const errorMessage = response.message || 'Booking failed!';
+          this.snackBar.open(errorMessage, 'Close', { duration: 3000 });
         }
+      },
+      error: (error) => {
+        this.snackBar.open('Booking failed! ' + error.error.message, 'Close', { duration: 3000 });
+        console.error('Booking failed:', error);
+      },
+      complete: () => {
+        this.isLoading = false;
+      }
     });
   }
 
@@ -563,9 +611,11 @@ displayCustomer = (customer: CustomerDto): string => customer?.name || '';
     this.filteredCustomers[productId] = [...this.customers]; // Reset filtered customers
     this.enteredPrice[productId] = 0; // Reset price to 0
     this.notes[productId] = ''; // Reset notes to empty string
-    this.licensePlate[productId] = ''; // Reset license plate to empty string (empty string clears input)
+    this.licensePlateInput[productId] = '';
+    this.filteredLicensePlates[productId] = [];
+    //this.licensePlate[productId] = ''; // Reset license plate to empty string (empty string clears input)
     // Reset filtered license plates for this product to show all suggestions again
-    this.filteredLicensePlates[productId] = [...this.allLicensePlates];
+    //this.filteredLicensePlates[productId] = [...this.allLicensePlates];
   }
 
 
