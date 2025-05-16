@@ -1,4 +1,4 @@
-import { BookingStatus, PaymentMethodType, PaymentStatus } from '../../model/booking'; // Assuming booking.model.ts contains the enums
+import { BookingStatus, PaymentMethodType, PaymentStatus } from '../../model/booking'; 
 
 /**
  * Updated Data Transfer Object for Booking information,
@@ -6,18 +6,18 @@ import { BookingStatus, PaymentMethodType, PaymentStatus } from '../../model/boo
  * This DTO now represents an immediate carwash job instance.
  */
 export interface BookingDTO {
-  bookingId?: number; // Corresponds to the 'id' primary key (optional for creation)
-  productId: number; // Corresponds to 'product_id'
-  customerId?: number; // Corresponds to 'customer_id' (optional)
-  staffId?: number; // Corresponds to 'staff_id' (Attendant assigned, optional)
+  bookingId?: number; 
+  productId: number; 
+  customerId?: number; 
+  staffId?: number;
   vehicleId?: number;
   customerName?: string | null;
   licensePlate?: string | null; 
   scheduledTime?: string | null;
-  createdAt?: string; // Corresponds to 'created_at' (Booking/Job creation time) - string for ISO 8601 timestamp
-  status: BookingStatus; // Corresponds to 'status' (Job status) - Use the imported enum type
-  paymentStatus: PaymentStatus; // Corresponds to 'payment_status' (Payment status for the job) - Use the imported enum type
-  paymentMethod?: PaymentMethodType; // Corresponds to 'payment_method' (optional) - Use the imported enum type
+  createdAt?: string; 
+  status: BookingStatus; 
+  paymentStatus: PaymentStatus;
+  paymentMethod?: PaymentMethodType;
 
   startedAt?: string | null; // Corresponds to 'started_at' (optional, can be null) - string for timestamp
   completedAt?: string | null; // Corresponds to 'completed_at' (optional, can be null) - string for timestamp
