@@ -27,10 +27,6 @@ mat-card-title {
   margin-bottom: 8px;
 }
 
-.mat-expansion-panel-header {
-  /* Align items in the header */
-}
-
 .mat-panel-title.product-header {
   display: flex;
   align-items: center; /* Vertically align name and image */
@@ -74,4 +70,22 @@ mat-card-actions {
   grid-template-columns: auto auto;
   align-items: center;
   gap: 1rem;
+}
+
+/* Style for invalid Mat Form Fields when they have been touched */
+.mat-form-field.ng-invalid.ng-touched .mat-form-field-underline,
+.mat-form-field.ng-invalid.ng-touched .mat-form-field-ripple {
+  /* Change the underline/ripple color */
+  background-color: red !important; /* Use !important if needed to override default theme */
+}
+
+.mat-form-field.ng-invalid.ng-touched .mat-form-field-label {
+  /* Change the label color */
+  color: red !important; /* Use !important if needed */
+}
+
+/* If you are using the 'outline' appearance */
+.mat-form-field-appearance-outline.ng-invalid.ng-touched .mat-form-field-outline-thick {
+  /* Change the outline border color */
+  color: red !important; /* Use !important if needed */
 }

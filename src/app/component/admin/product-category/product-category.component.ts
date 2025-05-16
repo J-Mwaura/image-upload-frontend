@@ -2,7 +2,6 @@ import {Component, OnInit} from '@angular/core';
 import {ProductCategoryService} from '../../../services/product-category.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
-import {environment} from '../../../../environments/environment';
 import {ProductCategory} from '../../../model/ProductCategory';
 import {CommonModule, NgOptimizedImage} from '@angular/common';
 import {MatCardModule} from '@angular/material/card';

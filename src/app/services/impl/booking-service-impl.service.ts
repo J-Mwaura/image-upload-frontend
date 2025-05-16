@@ -1,7 +1,7 @@
 // src/app/services/impl/booking.service.impl.ts (or just src/app/services/booking.service.ts if not using interface)
 
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
@@ -29,11 +29,17 @@ export class BookingServiceImpl implements BookingService { // Implement the int
    * @returns An Observable of the API response containing the created BookingDTO.
    */
   createBooking(bookingDto: BookingDTO): Observable<ApiResponse<BookingDTO>> {
-    return this.http.post<ApiResponse<BookingDTO>>(`${this.apiUrl}`, bookingDto)
-      .pipe(
-        catchError(this.handleError)
-      );
+  // --- Client-side validation ---
+  if (!bookingDto.vehicleId && !bookingDto.licensePlate) {
+    const errorMessage = "Either vehicleId or licensePlate must be provided for booking.";
+    return throwError(() => new Error(errorMessage)); // Early return with error
   }
+
+  // Proceed with HTTP request if validation passes
+  return this.http.post<ApiResponse<BookingDTO>>(`${this.apiUrl}`, bookingDto).pipe(
+    catchError(this.handleError) // Handle server-side errors
+  );
+}
 
   /**
    * Sends a GET request to retrieve all bookings.

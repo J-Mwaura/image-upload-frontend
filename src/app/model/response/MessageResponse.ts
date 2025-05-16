@@ -1,4 +1,3 @@
-// message-response.ts
 export class MessageResponse {
     message: string;
 

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { StaffDTO, StaffType } from '../../../../model/dto/staff-dto';
+import { StaffDTO } from '../../../../model/dto/staff-dto';
 import { StaffService } from '../../../../services/staff.service';
 import { CommonModule } from '@angular/common';
 import { MatSnackBar } from '@angular/material/snack-bar';

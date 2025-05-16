@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { BehaviorSubject, catchError, map, Observable, of, Subject, Subscription, takeUntil, tap, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, map, Observable, Subject, Subscription, takeUntil, tap, throwError } from 'rxjs';
 import { LoginRequest } from '../model/LoginRequest ';
 import { JwtResponse } from '../model/response/JwtResponse ';
 import { environment } from '../../environments/environment';

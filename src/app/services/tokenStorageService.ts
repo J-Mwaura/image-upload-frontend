@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs'; // Import throwError
 import { User } from '../model/user';
-import { JwtResponse } from '../model/response/JwtResponse ';
 import { JwtHelperService } from '@auth0/angular-jwt';
 
 // interface JwtPayload {

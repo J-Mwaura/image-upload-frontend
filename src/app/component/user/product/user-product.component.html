@@ -28,12 +28,16 @@
             <div class="product-details">
               <mat-form-field appearance="fill">
                 <mat-label>Staff</mat-label>
-                <mat-select [(ngModel)]="selectedStaffId[product.id!]" name="staff_{{product.id}}">
+                <mat-select [(ngModel)]="selectedStaffId[product.id!]" name="staff_{{product.id}}" required
+                  #staffSelect="ngModel">
                   <mat-option [value]="null">-- Select Staff --</mat-option>
                   <mat-option *ngFor="let staff of staffList" [value]="staff.id">
                     {{ staff.firstName }} {{ staff.lastName }}
                   </mat-option>
                 </mat-select>
+                <mat-error *ngIf="staffSelect.invalid && (staffSelect.dirty || staffSelect.touched)">
+                  Please select a staff member.
+                </mat-error>
               </mat-form-field>
 
               <mat-form-field appearance="fill">
@@ -41,27 +45,30 @@
                 <input matInput type="text" [(ngModel)]="customerInput[product.id!]"
                   (input)="onCustomerInputChange($event, product.id!)" (focus)="activeProductId = product.id!"
                   name="customerInput_{{product.id}}" placeholder="Select or Enter Customer" maxlength="100"
-                  [matAutocomplete]="customerAuto" />
+                  [matAutocomplete]="customerAuto" required #customerInputControl="ngModel" />
                 <mat-autocomplete #customerAuto="matAutocomplete"
                   (optionSelected)="onCustomerSelect($event.option.value, product.id!)" autoActiveFirstOption>
                   <mat-option *ngFor="let customer of filteredCustomers[product.id!]" [value]="customer">
                     {{ customer.name }}
                   </mat-option>
                 </mat-autocomplete>
+                <mat-error
+                  *ngIf="customerInputControl.invalid && (customerInputControl.dirty || customerInputControl.touched)">
+                  Please select a customer or enter a new customer name.
+                </mat-error>
               </mat-form-field>
 
-              <mat-form-field appearance="fill">
-                <mat-label>License Plate</mat-label>
-                <input matInput type="text" [(ngModel)]="licensePlateInput[product.id!]"
-                  (input)="onLicensePlateInputChange($event, product.id!)" name="licensePlate_{{product.id}}"
-                  placeholder="Enter License Plate" [matAutocomplete]="autoLicensePlate">
-                <mat-autocomplete #autoLicensePlate="matAutocomplete"
-                  (optionSelected)="onLicensePlateSelect($event, product.id!)">
-                  <mat-option *ngFor="let plate of filteredLicensePlates[product.id!]" [value]="plate">
-                    {{ plate }}
+              <mat-form-field>
+                <input matInput placeholder="License Plate" [(ngModel)]="licensePlateInput[product.id!]"
+                  (input)="onLicensePlateInputChange($event, product.id!)" (focus)="activeProductId = product.id!"
+                  [matAutocomplete]="auto" #licensePlateControl="ngModel"> <mat-autocomplete #auto="matAutocomplete"
+                  (optionSelected)="onLicensePlateSelect($event.option.value, product.id!)" autoActiveFirstOption>
+                  <mat-option *ngFor="let vehicle of filteredVehicles[product.id!]" [value]="vehicle">
+                    {{ vehicle.licensePlate }}
                   </mat-option>
                 </mat-autocomplete>
               </mat-form-field>
+
 
               <mat-form-field appearance="fill">
                 <mat-label>Price</mat-label>

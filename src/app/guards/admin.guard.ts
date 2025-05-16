@@ -2,7 +2,7 @@ import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot } from '@angular/router';
 import { AuthService } from '../services/authService';
 import { of } from 'rxjs';
-import { switchMap, map, catchError, filter } from 'rxjs/operators'; // Import filter
+import { switchMap, catchError } from 'rxjs/operators'; // Import filter
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TokenStorageService } from '../services/tokenStorageService';
 import { User } from '../model/user'; // Import your User type

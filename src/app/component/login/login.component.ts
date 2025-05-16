@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
 import { TokenStorageService } from '../../services/tokenStorageService';
 import { AuthService } from '../../services/authService';
 import { Router } from '@angular/router';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { User } from '../../model/user'; // Import your User type

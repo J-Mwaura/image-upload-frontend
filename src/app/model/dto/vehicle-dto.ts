@@ -4,5 +4,4 @@ export interface VehicleDTO {
   make?: string;        // Optional - matches nullable field
   model?: string;       // Optional - matches nullable field
   year?: number;        // Optional - matches nullable field
-  productId: number;    // Required - matches non-nullable field in Spring
 }

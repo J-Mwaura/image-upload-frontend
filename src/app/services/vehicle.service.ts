@@ -1,11 +1,10 @@
-import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpParams, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { VehicleDTO } from '../model/dto/vehicle-dto';
-import { catchError, Observable, of, throwError } from 'rxjs';
+import { catchError, map, Observable, of, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Page } from '../model/page';
 import { ApiResponse } from '../model/response/ApiResponse';
-import { Vehicle } from '../model/vehicle';
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +14,43 @@ export class VehicleService {
   private baseUrl = `${environment.apiUrl}api/vehicle`; 
 
   constructor(private http: HttpClient) {}
+
+  /**
+   * Creates a new vehicle and returns the created resource with location header
+   * @param vehicleDTO The vehicle data to create
+   * @returns Observable containing the ApiResponse with the created vehicle
+   */
+  createVehicle(vehicleDTO: VehicleDTO): Observable<ApiResponse<VehicleDTO>> {
+    return this.http.post<ApiResponse<VehicleDTO>>(
+      this.baseUrl,
+      vehicleDTO,
+      { observe: 'response' } // Get full response to access headers
+    ).pipe(
+      map((response: HttpResponse<ApiResponse<VehicleDTO>>) => {
+        // Extract location header if needed
+        const location = response.headers.get('Location');
+        if (location) {
+          console.log('New vehicle created at:', location);
+          // You can store this URL for later use if needed
+        }
+        
+        // Return the response body (which should be ApiResponse<VehicleDTO>)
+        if (!response.body) {
+          throw new Error('No response body received');
+        }
+        return response.body;
+      }),
+      catchError(error => {
+        console.error('Error creating vehicle:', error);
+        // Return a consistent error response similar to your API
+        return throwError(() => ({
+          success: false,
+          message: error.error?.message || 'Failed to create vehicle',
+          data: null
+        }));
+      })
+    );
+  }
 
   // Create or update vehicle
   saveOrUpdateVehicle(vehicle: VehicleDTO): Observable<VehicleDTO> {
@@ -29,12 +65,16 @@ export class VehicleService {
   }
 
   // Search license plates
-  findMatchingLicensePlates(query: string): Observable<string[]> {
-    return this.http.get<string[]>(
-      `${this.baseUrl}/search`, 
-      { params: new HttpParams().set('query', query) }
-    );
-  }
+  // findMatchingLicensePlates(query: string): Observable<VehicleDTO[]> {
+  //   return this.http.get<VehicleDTO[]>(
+  //     `${this.baseUrl}/search?term=${query}`, 
+  //     { params: new HttpParams().set('query', query) }
+  //   );
+  // }
+  // In your VehicleService
+// findMatchingLicensePlates(searchTerm: string): Observable<VehicleDTO[]> {
+//   return this.http.get<VehicleDTO[]>(`${this.baseUrl}/search?term=${searchTerm}`);
+// }
 
   // Advanced search
   findByLicensePlateContaining(searchTerm: string): Observable<VehicleDTO[]> {
@@ -54,8 +94,12 @@ export class VehicleService {
     return this.http.get<VehicleDTO>(`${this.baseUrl}/id/${id}`);
   }
 
+   getAllVehicles(): Observable<any>{
+    return this.http.get<any>(this.baseUrl);
+   }
+
   // Paginated list
-  getAllVehicles(page: number = 0, size: number = 10): Observable<Page<VehicleDTO>> {
+  getAllVehiclesPaged(page: number = 0, size: number = 10): Observable<Page<VehicleDTO>> {
     return this.http.get<Page<VehicleDTO>>(
       this.baseUrl,
       { params: new HttpParams().set('page', page).set('size', size) }

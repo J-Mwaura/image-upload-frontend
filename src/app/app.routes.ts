@@ -2,7 +2,6 @@ import {Routes} from '@angular/router';
 import {ImageComponent} from './component/admin/image/image.component';
 import {AdminProductComponent} from './component/admin/product/product.component';
 import {LoginComponent} from './component/login/login.component';
-import {HomeComponent} from './home/home.component';
 import {RegisterComponent} from './register/register.component';
 import {UserAreaComponent} from './component/board-user/board-user.component';
 import {ProfileComponent} from './component/profile/profile.component';
@@ -11,7 +10,6 @@ import {adminGuard} from './guards/admin.guard';
 import {ProductCategoryComponent} from './component/product-category/product-category.component';
 import {AdminProductCategoryComponent} from './component/admin/product-category/product-category.component';
 import {AdminAreaComponent} from './component/admin/board-admin.component';
-import { UserProductComponent } from './component/user/product/product.component';
 import { StaffComponent } from './component/admin/staff/list/staff.component';
 import { BookingComponent } from './component/user/booking/booking.component';
 

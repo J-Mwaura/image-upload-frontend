@@ -1,4 +1,3 @@
-// staff.mapper.ts
 import { StaffDTO, StaffType } from '../dto/staff-dto';
 
 export class StaffMapper {
