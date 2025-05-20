@@ -16,10 +16,11 @@ export class AppComponent implements OnInit{
   constructor( private router: Router, private authService: AuthService, private tokenStorage: TokenStorageService){}
   ngOnInit(): void {
     const isLoggedIn = !!this.tokenStorage.getToken();
-    const accessToken = localStorage.getItem('accessToken');
+    const accessToken = typeof window !== 'undefined' ? localStorage.getItem('accessToken'): null;
     if (accessToken) {
         this.authService.updateLoginStatus(true);
     }
+  
 
     if (isLoggedIn) {
       if (this.tokenStorage.isTokenExpired()) {

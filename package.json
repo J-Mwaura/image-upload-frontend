@@ -6,14 +6,14 @@
   },
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
+    "start": "node dist/skmsys/server/main.js",
+    "build": "ng build --configuration production && ng run skmsys:server:production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr": "node dist/your-project-name/server/main.js",
-    "build:ssr": "ng build && ng run your-project-name:server",
-    "dev:ssr": "ng run your-project-name:serve-ssr",
-    "prerender": "ng run your-project-name:prerender"
+    "serve:ssr": "ng serve --ssr", 
+    "build:ssr": "ng build && ng run skmsys:server", 
+    "dev:ssr": "ng run skmsys:serve-ssr", 
+    "prerender": "ng run skmsys:prerender"
   },
   "private": true,
   "dependencies": {

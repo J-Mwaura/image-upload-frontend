@@ -111,7 +111,7 @@ export class NavbarComponent implements OnInit {
 
    opened = false;
 
-  storage: Storage = localStorage;
+  //storage: Storage = localStorage;
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
     .pipe(

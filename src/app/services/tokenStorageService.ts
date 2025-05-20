@@ -33,15 +33,18 @@ export class TokenStorageService {
   }
 
     signOut(): void {
+      if (typeof window !== 'undefined') {
         localStorage.clear();
+      }
     }
 
     getToken(): string | null { // Return null if no token
-        return localStorage.getItem(TOKEN_KEY); // Use localStorage
+    const itemInlocalStorage = typeof window !== 'undefined' ? localStorage.getItem(TOKEN_KEY): null; // Use localStorage
+      return itemInlocalStorage;
     }
 
     getUser(): Observable<User | null> {
-        const userJson = localStorage.getItem(USER_KEY);
+        const userJson = typeof window !== 'undefined' ? localStorage.getItem(USER_KEY) : null;
         if (userJson) {
           try {
             const user = JSON.parse(userJson);
@@ -81,7 +84,9 @@ export class TokenStorageService {
     saveToken(token: string): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             try {
+              if (typeof window !== 'undefined') {
                 localStorage.setItem(TOKEN_KEY, token);
+              }
                 resolve();
             } catch (error) {
                 reject(error);
@@ -92,7 +97,9 @@ export class TokenStorageService {
     saveUser(user: User): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             try {
+              if (typeof window !== 'undefined') {
                 localStorage.setItem(USER_KEY, JSON.stringify(user));
+              }
                 resolve();
             } catch (error) {
                 reject(error);
@@ -101,7 +108,7 @@ export class TokenStorageService {
     }
 
 getRefreshToken(): string | null {
-  const refreshToken = localStorage.getItem(USER_KEY);
+  const refreshToken = typeof window !== 'undefined' ? localStorage.getItem(USER_KEY): null;
   return refreshToken ? refreshToken : null;
 }
 }
