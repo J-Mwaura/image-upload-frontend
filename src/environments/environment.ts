@@ -14,8 +14,6 @@ export const environment = {
       measurementId: 'G-GZ6YCLS1C1',
     },
     apiUrl: 'http://localhost:8080/',
-    //apiUrl: 'http://localhost:8080/api/images/addImage'
-    //apiUrl: 'https://ibtisambackend.herokuapp.com'
   };
   
   /*
