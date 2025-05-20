@@ -8,16 +8,18 @@
     "beasties": "^0.3.3"
 },
   "scripts": {
-    "ng": "ng",
-    "start": "node dist/skmsys/server/main.js",
-    "build": "ng build skmsys --configuration production && ng run skmsys:server:production",
-    "watch": "ng build --watch --configuration development",
-    "test": "ng test",
-    "serve:ssr": "ng serve --ssr",
-    "build:ssr": "ng build && ng run skmsys:server",
-    "dev:ssr": "ng run skmsys:serve-ssr",
-    "prerender": "ng run skmsys:prerender"
-  },
+  "ng": "ng",
+  "start": "node dist/skmsys/server/main.js",
+  "build": "npm run build:client && npm run build:server",
+  "build:client": "ng build skmsys --configuration production",
+  "build:server": "ng run skmsys:server:production",
+  "watch": "ng build --watch --configuration development",
+  "test": "ng test",
+  "serve:ssr": "node dist/skmsys/server/main.js",
+  "build:ssr": "npm run build:client && npm run build:server",
+  "dev:ssr": "ng run skmsys:serve-ssr",
+  "prerender": "ng run skmsys:prerender"
+},
   "private": true,
   "dependencies": {
     "@angular-devkit/build-angular": "^19.2.7",
