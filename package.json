@@ -4,6 +4,9 @@
   "engines": {
     "node": "22.x"
   },
+  "overrides": {
+    "beasties": "^0.3.3"
+},
   "scripts": {
     "ng": "ng",
     "start": "node dist/skmsys/server/main.js",
