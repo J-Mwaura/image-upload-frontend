@@ -17,35 +17,91 @@ const browserDistFolder = resolve(serverDistFolder, '../browser');
 const app = express();
 
 // ======= PRODUCTION MIDDLEWARE =======
-app.use(compression());
+// Compression (gzip)
+app.use(compression({
+  level: 6,            // Optimal compression level
+  threshold: '10kb',   // Only compress responses >10kb
+}));
+
+// Security headers
 app.use(helmet({
-  contentSecurityPolicy: false, // Configure based on your app needs
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:"],
+      connectSrc: ["'self'"],
+      fontSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      mediaSrc: ["'self'"]
+    }
+  },
+  hsts: {
+    maxAge: 63072000,  // 2 years in seconds
+    includeSubDomains: true,
+    preload: true
+  }
 }));
-app.use(rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100
-}));
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100,                 // Limit each IP to 100 requests
+  standardHeaders: true,    // Return rate limit info in headers
+  legacyHeaders: false,     // Disable X-RateLimit headers
+  message: 'Too many requests, please try again later.'
+});
+app.use(limiter);
 
 // Static files with cache control
 app.use(express.static(browserDistFolder, {
   maxAge: '1y',
   index: false,
   redirect: false,
+  setHeaders: (res, path) => {
+    if (path.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
+    }
+  }
 }));
 
 const angularApp = new AngularNodeAppEngine();
 
-// SSR Rendering with error handling
+// SSR Rendering with enhanced error handling
 app.use('/**', (req, res, next) => {
+  const startTime = Date.now();
+  
   angularApp
     .handle(req)
-    .then((response) =>
-      response ? writeResponseToNodeResponse(response, res) : next(),
-    )
+    .then((response) => {
+      if (response) {
+        console.log(`SSR rendered in ${Date.now() - startTime}ms`);
+        writeResponseToNodeResponse(response, res);
+      } else {
+        next();
+      }
+    })
     .catch((err) => {
       console.error('SSR Error:', err);
-      res.status(500).send('Server Error');
+      if (!res.headersSent) {
+        res.status(500).send(`
+          <!DOCTYPE html>
+          <html>
+            <head><title>Server Error</title></head>
+            <body>
+              <h1>500 Server Error</h1>
+              <p>Please try again later</p>
+            </body>
+          </html>
+        `);
+      }
     });
+});
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'healthy' });
 });
 
 // Start server
@@ -53,6 +109,7 @@ if (isMainModule(import.meta.url)) {
   const port = process.env['PORT'] || 4000;
   app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
+    console.log(`Serving static files from: ${browserDistFolder}`);
   });
 }
 
