@@ -21,6 +21,11 @@
             "outputPath": "dist/skmsys",
             "index": "src/index.html",
             "browser": "src/main.ts",
+            "externalDependencies": [
+        "compression",
+        "helmet", 
+        "express-rate-limit"
+      ],
             "polyfills": [
               "zone.js"
             ],
