@@ -18,7 +18,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/skmsys",
+            "outputPath": "dist/skmsys", 
             "index": "src/index.html",
             "browser": "src/main.ts",
             "externalDependencies": [
@@ -41,14 +41,16 @@
               "src/styles.scss"
             ],
             "scripts": [
+              "./node_modules/bootstrap/dist/js/bootstrap.min.js",
               "node_modules/popper.js/dist/popper.min.js",
               "node_modules/jquery/dist/jquery.min.js",
               "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
             ],
-            "server": "src/main.server.ts",
+            "server": "src/main.server.ts", 
             "outputMode": "server",
-            "ssr": {
-              "entry": "src/server.ts"   }
+            "ssr": {                        
+              "entry": "src/server.ts"     
+            }
           },
           "configurations": {
             "production": {
@@ -82,11 +84,6 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
-          "options": {
-            "headers": { 
-              "Content-Security-Policy": "connect-src 'self' http://localhost:8080;"
-            }
-          },
           "configurations": {
             "production": {
               "buildTarget": "skmsys:build:production"
@@ -95,8 +92,8 @@
               "buildTarget": "skmsys:build:development"
             },
             "ssr": {
-              "buildTarget": "skmsys:build:development", 
-              "servePath": "/" 
+              "buildTarget": "skmsys:build:production",
+              "serverTarget": "skmsys:server:production" 
             }
           },
           "defaultConfiguration": "development"
@@ -124,6 +121,26 @@
             ],
             "scripts": []
           }
+        },
+        "server": {
+          "builder": "@angular-devkit/build-angular:server",
+          "options": {
+            "outputPath": "dist/skmsys/server",
+            "main": "src/server.ts", 
+            "tsConfig": "tsconfig.app.json", 
+            "inlineStyleLanguage": "scss"
+          },
+          "configurations": {
+            "production": {
+              "outputHashing": "none" 
+            },
+            "development": {
+              "optimization": false,
+              "sourceMap": true,
+              "extractLicenses": false
+            }
+          },
+          "defaultConfiguration": "production"
         }
       }
     }
