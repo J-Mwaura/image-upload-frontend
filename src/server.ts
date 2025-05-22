@@ -28,11 +28,15 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:"],
-      connectSrc: ["'self'"],
-      fontSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://code.jquery.com",
+        "https://cdn.jsdelivr.net"],
+      styleSrc: ["'self'", "'unsafe-inline'",
+        "https://fonts.googleapis.com",
+        "https://fonts.gstatic.com",
+        "https://cdn.jsdelivr.net"],
+      imgSrc: ["'self'", "data:", "https://storage.googleapis.com"],
+      connectSrc: ["'self'", "http://localhost:8080"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
       objectSrc: ["'none'"],
       mediaSrc: ["'self'"]
     }
@@ -71,7 +75,7 @@ const angularApp = new AngularNodeAppEngine();
 // SSR Rendering with enhanced error handling
 app.use('/**', (req, res, next) => {
   const startTime = Date.now();
-  
+
   angularApp
     .handle(req)
     .then((response) => {

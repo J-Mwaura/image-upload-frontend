@@ -84,7 +84,7 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
-          "options": {
+          "options": { 
             "headers": {
               "Content-Security-Policy": "connect-src 'self' http://localhost:8080;"
             }
