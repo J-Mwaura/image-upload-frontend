@@ -10,7 +10,7 @@
   "scripts": {
     "ng": "ng",
     "start": "node dist/skmsys/server/main.js",
-    "build": "npm run build:client && npm run build:server",
+    "build": "ng build skmsys --configuration=production",
     "build:client": "ng build --configuration production",
     "build:server": "ng run skmsys:server:production",
     "watch": "ng build --watch --configuration development",
