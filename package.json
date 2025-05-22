@@ -14,7 +14,9 @@
     "build:client": "ng build --configuration production",
     "build:server": "ng run skmsys:server:production",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "serve:ssr": "ng run skmsys:serve-ssr",
+    "prerender": "ng run skmsys:prerender"
   },
   "private": true,
   "dependencies": {
