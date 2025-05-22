@@ -9,7 +9,7 @@
   },
   "scripts": {
     "ng": "ng",
-    "start": "node dist/skmsys/server/main.js",
+    "start": "node dist/skmsys/server/server.mjs",
     "build": "ng build skmsys --configuration=production",
     "build:client": "ng build --configuration production",
     "build:server": "ng run skmsys:server:production",
