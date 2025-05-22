@@ -18,14 +18,14 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/skmsys/server",
+            "outputPath": "dist/skmsys/browser", 
             "index": "src/index.html",
             "browser": "src/main.ts",
             "externalDependencies": [
-        "compression",
-        "helmet", 
-        "express-rate-limit"
-      ],
+              "compression",
+              "helmet",
+              "express-rate-limit"
+            ],
             "polyfills": [
               "zone.js"
             ],
@@ -41,16 +41,10 @@
               "src/styles.scss"
             ],
             "scripts": [
-              "./node_modules/bootstrap/dist/js/bootstrap.min.js",
               "node_modules/popper.js/dist/popper.min.js",
               "node_modules/jquery/dist/jquery.min.js",
               "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
-            ],
-            "server": "src/main.server.ts",
-            "outputMode": "server",
-            "ssr": {
-              "entry": "src/server.ts"
-            }
+            ]
           },
           "configurations": {
             "production": {
@@ -83,21 +77,21 @@
           "defaultConfiguration": "production"
         },
         "serve": {
-  "builder": "@angular-devkit/build-angular:dev-server",
-  "configurations": {
-    "production": {
-      "buildTarget": "skmsys:build:production"
-    },
-    "development": {
-      "buildTarget": "skmsys:build:development"
-    },
-    "ssr": {
-      "buildTarget": "skmsys:build:production",
-      "serverTarget": "skmsys:server:production"
-    }
-  },
-  "defaultConfiguration": "development"
-},
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "configurations": {
+            "production": {
+              "buildTarget": "skmsys:build:production"
+            },
+            "development": {
+              "buildTarget": "skmsys:build:development"
+            },
+            "ssr": {
+              "buildTarget": "skmsys:build:production",
+              "serverTarget": "skmsys:server:production"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n"
         },
@@ -121,6 +115,29 @@
             ],
             "scripts": []
           }
+        },
+        "server": {
+          "builder": "@angular-devkit/build-angular:server",
+          "options": {
+            "outputPath": "dist/skmsys/server", 
+            "main": "src/main.server.ts",
+            "tsConfig": "tsconfig.server.json",
+            "inlineStyleLanguage": "scss",
+            "ssr": {
+              "entry": "src/server.ts"
+            }
+          },
+          "configurations": {
+            "production": {
+              "outputHashing": "none" 
+            },
+            "development": {
+              "optimization": false,
+              "sourceMap": true,
+              "extractLicenses": false
+            }
+          },
+          "defaultConfiguration": "production"
         }
       }
     }
