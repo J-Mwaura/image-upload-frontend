@@ -127,7 +127,7 @@
           "options": {
             "outputPath": "dist/skmsys/server",
             "main": "src/server.ts", 
-            "tsConfig": "tsconfig.server.json", 
+            "tsConfig": "tsconfig.app.json", 
             "inlineStyleLanguage": "scss"
           },
           "configurations": {
