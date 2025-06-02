@@ -8,7 +8,7 @@ import {NgForm,
 } from '@angular/forms';
 import { ProductImage } from '../../../model/ProductImage.model';
 import { ImageService } from '../../../services/image.service';
-import { Subject, Subscription, takeUntil } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
@@ -17,13 +17,13 @@ import {
 } from '@angular/material/form-field';
 import { MatInputModule} from '@angular/material/input';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
 //eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { ConfirmDeleteDialogComponent } from '../../dialog/confirm-delete-dialog-component/confirm-delete-dialog-component.component';
 import { MessageResponse } from '../../../model/response/MessageResponse';
 import { firstValueFrom } from 'rxjs';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import { ApiResponse } from '../../../model/response/ApiResponse';
+import { SnackbarService } from '../../../services/snackbar.service';
 
 @Component({
   selector: 'app-image',
@@ -36,7 +36,6 @@ import { ApiResponse } from '../../../model/response/ApiResponse';
 })
 
 export class ImageComponent implements OnInit {
-  private dialogSub: Subscription | undefined;
   productImage: ProductImage = new ProductImage();
   selectedImage: ProductImage | null = null;
   imageEditForm: FormGroup;
@@ -54,7 +53,7 @@ export class ImageComponent implements OnInit {
   @ViewChild('editModal') editModal!: ElementRef;
 
   constructor(private imageService: ImageService, private http: HttpClient,
-    private dialog: MatDialog, private fb: FormBuilder, private snackBar: MatSnackBar
+    private dialog: MatDialog, private fb: FormBuilder, private snackBar: SnackbarService
   )
   {
     this.imageEditForm = this.fb.group({
@@ -74,7 +73,7 @@ export class ImageComponent implements OnInit {
       this.pageSize = event.pageSize;
     }
   
-    this.isLoading = true; // Add this line if you have a loading state
+    this.isLoading = true;
   
     this.imageService.getImageList(this.pageIndex, this.pageSize).subscribe({
       next: (response: any) => {
@@ -83,23 +82,20 @@ export class ImageComponent implements OnInit {
         this.isLoading = false;
       },
       error: (error) => {
-        this.snackBar.open('Error loading images: ' + (error.error?.message || ''), 'Close', {
-          duration: 3000,
-          panelClass: ['error-snackbar']
-        });
+        this.snackBar.error('Error loading images: ' + (error.error?.message || ''));
         this.isLoading = false;
         console.error('Image load error:', error);
       }
     });
   }
 
-  onChange(event: any):void {
+  onChange(event: any): void {
     const files: FileList = event.target.files;
     if (event.target.files) {
-      const url  = event.target.files;
+      const url = event.target.files;
       const fileName = event.target.files.name;
       this.url = url;
-      this.fileName =  fileName;
+      this.fileName = fileName;
     }
   }
 
@@ -113,11 +109,11 @@ export class ImageComponent implements OnInit {
 
       const response: MessageResponse = await firstValueFrom(this.imageService.addImage(formData));
 
-      this.snackBar.open(response.message, 'Close', { duration: 3000 });
+      this.snackBar.success(response.message);
       this.loadImages();
       imageForm.resetForm();
       this.url = [];
-      this.productImage = new ProductImage(); // Reset the model
+      this.productImage = new ProductImage();
     } catch (error) {
       let errorMessage = "An error occurred.";
 
@@ -132,7 +128,7 @@ export class ImageComponent implements OnInit {
         console.error("An unexpected error has occurred:", error);
       }
 
-      this.snackBar.open(errorMessage, 'Close', { duration: 5000, panelClass: ['error-snackbar'] });
+      this.snackBar.error(errorMessage);
       console.error("Image upload failed:", error);
     }
   }
@@ -140,14 +136,13 @@ export class ImageComponent implements OnInit {
   openEditModal(image: ProductImage) {
     const index = this.productImages.findIndex(img => img.id === image.id);
     if (index > -1) {
-      this.selectedImage = this.productImages[index]; // Direct reference!
+      this.selectedImage = this.productImages[index];
 
       this.imageEditForm.patchValue({
         name: this.selectedImage.name,
         url: this.selectedImage.url,
       });
 
-      // Subscribe to value changes for live updates
       this.imageEditForm.get('name')?.valueChanges.subscribe(value => {
         if (this.selectedImage) {
           this.selectedImage.name = value;
@@ -159,92 +154,76 @@ export class ImageComponent implements OnInit {
         modal.style.display = 'block';
       }
     } else {
-      this.snackBar.open('Image not found in productImages array.', 'Close',{duration: 3000,
+      this.snackBar.error('Image not found in productImages array.');
+    }
+  }
+
+  closeEditModal() {
+    const modal = document.getElementById('editModal');
+    if (modal != null) {
+      modal.style.display = 'none';
+    }
+    this.imageEditForm.reset();
+    this.selectedImage = null;
+  }
+
+  updateSelectedImage() {
+    if (!this.selectedImage || !this.selectedImage.id) {
+      this.snackBar.error('Image or image ID is missing.');
+      return;
+    }
+
+    if (this.imageEditForm.valid) {
+      const index = this.productImages.findIndex(img => img.id === this.selectedImage!.id);
+      if (index > -1) {
+        const updatedImage = new ProductImage(
+          this.selectedImage.id,
+          this.imageEditForm.value.name,
+          this.imageEditForm.value.url
+        );
+
+        this.productImages[index] = updatedImage;
+      }
+
+      this.imageService.updateImagePartial(this.selectedImage.id, this.imageEditForm.value).subscribe({
+        next: (resp: ApiResponse<ProductImage>) => { 
+          this.snackBar.success(`${resp.data?.name || 'Image'} ${resp.message}`);
+          this.closeEditModal();
+          this.loadImages(); 
+        },
+        error: (err: { message: string }) => { 
+          this.snackBar.error(`${err.message}`);
+        }
       });
     }
   }
 
-closeEditModal() {
-  const modal = document.getElementById('editModal');
-  if (modal != null) {
-    modal.style.display = 'none';
-  }
-  this.imageEditForm.reset();
-  this.selectedImage = null; // Reset selectedImage
-
-}
-
-updateSelectedImage() {
-  if (!this.selectedImage || !this.selectedImage.id) {
-    this.snackBar.open('Image or image ID is missing.', 'Close',{duration: 3000,
+  delete(productImage: ProductImage) {
+    const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent, {
+      width: '400px',
+      data: { itemName: productImage.name }
     });
-    return;
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.onDeleteImage(productImage.id!);
+      }
+    });
   }
 
-  if (this.imageEditForm.valid) {
-    const index = this.productImages.findIndex(img => img.id === this.selectedImage!.id);
-    if (index > -1) {
-      // Create a *new* ProductImage object with the updated values
-      const updatedImage = new ProductImage(
-        this.selectedImage.id,
-        this.imageEditForm.value.name,
-        this.imageEditForm.value.url
-      );
-
-      this.productImages[index] = updatedImage; // Update the array with the new object
-    }
-
-    this.imageService.updateImagePartial(this.selectedImage.id, this.imageEditForm.value).subscribe({
-      next: (resp: ApiResponse<ProductImage>) => { 
-        this.snackBar.open(`${resp.data?.name || 'Image'}  ${resp.message}`, 'Close', { duration: 3000 });
-        this.closeEditModal();
-        this.loadImages(); 
+  onDeleteImage(id: number): void {
+    this.imageService.deleteImage(id).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.snackBar.success(response.message);
+          this.loadImages();
+        } else {
+          this.snackBar.error(response.message);
+        }
       },
-      error: (err: { message: string }) => { 
-        this.snackBar.open(`${err.message}`, 'Close', { duration: 3000 });
+      error: (error) => {
+        this.snackBar.error('An unexpected error occurred');
       }
     });
   }
 }
-
-delete(productImage: ProductImage) {
-  const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent, {
-    width: '400px',
-    data: { itemName: productImage.name }
-  });
-
-  dialogRef.afterClosed().subscribe(result => {
-    if (result) {
-      this.onDeleteImage(productImage.id!);
-    }
-  });
-}
-
-onDeleteImage(id: number): void {
-  this.imageService.deleteImage(id).subscribe({
-    next: (response) => {
-      if (response.success) {
-        this.snackBar.open(response.message, 'Close', { 
-          duration: 3000,
-          panelClass: ['success-snackbar']
-        });
-        this.loadImages(); // Refresh your data
-      } else {
-        this.snackBar.open(response.message, 'Close', {
-          duration: 5000,
-          panelClass: ['error-snackbar']
-        });
-      }
-    },
-    error: (error) => {
-      this.snackBar.open('An unexpected error occurred', 'Close', {
-        duration: 5000,
-        panelClass: ['error-snackbar']
-      });
-    }
-  });
-}
-
-}
-
-

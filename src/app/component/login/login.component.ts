@@ -12,12 +12,11 @@ import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { User } from '../../model/user'; // Import your User type
-import { take } from 'rxjs/operators'; // Import take
+import { User } from '../../model/user';
+import { take } from 'rxjs/operators';
 import { JwtResponse } from '../../model/response/JwtResponse ';
 import { mapJwtResponseToUser } from '../../model/utils/mapJwtResponseToUser';
-import {MatSnackBar} from '@angular/material/snack-bar';
-
+import { SnackbarService } from '../../services/snackbar.service';
 
 @Component({
     standalone: true,
@@ -36,9 +35,10 @@ export class LoginComponent implements OnInit {
     roles: string[] = [];
 
     private readonly router = inject(Router);
-
-    constructor(private authService: AuthService, private fb: FormBuilder,
-        private tokenStorage: TokenStorageService, private snackBar: MatSnackBar) { }
+    private snackbar = inject(SnackbarService);
+    private authService = inject(AuthService);
+    private fb = inject(FormBuilder);
+    private tokenStorage = inject(TokenStorageService);
 
     ngOnInit(): void {
         this.loginForm = this.fb.group({
@@ -46,13 +46,13 @@ export class LoginComponent implements OnInit {
             password: ['', [Validators.required]]
         });
 
-        this.checkLoginStatus(); // Call the function to check login status
+        this.checkLoginStatus();
     }
 
     private checkLoginStatus() {
         const token = this.tokenStorage.getToken();
         if (token) {
-            this.tokenStorage.getUser().pipe(take(1)).subscribe((user: User | null) => { // Use pipe and subscribe
+            this.tokenStorage.getUser().pipe(take(1)).subscribe((user: User | null) => {
                 if (user && user.roles) {
                     this.isLoggedIn = true;
                     this.roles = user.roles;
@@ -60,7 +60,6 @@ export class LoginComponent implements OnInit {
             });
         }
     }
-
 
     get usernameControl() {
         return this.loginForm.get('username');
@@ -70,92 +69,70 @@ export class LoginComponent implements OnInit {
         return this.loginForm.get('password');
     }
 
-  login(): void {
-    if (this.loginForm.invalid) {
-      return;
-    }
-
-    this.isLoading = true;
-    this.errorMessage = null;
-
-    const loginRequest = this.loginForm.value;
-
-    this.authService.login(loginRequest).subscribe({ // Only one call to login
-      next: (data: JwtResponse) => { // Type data as JwtResponse
-        this.tokenStorage.saveToken(data.token!).then(() => {
-          const user: User = mapJwtResponseToUser(data); // Convert JwtResponse to User
-          return this.tokenStorage.saveUser(user); // Now saveUser will accept the User object
-        }).then(() => {
-          this.isLoginFailed = false;
-          this.isLoggedIn = true;
-
-          this.tokenStorage.getUser().pipe(take(1)).subscribe((user: User | null) => {
-            if (user && user.roles) {
-              this.roles = user.roles;
-              if (this.roles.includes('ADMIN')) {
-                this.router.navigate(['admin']); // Redirect admin to '/admin'
-              } else {
-                this.router.navigate(['user']);  // Redirect regular users to '/home'
-              }
-              this.snackBar.open('Login successful!', 'Dismiss', {
-                duration: 3000,
-                panelClass: ['success-snackbar']
-              });
-            } else {
-              console.error("User data not found after login.");
-              this.errorMessage = "An error occurred during login. Please try again.";
-              this.isLoginFailed = true;
-              this.snackBar.open(this.errorMessage, 'Dismiss', {
-                duration: 5000,
-                panelClass: ['error-snackbar']
-              });
-            }
-          });
-
-        }).catch(error => { // Catch any errors in the Promise chain (saveToken or saveUser)
-          console.error("Error saving token/user:", error);
-          this.isLoading = false;
-          this.errorMessage = "An error occurred during login. Please try again.";
-          this.isLoginFailed = true;
-          this.snackBar.open(this.errorMessage, 'Dismiss', {
-            duration: 5000,
-            panelClass: ['error-snackbar']
-          });
-        });
-      },
-      error: (error: HttpErrorResponse) => { // Error handling for authService.login
-        console.error('Login error:', error);
-        this.isLoading = false;
-
-        let errorMessage = 'Login failed. Please try again.';
-
-        if (error.error) {
-          const backendError = error.error;
-
-          if (backendError.errors && Array.isArray(backendError.errors)) {
-            errorMessage = backendError.errors.join('\n');
-          } else if (backendError.message) {
-            errorMessage = backendError.message;
-          } else if (typeof backendError === 'string') {
-            errorMessage = backendError;
-          } else if (error.status === 401) {
-            errorMessage = "Invalid username or password.";
-          } else if (error.status === 0) {
-            errorMessage = 'A client-side or network error occurred. Please check your connection.';
-          } else {
-            errorMessage = "An unexpected error occurred. Please try again later.";
-          }
+    login(): void {
+        if (this.loginForm.invalid) {
+            return;
         }
-        this.errorMessage = errorMessage;
-        this.isLoginFailed = true;
-        this.snackBar.open(this.errorMessage, 'Dismiss', {
-          duration: 5000,
-          panelClass: ['error-snackbar']
+
+        this.isLoading = true;
+        this.errorMessage = null;
+
+        const loginRequest = this.loginForm.value;
+
+        this.authService.login(loginRequest).subscribe({
+            next: (data: JwtResponse) => {
+                this.tokenStorage.saveToken(data.token!).then(() => {
+                    const user: User = mapJwtResponseToUser(data);
+                    return this.tokenStorage.saveUser(user);
+                }).then(() => {
+                    this.isLoginFailed = false;
+                    this.isLoggedIn = true;
+
+                    this.tokenStorage.getUser().pipe(take(1)).subscribe((user: User | null) => {
+                        if (user && user.roles) {
+                            this.roles = user.roles;
+                            if (this.roles.includes('ADMIN')) {
+                                this.router.navigate(['admin']);
+                            } else {
+                                this.router.navigate(['user']);
+                            }
+                            this.snackbar.success('Login successful!');
+                        } else {
+                            console.error("User data not found after login.");
+                            this.errorMessage = "An error occurred during login. Please try again.";
+                            this.isLoginFailed = true;
+                            this.snackbar.error(this.errorMessage);
+                        }
+                    });
+                }).catch(error => {
+                    console.error("Error saving token/user:", error);
+                    this.isLoading = false;
+                    this.errorMessage = "An error occurred during login. Please try again.";
+                    this.isLoginFailed = true;
+                    this.snackbar.error(this.errorMessage);
+                });
+            },
+            error: (error: HttpErrorResponse) => {
+                console.error('Login error:', error);
+                this.isLoading = false;
+                this.isLoginFailed = true;
+
+                let errorMessage = 'Login failed. Please try again.';
+
+                if (error.status === 401) {
+                    errorMessage = 'Invalid username or password. Please check your credentials.';
+                } else if (error.error?.message) {
+                    errorMessage = error.error.message;
+                } else if (error.status === 0) {
+                    errorMessage = 'Network error. Please check your internet connection.';
+                }
+
+                this.errorMessage = errorMessage;
+                this.snackbar.error(errorMessage);
+            },
+            complete: () => this.isLoading = false
         });
-      },
-      complete: () => this.isLoading = false
-    });
-  }
+    }
 
     resetForm() {
         // ...

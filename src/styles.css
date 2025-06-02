@@ -1,38 +1,70 @@
-/* You can add global styles to this file, and also import other style files */
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+/* styles.css (or styles.scss) */
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  /* If you want a small universal space from the very top, consider adding it here */
+  /* padding-top: 10px; */
+}
 
 * {
-	box-sizing: border-box;
-	margin: 0;
-	padding: 0;
-	font-family: Raleway, sans-serif;
+  box-sizing: border-box;
+  /* Ensure margin and padding are reset, but not globally overriding all font-family */
+  /* Consider applying Raleway only to specific elements or using Angular's typography */
+  /* margin: 0; */
+  /* padding: 0; */
+  /* font-family: Raleway, sans-serif; */
 }
 
-/* CSS fro mat snackbar */
-.cdk-global-overlay-wrapper{
-	padding-top: 50px;
-	align-items:start !important;
+/* Global Snackbar Styling - Applies to ALL pages */
+/* Remove conflicting positioning rules from here */
+.cdk-global-overlay-wrapper {
+  /* align-items: flex-start;  Keep if it helps horizontal centering, but remove padding-top */
+  /* padding-top: 50px !important;  <-- REMOVE THIS */
 }
 
-.mat-mdc-snack-bar-handset, .mat-mdc-snack-bar-container, .mat-mdc-snack-bar-label{
-	font-size: large !important;
-}
-.cdk-overlay-pane .mat-mdc-simple-snack-bar {
-	top: 10px;
-	background-color: #cbf1cf;
-	color: rgb(10, 10, 10);
-  }
-
-.mdc-button__label {
-    color: #000;
-}
-/* CSS fro mat snackbar */
-.error-snackbar {
-  color: white;
-  --mdc-snackbar-container-color: rgb(244, 106, 108) !important;
+/* Base snackbar container styling */
+.mat-mdc-snack-bar-container {
+  --mdc-snackbar-container-color: transparent; /* Use CSS variables for theming */
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+  /* margin-top: 20px !important; <-- REMOVE THIS */
+  max-width: 100vw;
 }
 
+/* Handset/mobile specific adjustments */
+.mat-mdc-snack-bar-handset {
+  width: 95%;
+  max-width: 95%;
+  margin: 0 auto; /* This is for horizontal centering */
+}
+
+/* Label styling */
+.mat-mdc-snack-bar-label {
+  font-size: large;
+  padding: 14px 16px;
+}
+
+/* Success snackbar */
 .success-snackbar {
+  --mdc-snackbar-container-color: #4caf50;
   color: white;
-  --mdc-snackbar-container-color: rgb(143, 248, 143) !important;
+  background-color: #4caf50;
+}
+
+/* Error snackbar */
+.error-snackbar {
+  --mdc-snackbar-container-color: #f44336;
+  color: white;
+  background-color: #f44336;
+}
+
+/* Button styling */
+.mdc-button__label {
+  color: white;
+}
+
+/* Animation adjustments */
+.mat-mdc-snack-bar-handset .mat-mdc-snack-bar-container {
+  /* REMOVE these problematic lines entirely */
+  /* position: relative !important; */
+  /* top: 20px !important; */
 }
