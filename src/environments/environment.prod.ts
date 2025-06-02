@@ -2,6 +2,6 @@ export const environment = {
 
   production: true,
 
-  apiUrl: 'https://git.heroku.com/revenue-backend.com/'
+  apiUrl: 'https://revenue-backend-bf7e5e6a786a.herokuapp.com/'
 
 };
