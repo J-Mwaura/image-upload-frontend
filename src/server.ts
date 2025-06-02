@@ -35,7 +35,9 @@ app.use(helmet({
         "https://fonts.gstatic.com",
         "https://cdn.jsdelivr.net"],
       imgSrc: ["'self'", "data:", "https://storage.googleapis.com"],
-      connectSrc: ["'self'", "http://localhost:8080"],
+      connectSrc: ["'self'", "http://localhost:8080",
+        "https://revenue-backend-bf7e5e6a786a.herokuapp.com"
+      ],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       objectSrc: ["'none'"],
       mediaSrc: ["'self'"]
