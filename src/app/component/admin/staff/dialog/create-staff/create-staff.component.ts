@@ -1,6 +1,7 @@
 // create-staff-dialog.component.ts
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { StaffService } from '../../../../../services/staff.service';
@@ -23,6 +24,7 @@ import { Page } from '../../../../../model/page';
   styleUrls: ['./create-staff.component.css'],
   imports:[CommonModule,
     ReactiveFormsModule,
+    MatSlideToggleModule,
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,

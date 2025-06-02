@@ -54,11 +54,8 @@
       <tr mat-row *matRowDef="let row; columns: ['name', 'position', 'status', 'actions'];"></tr>
     </table>
 
-    <mat-paginator [length]="totalElements"
-[pageSize]="pageSize"
-[pageIndex]="currentPage"
-[pageSizeOptions]="[2, 4, 25, 100]"
-(page)="onPageChange($event)">
-</mat-paginator>
+    <mat-paginator [length]="totalElements" [pageSize]="pageSize" [pageIndex]="currentPage"
+      [pageSizeOptions]="[2, 4, 25, 100]" (page)="onPageChange($event)">
+    </mat-paginator>
   </div>
 </div>

@@ -50,15 +50,15 @@ export class StaffComponent implements OnInit {
     next: (userId: number | null) => {
       this.currentUserId = userId;
       if (userId !== null) {
-        console.log('User ID in StaffComponent:', userId);
+        //console.log('User ID in StaffComponent:', userId);
         // You can use the userId here
       } else {
-        console.log('User is not logged in.');
+        //console.log('User is not logged in.');
         // Handle not logged in case
       }
     },
     error: (error: any) => {
-      console.error('Error fetching user ID:', error);
+      //console.error('Error fetching user ID:', error);
       this.snackBar.open('Error fetching user ID', 'Close', { duration: 3000 });
     }
   });

@@ -1,0 +1,22 @@
+/* Extra compact version */
+.compact-table {
+  th.mat-header-cell, td.mat-cell {
+    padding: 0 4px !important;
+    font-size: 13px;
+  }
+  
+  .mat-icon-button {
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
+    
+    .mat-icon {
+      font-size: 18px;
+    }
+  }
+  
+  .position-badge, .status-badge {
+    padding: 1px 6px;
+    font-size: 12px;
+  }
+}

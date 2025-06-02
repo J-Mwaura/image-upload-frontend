@@ -13,8 +13,7 @@ export const environment = {
       appId: '1:265560313088:web:9cc57b3e550c0859d3f7e5',
       measurementId: 'G-GZ6YCLS1C1',
     },
-    //apiUrl: 'http://localhost:8080/',
-    apiUrl: 'https://revenue-backend-bf7e5e6a786a.herokuapp.com/'
+    apiUrl: 'http://localhost:8080/',
   };
   
   /*

@@ -16,15 +16,14 @@ export interface User {
   providedIn: 'root'
 })
 export class UserService {
-  private host = environment.apiUrl;
   private baseUrl = environment.apiUrl + 'api/home/';
-  private userUrl = environment.apiUrl + 'api/user';
+  private userUrl = environment.apiUrl + 'api/user/';
 
 
   constructor(private http: HttpClient) { }
 
   getUsers(): Observable<User[]> {
-    return this.http.get<User[]>(`${this.host}user`).pipe(
+    return this.http.get<User[]>(`${this.userUrl}`).pipe(
       tap(users => console.log('Fetched users')),
       catchError(this.handleError<User[]>('getUsers', []))
     );
