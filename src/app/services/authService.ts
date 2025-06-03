@@ -8,6 +8,7 @@ import { RegisterRequest } from '../model/RegisterRequest';
 import { TokenStorageService } from './tokenStorageService';
 import { User } from '../model/user';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import { SnackbarService } from './snackbar.service';
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -26,7 +27,7 @@ export class AuthService {
   public showAdminBoard$ = this.showAdminBoardSubject.asObservable();
   private readonly ADMIN_ROLE = 'ADMIN';
 
-  constructor(private http: HttpClient, private tokenStorage: TokenStorageService, private snackBar: MatSnackBar) {
+  constructor(private snackbarService: SnackbarService, private http: HttpClient, private tokenStorage: TokenStorageService, private snackBar: MatSnackBar) {
      const storedLoginStatus = tokenStorage.getToken();
      this.isLoggedInSubject.next(storedLoginStatus === 'true');
   }

@@ -1,0 +1,79 @@
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  /* If you want a small universal space from the very top, consider adding it here */
+  /* padding-top: 10px; */
+}
+
+* {
+  box-sizing: border-box;
+  /* Ensure margin and padding are reset, but not globally overriding all font-family */
+  /* Consider applying Raleway only to specific elements or using Angular's typography */
+  /* margin: 0; */
+  /* padding: 0; */
+  /* font-family: Raleway, sans-serif; */
+}
+
+/* Global Snackbar Styling - Applies to ALL pages */
+/* Remove conflicting positioning rules from here */
+.cdk-global-overlay-wrapper {
+   align-items: flex-start;
+  /* padding-top: 50px !important;  <-- REMOVE THIS */
+}
+
+/* Base snackbar container styling */
+.mat-mdc-snack-bar-container {
+  --mdc-snackbar-container-color: transparent; /* Use CSS variables for theming */
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+  /* margin-top: 20px !important; <-- REMOVE THIS */
+  max-width: 100vw;
+}
+
+/* Handset/mobile specific adjustments */
+.mat-mdc-snack-bar-handset {
+  width: 95%;
+  max-width: 95%;
+  margin: 0 auto; /* This is for horizontal centering */
+}
+
+/* Label styling */
+.mat-mdc-snack-bar-label {
+  font-size: large;
+  padding: 14px 16px;
+}
+
+/* Success snackbar */
+/* Make the selector more specific by chaining it with the Angular Material container class */
+.mat-mdc-snack-bar-container.success-snackbar {
+  --mdc-snackbar-container-color: #4caf50 !important; /* Use CSS variables for theming */
+  color: white !important; /* Text color */
+  background-color: #4caf50 !important; /* Fallback/additional background color */
+}
+
+/* Error snackbar */
+/* Make the selector more specific by chaining it with the Angular Material container class */
+.mat-mdc-snack-bar-container.error-snackbar {
+  --mdc-snackbar-container-color: #f44336 !important; /* Material Design Components variable */
+  color: white !important; /* Text color */
+  background-color: #f44336 !important; /* Fallback/additional background color */
+}
+
+/* Other snackbar styling - ensure these are below the specific ones if they conflict */
+.mat-mdc-snack-bar-container {
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+  /* Make sure you've removed the problematic margin/padding/positioning rules here */
+  /* --mdc-snackbar-container-color: transparent; (You can remove this if your specific classes handle it) */
+  max-width: 100vw;
+}
+
+/* Button styling */
+.mdc-button__label {
+  color: white;
+}
+
+/* Animation adjustments */
+.mat-mdc-snack-bar-handset .mat-mdc-snack-bar-container {
+  /* REMOVE these problematic lines entirely */
+  /* position: relative !important; */
+  /* top: 20px !important; */
+}

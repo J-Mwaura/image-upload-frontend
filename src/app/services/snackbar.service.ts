@@ -6,7 +6,7 @@ import { MatSnackBarConfig } from '@angular/material/snack-bar';
 @Injectable({ providedIn: 'root' })
 export class SnackbarService {
   private readonly defaultConfig: MatSnackBarConfig = {
-    duration: 80000,
+    duration: 2000,
     verticalPosition: 'top',
     horizontalPosition: 'center'
   };
