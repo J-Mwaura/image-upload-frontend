@@ -98,14 +98,14 @@ export class LoginComponent implements OnInit {
                             }
                             this.snackbar.success('Login successful!');
                         } else {
-                            console.error("User data not found after login.");
+                            //console.error("User data not found after login.");
                             this.errorMessage = "An error occurred during login. Please try again.";
                             this.isLoginFailed = true;
                             this.snackbar.error(this.errorMessage);
                         }
                     });
                 }).catch(error => {
-                    console.error("Error saving token/user:", error);
+                    //console.error("Error saving token/user:", error);
                     this.isLoading = false;
                     this.errorMessage = "An error occurred during login. Please try again.";
                     this.isLoginFailed = true;
@@ -113,7 +113,7 @@ export class LoginComponent implements OnInit {
                 });
             },
             error: (error: HttpErrorResponse) => {
-                console.error('Login error:', error);
+                //console.error('Login error:', error);
                 this.isLoading = false;
                 this.isLoginFailed = true;
 
