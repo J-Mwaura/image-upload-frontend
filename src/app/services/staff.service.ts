@@ -30,9 +30,7 @@ export class StaffService {
   }
 
   createStaff(staff: Partial<StaffDTO>): Observable<StaffDTO> {
-    const apiStaffData = StaffMapper.toAPI(staff);
-
-    return this.http.post<ApiResponse<any>>(this.apiUrl, StaffMapper.toAPI(staff)).pipe(
+    return this.http.post<ApiResponse<any>>(`${this.apiUrl}`, StaffMapper.toAPI(staff)).pipe(
       map(response => {
         // Check for success flag in the ApiResponse
         if (response.success) {
@@ -40,7 +38,6 @@ export class StaffService {
           return StaffMapper.toDTO(response.data);
         } else {
           // If 'success' is false (backend returned a business error with 200 OK or other status)
-          // You might want to throw an error here to be caught by catchError or the subscriber's error callback
           throw new Error(response.message || 'Unknown error from API');
         }
       }),
