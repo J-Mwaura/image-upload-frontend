@@ -30,6 +30,9 @@ export class StaffService {
   }
 
   createStaff(staff: Partial<StaffDTO>): Observable<StaffDTO> {
+    const apiStaffData = StaffMapper.toAPI(staff);
+    console.log("creating user " +apiStaffData.userId);
+
     return this.http.post<ApiResponse<any>>(`${this.apiUrl}`, StaffMapper.toAPI(staff)).pipe(
       map(response => {
         // Check for success flag in the ApiResponse
