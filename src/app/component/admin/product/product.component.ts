@@ -55,10 +55,10 @@ export class AdminProductComponent implements OnInit {
 
   constructor(
     private productService: ProductService,
-    private imageService: ImageService, // Inject ImageService
+    private imageService: ImageService,
     private snackBar: MatSnackBar,
     private router: Router,
-    public dialog: MatDialog // Inject MatDialog
+    public dialog: MatDialog
   ) {}
 
   ngOnInit(): void {

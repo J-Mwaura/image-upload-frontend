@@ -50,7 +50,7 @@ export class AddProductDialogComponent implements OnInit { // Implemented OnDest
   selectedMainImageId: number | null = null;
   selectedOtherImageIds: number[] = [];
   allCategories: ProductCategory[] = [];
- // allCategories: ProductCategory[] = []; // Declare the categories array
+  // allCategories: ProductCategory[] = []; // Declare the categories array
   isLoadingCategories = false;
   categoryErrorMessage = '';
   currentPage: number = 0; // Current page for categories
@@ -82,8 +82,8 @@ export class AddProductDialogComponent implements OnInit { // Implemented OnDest
       description: [''],
       price: [0, [Validators.required, Validators.min(0)]],
       productType: ['NON_VEHICLE', Validators.required],
-  vehicleType: [''],
-  licensePlate: [''],
+      vehicleType: [''],
+      licensePlate: [''],
       mainImageId: [null], // To store the selected main image ID
       imageIds: [[]], // To store the selected other image IDs (array of IDs)
       categoryId: [null, Validators.required], // Category is required
@@ -92,122 +92,122 @@ export class AddProductDialogComponent implements OnInit { // Implemented OnDest
 
   ngOnInit(): void {
     if (this.data && this.data.loadProductImages) {
-     this.data.loadProductImages(this.data.currentProductImagePage, this.data.productImagePageSize, this.data.productImageFilterTerm);
-    this.allProductImages = this.data.allProductImages;
-   // this.isLoadingProductImages = this.data.isLoadingProductImages; // Removed
-    this.totalProductImageCount = this.data.totalProductImageCount;
-    this.currentProductImagePage = this.data.currentProductImagePage;
-    this.productImagePageSize = this.data.productImagePageSize;
-    this.productImageFilterTerm = this.data.productImageFilterTerm;
-     this.productImageErrorMessage = this.data.productImageErrorMessage;
+      this.data.loadProductImages(this.data.currentProductImagePage, this.data.productImagePageSize, this.data.productImageFilterTerm);
+      this.allProductImages = this.data.allProductImages;
+      // this.isLoadingProductImages = this.data.isLoadingProductImages; // Removed
+      this.totalProductImageCount = this.data.totalProductImageCount;
+      this.currentProductImagePage = this.data.currentProductImagePage;
+      this.productImagePageSize = this.data.productImagePageSize;
+      this.productImageFilterTerm = this.data.productImageFilterTerm;
+      this.productImageErrorMessage = this.data.productImageErrorMessage;
     } else {
-    console.warn('loadProductImages function not passed to the dialog.');
+      console.warn('loadProductImages function not passed to the dialog.');
     }
-    
-     this.loadCategories();
-     }
-    
-    onMainImageSelected(imageId: number): void {
-     this.selectedMainImageId = imageId;
-     this.addProductForm.patchValue({ mainImageId: imageId });
-     }
-    
-     isMainImageSelected(imageId: number): boolean {
-     return this.selectedMainImageId === imageId;
-     }
-    
-     onOtherImageToggled(imageId: number): void {
-        const index = this.selectedOtherImageIds.indexOf(imageId);
-        if (index > -1) {
-          this.selectedOtherImageIds.splice(index, 1);
-        } else {
-          this.selectedOtherImageIds.push(imageId);
-        }
-        this.addProductForm.patchValue({ imageIds: this.selectedOtherImageIds });
-      }
-    
-      isOtherImageSelected(imageId: number): boolean {
-        return this.selectedOtherImageIds.includes(imageId);
-      }
-    
-      loadCategories(): void {
-        this.isLoadingCategories = true;
-        this.categoryErrorMessage = '';
-    
-        this.productCategoryService.getProductCategories(this.currentPage, this.pageSize).subscribe({ // Using observer object
-          next: (response: any) => {
-            this.allCategories = response.content;
-            this.totalProductImageCount = response.totalElements;
-            this.isLoadingCategories = false;
-          },
-          error: () => {
-            this.snackBar.open('Error loading product categories:', 'Close', {duration: 3000});
-            this.isLoadingCategories = false;
-          },
-          complete: () => {
-            // Optional: Called when the observable completes (not common for HTTP requests)
-            // console.log('Observable completed');
-          }
-        });
-      }
-    
-      onCategorySelected(categoryId: number): void {
-        this.selectedCategoryId = categoryId;
-        this.addProductForm.patchValue({ categoryId: categoryId }); // Update the form control
-      }
-    
-      handleCategoryPageEvent(event: PageEvent): void {
-        this.currentPage = event.pageIndex;
-        this.pageSize = event.pageSize;
-        this.loadCategories();
-      }
-    
-      loadMoreProductImages(event?: PageEvent): void {
-        if (this.data && this.data.loadProductImages) {
-          const page = event ? event.pageIndex + 1 : this.currentProductImagePage + 1;
-          const size = event ? event.pageSize : this.productImagePageSize;
-    
-          this.data.loadProductImages(page, size, this.productImageFilterTerm);
-          this.currentProductImagePage = page;
-          this.productImagePageSize = size;
-          this.allProductImages = this.data.allProductImages;
-        }
+
+    this.loadCategories();
+  }
+
+  onMainImageSelected(imageId: number): void {
+    this.selectedMainImageId = imageId;
+    this.addProductForm.patchValue({ mainImageId: imageId });
+  }
+
+  isMainImageSelected(imageId: number): boolean {
+    return this.selectedMainImageId === imageId;
+  }
+
+  onOtherImageToggled(imageId: number): void {
+    const index = this.selectedOtherImageIds.indexOf(imageId);
+    if (index > -1) {
+      this.selectedOtherImageIds.splice(index, 1);
+    } else {
+      this.selectedOtherImageIds.push(imageId);
+    }
+    this.addProductForm.patchValue({ imageIds: this.selectedOtherImageIds });
+  }
+
+  isOtherImageSelected(imageId: number): boolean {
+    return this.selectedOtherImageIds.includes(imageId);
+  }
+
+  loadCategories(): void {
+    this.isLoadingCategories = true;
+    this.categoryErrorMessage = '';
+
+    this.productCategoryService.getProductCategories(this.currentPage, this.pageSize).subscribe({ // Using observer object
+      next: (response: any) => {
+        this.allCategories = response.content;
+        this.totalProductImageCount = response.totalElements;
+        this.isLoadingCategories = false;
+      },
+      error: () => {
+        this.snackBar.open('Error loading product categories:', 'Close', { duration: 3000 });
+        this.isLoadingCategories = false;
+      },
+      complete: () => {
+        // Optional: Called when the observable completes (not common for HTTP requests)
+        // console.log('Observable completed');
       }
-    
-      applyImageFilter(): void {
-        if (this.data && this.data.loadProductImages) {
-          this.currentProductImagePage = 1;
-          this.data.loadProductImages(this.currentProductImagePage, this.productImagePageSize, this.productImageFilterTerm);
-          this.allProductImages = this.data.allProductImages;
-          // this.isLoadingProductImages = this.data.isLoadingProductImages; // Removed
-        }
-      }
-    
-      save(): void {
-        if (this.addProductForm.valid && this.selectedMainImageId && this.addProductForm.get('categoryId')?.value) {
-          const newProduct: ProductDto = {
-            ...this.addProductForm.value,
-            mainImageId: this.selectedMainImageId,
-            imageIds: this.selectedOtherImageIds,
-            categoryId: this.selectedCategoryId,
-          };
-          this.productService.createProduct(newProduct).subscribe({
-            next: () => {
-              this.snackBar.open('Product added successfully', 'Close', { duration: 3000 });
-              this.dialogRef.close(true); // Indicate success
-            },
-            error: (error) => {
-              this.snackBar.open('Error adding product', 'Close', { duration: 3000 });
-              console.error('Error adding product:', error);
-            },
-          });
-        } else {
-          this.snackBar.open('Please fill all required fields and select a main image and category', 'Close', { duration: 5000 });
-          console.error('Form is invalid or main image/category is not selected');
-        }
-      }
-    
-      onNoClick(): void {
-        this.dialogRef.close(false);
+    });
+  }
+
+  onCategorySelected(categoryId: number): void {
+    this.selectedCategoryId = categoryId;
+    this.addProductForm.patchValue({ categoryId: categoryId }); // Update the form control
+  }
+
+  handleCategoryPageEvent(event: PageEvent): void {
+    this.currentPage = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.loadCategories();
+  }
+
+  loadMoreProductImages(event?: PageEvent): void {
+    if (this.data && this.data.loadProductImages) {
+      const page = event ? event.pageIndex + 1 : this.currentProductImagePage + 1;
+      const size = event ? event.pageSize : this.productImagePageSize;
+
+      this.data.loadProductImages(page, size, this.productImageFilterTerm);
+      this.currentProductImagePage = page;
+      this.productImagePageSize = size;
+      this.allProductImages = this.data.allProductImages;
+    }
+  }
+
+  applyImageFilter(): void {
+    if (this.data && this.data.loadProductImages) {
+      this.currentProductImagePage = 1;
+      this.data.loadProductImages(this.currentProductImagePage, this.productImagePageSize, this.productImageFilterTerm);
+      this.allProductImages = this.data.allProductImages;
+      // this.isLoadingProductImages = this.data.isLoadingProductImages; // Removed
+    }
+  }
+
+  save(): void {
+    if (this.addProductForm.valid && this.selectedMainImageId && this.addProductForm.get('categoryId')?.value) {
+      const newProduct: ProductDto = {
+        ...this.addProductForm.value,
+        mainImageId: this.selectedMainImageId,
+        imageIds: this.selectedOtherImageIds,
+        categoryId: this.selectedCategoryId,
+      };
+      this.productService.createProduct(newProduct).subscribe({
+        next: () => {
+          this.snackBar.open('Product added successfully', 'Close', { duration: 3000 });
+          this.dialogRef.close(true); // Indicate success
+        },
+        error: (error) => {
+          this.snackBar.open('Error adding product', 'Close', { duration: 3000 });
+          console.error('Error adding product:', error);
+        },
+      });
+    } else {
+      this.snackBar.open('Please fill all required fields and select a main image and category', 'Close', { duration: 5000 });
+      console.error('Form is invalid or main image/category is not selected');
+    }
+  }
+
+  onNoClick(): void {
+    this.dialogRef.close(false);
   }
 }

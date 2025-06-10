@@ -5,8 +5,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { StaffService } from '../../../../../services/staff.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { StaffType } from '../../../../../model/dto/staff-dto';
+import { StaffDTO, StaffType } from '../../../../../model/dto/staff-dto';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -17,8 +16,10 @@ import { User } from '../../../../../model/user';
 import { UserService } from '../../../../../services/user.service';
 import { UserDTO } from '../../../../../model/dto/user-dto';
 import { Page } from '../../../../../model/page';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
+  standalone: true,
   selector: 'app-create-staff-dialog',
   templateUrl: './create-staff.component.html',
   styleUrls: ['./create-staff.component.css'],
@@ -74,36 +75,51 @@ export class CreateStaffComponent implements OnInit{
 
   onSubmit(): void {
     if (this.staffForm.invalid) {
+      this.staffForm.markAllAsTouched();
       return;
     }
 
     this.isLoading = true;
-    const staffData = {
-      ...this.staffForm.value,
-      user: { id: this.data.userId }
+    const formValues = this.staffForm.value;
+
+    const staffData: Partial<StaffDTO> = {
+      firstName: formValues.firstName,
+      lastName: formValues.lastName,
+      phone: formValues.phone,
+      staffType: formValues.staffType,
+      hireDate: formValues.hireDate,
+      pinCode: formValues.pinCode,
+      hourlyRate: formValues.hourlyRate,
+      isActive: formValues.isActive,
+      // For 'user' property, create a UserDTO object with the selected userId from the form
+      user: { id: formValues.userId } as UserDTO,
+      // 'isAvailable' typically depends on 'isActive' and potentially other factors
+      isAvailable: formValues.isActive && formValues.isAvailable,
     };
 
-    this.staffService.createStaff(staffData).subscribe({
+        //console.log('Frontend (CreateStaffComponent): Sending StaffDTO to service:', staffData);
+
+   this.staffService.createStaff(staffData).subscribe({
       next: () => {
-        this.snackBar.open('Staff member created successfully!', 'Close', {
-          duration: 3000,
-          panelClass: ['success-snackbar']
-        });
-        this.dialogRef.close(true); // Pass true to indicate success
+        this.snackBar.open('Staff member created successfully!', 'Close', { duration: 3000 });
+        this.dialogRef.close(true);
       },
       error: (err) => {
-        this.snackBar.open('Failed to create staff member', 'Close', {
-          duration: 3000,
-          panelClass: ['error-snackbar']
+        const errorMessage = err.message;
+        this.snackBar.open(errorMessage, 'Close', { duration: 5000,
+          verticalPosition: 'top', 
+          horizontalPosition: 'center',
+          panelClass: ['snackbar-error']
         });
+        //console.error('Error creating staff member:', err);
         this.isLoading = false;
       }
     });
   }
 
   onCancel(): void {
-    this.dialogRef.close(false);
-  }
+  this.dialogRef.close(false);
+}
 
   loadAvailableUsers(): void {
     this.isLoadingUsers = true;
