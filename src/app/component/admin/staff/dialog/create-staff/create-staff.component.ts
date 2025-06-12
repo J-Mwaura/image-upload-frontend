@@ -124,8 +124,8 @@ export class CreateStaffComponent implements OnInit{
   loadAvailableUsers(): void {
     this.isLoadingUsers = true;
     this.userService.getAvailableUsers().subscribe({
-      next: (page: Page<UserDTO>) => {  // Correct type to Page<UserDTO>
-        this.availableUsers = page.content.map(convertUserDTOToUser); // Access .content
+      next: (page: Page<UserDTO>) => {
+        this.availableUsers = page.content.map(convertUserDTOToUser);
         this.isLoadingUsers = false;
         
         // Optional: Store pagination info if needed
