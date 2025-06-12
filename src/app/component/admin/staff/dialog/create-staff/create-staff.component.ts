@@ -97,8 +97,6 @@ export class CreateStaffComponent implements OnInit{
       isAvailable: formValues.isActive && formValues.isAvailable,
     };
 
-        //console.log('Frontend (CreateStaffComponent): Sending StaffDTO to service:', staffData);
-
    this.staffService.createStaff(staffData).subscribe({
       next: () => {
         this.snackBar.open('Staff member created successfully!', 'Close', { duration: 3000 });
@@ -111,7 +109,6 @@ export class CreateStaffComponent implements OnInit{
           horizontalPosition: 'center',
           panelClass: ['snackbar-error']
         });
-        //console.error('Error creating staff member:', err);
         this.isLoading = false;
       }
     });
