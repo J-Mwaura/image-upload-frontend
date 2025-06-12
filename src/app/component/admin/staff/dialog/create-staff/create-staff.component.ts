@@ -98,9 +98,9 @@ export class CreateStaffComponent implements OnInit{
     };
 
    this.staffService.createStaff(staffData).subscribe({
-      next: () => {
+      next: (newStaff) => {
         this.snackBar.open('Staff member created successfully!', 'Close', { duration: 3000 });
-        this.dialogRef.close(true);
+        this.dialogRef.close(newStaff);
       },
       error: (err) => {
         const errorMessage = err.message;
