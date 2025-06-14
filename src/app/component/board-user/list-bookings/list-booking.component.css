@@ -5,15 +5,15 @@
 }
 
 /* Specific column width adjustments */
-.mat-column-bookingId {
-  width: 70px;  /* Reduced from default */
+/* .mat-column-bookingId {
+  width: 70px;
   max-width: 80px;
 }
 
 .mat-column-customerName {
-  width: 110px; /* Slightly reduced */
+  width: 110px;
   max-width: 130px;
-}
+} */
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
@@ -37,6 +37,12 @@
   }
   
   .mat-column-bookingId {
+    width: 50px;
+  }
+  .mat-column-staffName{
+    width: 50px;
+  }
+  .mat-column-licensePlate{
     width: 50px;
   }
   
