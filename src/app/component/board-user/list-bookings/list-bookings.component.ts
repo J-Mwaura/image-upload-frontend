@@ -65,7 +65,7 @@ export class ListBookingsComponent implements OnInit {
     'licensePlate',
     'priceCharged',
     'createdAt',
-    'actions'
+    //'actions'
   ];
 
 
