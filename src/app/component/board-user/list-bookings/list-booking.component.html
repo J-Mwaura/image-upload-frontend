@@ -1,7 +1,7 @@
 <div class="container mx-auto p-4 rounded-lg shadow-lg bg-gray-50">
   <div class="booking-header">
     <p class="header-left">Total: {{ totalBookingsInDatabase }}</p>
-    <h2 class="header-center">Booking List</h2>
+    <h2 class="header-center">Bookings</h2>
     <p class="header-right">Today: {{ totalBookingsToday }}</p>
 </div>
   <div class="booking-list-container relative"> 
@@ -115,7 +115,7 @@
             </div>
           </th>
           <td mat-cell *matCellDef="let booking">
-            {{ booking.createdAt | date:'short' }}
+            {{ booking.createdAt | date:'dd/MM/yyyy hh:mm a' }}
           </td>
         </ng-container>
 
