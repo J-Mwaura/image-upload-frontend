@@ -1,124 +1,93 @@
-<div class="container mx-auto p-4 rounded-lg shadow-lg bg-gray-50">
-  <h2 class="text-3xl font-bold text-center text-indigo-800 mb-6 rounded-md p-2 bg-indigo-100">Booking List</h2>
-
-  <!-- Temporary style block for testing header text visibility -->
-  <style>
-    /* Force header text color to red for all mat-header-cell elements */
-    .mat-header-cell {
-      color: red !important;
-      /* Use !important to try to override other styles */
-      font-weight: bold;
-      /* Make sure it's bold for visibility */
-      font-size: 1rem;
-      /* Ensure a reasonable font size */
-    }
-  </style>
-
+<div class="booking-container">
   <!-- Loading Indicator -->
-  <div *ngIf="isLoading" class="text-center py-8 text-indigo-600">
-    <p class="text-xl">Loading bookings... Please wait.</p>
-    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mt-4"></div>
+  <div *ngIf="isLoading" class="loading-indicator">
+    <p>Loading bookings... Please wait.</p>
+    <div class="spinner"></div>
   </div>
 
-  <!-- Booking List Section with MatTable -->
-  <div class="table-container" *ngIf="!isLoading && allBookings.length > 0">
-    <p class="text-gray-700 text-sm mb-4 text-center">{{ pageInfo }}</p>
+  <!-- Booking List Section -->
+  <div *ngIf="!isLoading && allBookings.length > 0" class="booking-list-container">
 
-    <!-- Binding dataSource directly to allBookings -->
-    <table mat-table [dataSource]="allBookings"
-      class="mat-elevation-z8 min-w-full bg-white border border-gray-200 rounded-lg">
+    <div class="table-wrapper">
+      <table mat-table [dataSource]="allBookings" class="booking-table">
+        <!-- Booking ID Column - Compact -->
+        <ng-container matColumnDef="bookingId">
+          <th mat-header-cell *matHeaderCellDef (click)="changeSort('bookingId')" class="compact-col">
+            <div class="header-content">
+              ID <span>{{ getSortIcon('bookingId') }}</span>
+            </div>
+          </th>
+          <td mat-cell *matCellDef="let booking" class="compact-col">{{ booking.id }}</td>
+        </ng-container>
 
-      <!-- Booking ID Column -->
-      <ng-container matColumnDef="bookingId">
-        <th mat-header-cell *matHeaderCellDef
-          class="py-3 px-4 text-left rounded-tl-lg cursor-pointer hover:bg-indigo-700"
-          (click)="changeSort('bookingId')">
-          Booking ID <span class="ml-1">{{ getSortIcon('bookingId') }}</span>
-        </th>
-        <td mat-cell *matCellDef="let booking" class="py-3 px-4 text-gray-800">{{ booking.id }}</td>
-      </ng-container>
+        <!-- Staff Name Column -->
+        <ng-container matColumnDef="staffName">
+          <th mat-header-cell *matHeaderCellDef (click)="changeSort('staff.firstName')" class="compact-col">
+            <div class="header-content">
+              Staff <span>{{ getSortIcon('staff.firstName') }}</span>
+            </div>
+          </th>
+          <td mat-cell *matCellDef="let booking" class="compact-col">
+            {{ booking.staff?.firstName || 'Unassigned' }}
+          </td>
+        </ng-container>
 
-      <!-- Staff Name Column -->
-      <ng-container matColumnDef="staffName">
-        <th mat-header-cell *matHeaderCellDef class="py-3 px-4 text-left cursor-pointer hover:bg-indigo-700"
-          (click)="changeSort('staff.firstName')"> <!-- Changed to nested property syntax -->
-          Staff Name <span class="ml-1">{{ getSortIcon('staff.firstName') }}</span>
-        </th>
-        <td mat-cell *matCellDef="let booking" class="py-3 px-4 text-gray-800">
-          {{ booking.staff?.firstName }}
-          <span *ngIf="!booking.staff" class="text-gray-400">Unassigned</span>
-        </td>
-      </ng-container>
+        <!-- Customer Name Column - Compact -->
+        <ng-container matColumnDef="customerName">
+          <th mat-header-cell *matHeaderCellDef (click)="changeSort('customerName')" class="compact-col">
+            <div class="header-content">
+              Customer <span>{{ getSortIcon('customerName') }}</span>
+            </div>
+          </th>
+          <td mat-cell *matCellDef="let booking" class="compact-col">{{ booking.customerName }}</td>
+        </ng-container>
 
-      <!-- Customer Name Column -->
-      <ng-container matColumnDef="customerName">
-        <th mat-header-cell *matHeaderCellDef class="py-3 px-4 text-left cursor-pointer hover:bg-indigo-700"
-          (click)="changeSort('customerName')">
-          Customer Name <span class="ml-1">{{ getSortIcon('customerName') }}</span>
-        </th>
-        <td mat-cell *matCellDef="let booking" class="py-3 px-4 text-gray-800">{{ booking.customerName }}</td>
-      </ng-container>
+        <!-- Other columns remain unchanged -->
+        <ng-container matColumnDef="licensePlate">
+          <th mat-header-cell *matHeaderCellDef (click)="changeSort('licensePlate')">
+            <div class="header-content">
+              Plate <span>{{ getSortIcon('licensePlate') }}</span>
+            </div>
+          </th>
+          <td mat-cell *matCellDef="let booking">{{ booking.licensePlate }}</td>
+        </ng-container>
 
-      <!-- License Plate Column -->
-      <ng-container matColumnDef="licensePlate">
-        <th mat-header-cell *matHeaderCellDef class="py-3 px-4 text-left cursor-pointer hover:bg-indigo-700"
-          (click)="changeSort('licensePlate')">
-          License Plate <span class="ml-1">{{ getSortIcon('licensePlate') }}</span>
-        </th>
-        <td mat-cell *matCellDef="let booking" class="py-3 px-4 text-gray-800">{{ booking.licensePlate }}</td>
-      </ng-container>
+        <ng-container matColumnDef="priceCharged">
+          <th mat-header-cell *matHeaderCellDef (click)="changeSort('priceCharged')">
+            <div class="header-content">
+              Price <span>{{ getSortIcon('priceCharged') }}</span>
+            </div>
+          </th>
+          <td mat-cell *matCellDef="let booking">
+            {{ booking.priceCharged | currency:'GBP' }}
+          </td>
+        </ng-container>
 
-      <!-- Price Charged Column -->
-      <ng-container matColumnDef="priceCharged">
-        <th mat-header-cell *matHeaderCellDef class="py-3 px-4 text-left cursor-pointer hover:bg-indigo-700"
-          (click)="changeSort('priceCharged')">
-          Price <span class="ml-1">{{ getSortIcon('priceCharged') }}</span>
-        </th>
-        <td mat-cell *matCellDef="let booking" class="py-3 px-4 text-gray-800">{{ booking.priceCharged | currency:'GBP'
-          }}</td>
-      </ng-container>
+        <ng-container matColumnDef="createdAt">
+          <th mat-header-cell *matHeaderCellDef (click)="changeSort('createdAt')">
+            <div class="header-content">
+              Created <span>{{ getSortIcon('createdAt') }}</span>
+            </div>
+          </th>
+          <td mat-cell *matCellDef="let booking">
+            {{ booking.createdAt | date:'short' }}
+          </td>
+        </ng-container>
 
-      <!-- Created At Column -->
-      <ng-container matColumnDef="createdAt">
-        <th mat-header-cell *matHeaderCellDef
-          class="py-3 px-4 text-left rounded-tr-lg cursor-pointer hover:bg-indigo-700"
-          (click)="changeSort('createdAt')">
-          Created At <span class="ml-1">{{ getSortIcon('createdAt') }}</span>
-        </th>
-        <td mat-cell *matCellDef="let booking" class="py-3 px-4 text-gray-800">{{ booking.createdAt | date:'short' }}
-        </td>
-      </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </div>
 
-      <!-- Actions Column -->
-      <!-- <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef class="py-3 px-4 text-left">Actions</th>
-        <td mat-cell *matCellDef="let booking" class="py-3 px-4 text-gray-800">
-          <button mat-icon-button color="primary" [routerLink]="['/bookings/edit', booking.bookingId]"
-            class="text-blue-500 hover:text-blue-700">
-            <mat-icon>edit</mat-icon>
-          </button>
-          <button mat-icon-button color="warn" (click)="deleteBooking(booking.bookingId)"
-            class="text-red-500 hover:text-red-700">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </td>
-      </ng-container> -->
-
-      <!-- Table Rows Definition -->
-      <tr mat-header-row *matHeaderRowDef="displayedColumns" class="bg-blue-600 text-white rounded-t-lg"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"
-        class="border-b border-gray-200 last:border-0 hover:bg-indigo-50 transition duration-150 ease-in-out"></tr>
-    </table>
-
-    <!-- Mat Paginator -->
-    <mat-paginator [length]="totalElements" [pageSize]="pageSize" [pageIndex]="currentPage"
-      [pageSizeOptions]="[5, 10, 20, 50]" (page)="onPageChange($event)" aria-label="Select page of bookings"
-      class="mt-6 bg-white rounded-lg shadow-md p-4"></mat-paginator>
+    <mat-paginator [length]="totalElements" [pageSize]="pageSize" 
+                  [pageIndex]="currentPage" [pageSizeOptions]="[5, 10, 20, 50]" 
+                  (page)="onPageChange($event)" class="booking-paginator">
+    </mat-paginator>
+    <p class="page-info">{{ pageInfo }}</p>
   </div>
 
   <!-- No Bookings Found Message -->
-  <div *ngIf="!isLoading && allBookings.length === 0" class="text-center py-8 text-gray-600">
-    <p class="text-xl">No bookings found for the current criteria.</p>
+  <div *ngIf="!isLoading && allBookings.length === 0" class="no-bookings">
+    <p>No bookings found for the current criteria.</p>
   </div>
-
 </div>

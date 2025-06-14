@@ -1,0 +1,52 @@
+/* Add these styles to your CSS */
+.compact-col {
+  padding: 0.5rem 0.3rem !important;  /* Reduced side padding */
+  min-width: auto !important;
+}
+
+/* Specific column width adjustments */
+.mat-column-bookingId {
+  width: 70px;  /* Reduced from default */
+  max-width: 80px;
+}
+
+.mat-column-customerName {
+  width: 110px; /* Slightly reduced */
+  max-width: 130px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .compact-col {
+    padding: 0.4rem 0.2rem !important;
+  }
+  
+  .mat-column-bookingId {
+    width: 60px;
+  }
+  
+  .mat-column-customerName {
+    width: 90px;
+  }
+}
+
+@media (max-width: 640px) {
+  .compact-col {
+    padding: 0.3rem 0.15rem !important;
+    font-size: 0.8rem;
+  }
+  
+  .mat-column-bookingId {
+    width: 50px;
+  }
+  
+  .mat-column-customerName {
+    width: 80px;
+  }
+  
+  /* Shorten header labels on very small screens */
+  .header-content {
+    flex-direction: column;
+    line-height: 1.2;
+  }
+}
