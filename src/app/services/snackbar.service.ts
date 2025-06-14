@@ -2,6 +2,7 @@
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSnackBarConfig } from '@angular/material/snack-bar';
+import { info } from 'console';
 
 @Injectable({ providedIn: 'root' })
 export class SnackbarService {
@@ -17,6 +18,20 @@ export class SnackbarService {
     this.snackBar.open(message, 'Dismiss', {
       ...this.defaultConfig,
       panelClass: ['success-snackbar', 'top']
+    });
+  }
+
+  info(message: string) {
+    this.snackBar.open(message, 'Dismiss', {
+      ...this.defaultConfig,
+      panelClass: ['info-snackbar', 'top']
+    });
+  }
+
+  warning(message: string) {
+    this.snackBar.open(message, 'Dismiss', {
+      ...this.defaultConfig,
+      panelClass: ['warning-snackbar', 'top']
     });
   }
 

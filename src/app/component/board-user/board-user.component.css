@@ -1,16 +1,14 @@
-.main-content {
-    text-align: center;
-  }
-  
-  /* .user-content {
-    display: inline-block;
-    text-align: left;
-    width: 100%; 
-  }  **/
-  
-  
-  header app-navbar {
-    z-index: 1;
-    position: relative;
-  }
-  
+.user-container {
+  display: flex;
+  flex-direction: column;  /* Stack children vertically */
+  min-height: 100vh;      /* Full viewport height */
+}
+
+.user-navbar {
+  flex-shrink: 0;         /* Prevents navbar from shrinking */
+}
+
+.user-content {
+  flex-grow: 1;           /* Takes remaining space */
+  overflow-y: auto;       /* Adds scroll if content overflows */
+}

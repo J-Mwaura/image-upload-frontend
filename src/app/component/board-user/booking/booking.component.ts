@@ -20,7 +20,7 @@ import { CommonModule } from '@angular/common';
 })
 export class BookingComponent implements OnInit {
 
-  bookings$!: Observable<ApiResponse<BookingDTO[]>>; // Observable to hold the list of bookings
+  bookings$!: Observable<ApiResponse<BookingDTO>>; // Observable to hold the list of bookings
   matchingLicensePlates$!: Observable<ApiResponse<Set<string>>>; // Observable for license plate search results
   matchingVehicles$!: Observable<ApiResponse<Set<VehicleDTO>>>; // Observable for vehicle search results (by license plate containing)
 
@@ -30,7 +30,6 @@ export class BookingComponent implements OnInit {
 
 
   // Variables for UI feedback
-  loadingBookings = false;
   loadingLicensePlateSearch = false;
   loadingVehicleSearch = false;
   errorMessage: string | null = null;
@@ -105,8 +104,6 @@ export class BookingComponent implements OnInit {
          return response;
        })
      );
-
-    this.loadAllBookings();
   }
 
   // Method to initialize the booking form with FormBuilder
@@ -161,24 +158,6 @@ export class BookingComponent implements OnInit {
     return null; // Return null if validation passes
   };
 
-  // Method to load all bookings
-  loadAllBookings(): void {
-    this.loadingBookings = true; // Show loading indicator
-    this.errorMessage = null; // Clear previous errors
-    this.bookings$ = this.bookingService.getAllBookings().pipe(
-      catchError(error => {
-        this.errorMessage = `Failed to load bookings: ${error.message}`;
-        this.loadingBookings = false; // Hide loading indicator on error
-        // Include message and success properties in the returned object
-        return of({ message: this.errorMessage, success: false, data: [] } as ApiResponse<BookingDTO[]>); // Return an empty ApiResponse on error
-      }),
-      map(response => {
-         this.loadingBookings = false;
-         return response;
-      })
-    );
-  }
-
   // Method to trigger the license plate string search
   searchLicensePlates(term: string): void {
     this.licensePlateSearchTerms.next(term); // Push the search term into the Subject
@@ -214,7 +193,7 @@ export class BookingComponent implements OnInit {
           // Clear the form or reset it
           this.resetForm(); // Use resetForm to clear all fields
           // Optionally reload the list of all bookings
-          this.loadAllBookings();
+          //this.loadAllBookings();
         } else {
           this.errorMessage = response.message || 'Failed to create booking.';
         }
@@ -254,10 +233,5 @@ export class BookingComponent implements OnInit {
     this.errorMessage = null;
     this.successMessage = null;
   }
-  // Implement other methods for update, delete, getById as needed
-  // Example:
-  // getBookingDetails(id: number): void { ... }
-  // updateBooking(booking: BookingDTO): void { ... }
-  // deleteBooking(id: number): void { ... }
 
 }

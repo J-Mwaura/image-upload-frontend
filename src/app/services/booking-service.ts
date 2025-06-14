@@ -1,6 +1,7 @@
 import { Observable } from 'rxjs';
 import { BookingDTO } from '../model/dto/booking-dto'; // Import the DTO
 import { ApiResponse } from '../model/response/ApiResponse' ; 
+import { Page } from '../model/page';
 
 /**
  * Interface for the Booking Service.
@@ -18,7 +19,7 @@ export interface BookingService {
    * Sends a request to retrieve all bookings.
    * @returns An Observable of the API response containing a list of BookingDTOs.
    */
-  getAllBookings(): Observable<ApiResponse<BookingDTO[]>>;
+  getAllBookings(): Observable<ApiResponse<Page<BookingDTO>>>;
   /**
    * Sends a request to retrieve a booking by its ID.
    * @param bookingId The ID of the booking to retrieve.

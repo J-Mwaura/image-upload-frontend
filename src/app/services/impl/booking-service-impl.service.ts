@@ -1,7 +1,7 @@
 // src/app/services/impl/booking.service.impl.ts (or just src/app/services/booking.service.ts if not using interface)
 
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
@@ -9,19 +9,20 @@ import { BookingService } from '../booking-service'; // Import the interface (if
 import { BookingDTO } from '../../model/dto/booking-dto'; // Import the DTO
 import { ApiResponse } from '../../model/response/ApiResponse'; // Assuming you have an ApiResponse structure
 import { environment } from '../../../environments/environment'; // Assuming environment files for API URL
+import { Page } from '../../model/page';
 
 /**
  * Implementation of the BookingService interface.
  * Handles communication with the backend Booking API.
  */
 @Injectable({
-  providedIn: 'root' // Makes the service available throughout the application
+  providedIn: 'root'
 })
 export class BookingServiceImpl implements BookingService { // Implement the interface (if using)
 
   private apiUrl = `${environment.apiUrl}api/booking`; // Base URL for the booking API endpoints
 
-  constructor(private http: HttpClient) { } // Inject Angular's HttpClient
+  constructor(private http: HttpClient) { }
 
   /**
    * Sends a POST request to create a new booking.
@@ -29,27 +30,30 @@ export class BookingServiceImpl implements BookingService { // Implement the int
    * @returns An Observable of the API response containing the created BookingDTO.
    */
   createBooking(bookingDto: BookingDTO): Observable<ApiResponse<BookingDTO>> {
-  // --- Client-side validation ---
-  if (!bookingDto.vehicleId && !bookingDto.licensePlate) {
-    const errorMessage = "Either vehicleId or licensePlate must be provided for booking.";
-    return throwError(() => new Error(errorMessage)); // Early return with error
+    // --- Client-side validation ---
+    if (!bookingDto.vehicleId && !bookingDto.licensePlate) {
+      const errorMessage = "Either vehicleId or licensePlate must be provided for booking.";
+      return throwError(() => new Error(errorMessage)); // Early return with error
+    }
+
+    // Proceed with HTTP request if validation passes
+    return this.http.post<ApiResponse<BookingDTO>>(`${this.apiUrl}`, bookingDto).pipe(
+      catchError(this.handleError) // Handle server-side errors
+    );
   }
 
-  // Proceed with HTTP request if validation passes
-  return this.http.post<ApiResponse<BookingDTO>>(`${this.apiUrl}`, bookingDto).pipe(
-    catchError(this.handleError) // Handle server-side errors
-  );
-}
+  getAllBookings(
+    page: number = 0,
+    size: number = 20,
+    sortBy: string = 'createdAt',
+    sortOrder: string = 'asc'
+  ): Observable<ApiResponse<Page<BookingDTO>>> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('sort', `${sortBy},${sortOrder}`);
 
-  /**
-   * Sends a GET request to retrieve all bookings.
-   * @returns An Observable of the API response containing a list of BookingDTOs.
-   */
-  getAllBookings(): Observable<ApiResponse<BookingDTO[]>> {
-    // You might want to add pagination/sorting parameters here later
-    return this.http.get<ApiResponse<BookingDTO[]>>(`${this.apiUrl}`).pipe(
-      catchError(this.handleError) // Add error handling
-    );
+    return this.http.get<ApiResponse<Page<BookingDTO>>>(this.apiUrl, { params });
   }
 
   /**
@@ -68,12 +72,12 @@ export class BookingServiceImpl implements BookingService { // Implement the int
  * @param searchTerm The term to search for in license plates.
  * @returns An Observable of the API response containing a Set of matching license plates.
  */
-searchLicensePlates(): Observable<ApiResponse<Set<string>>> {
-  return this.http.get<ApiResponse<Set<string>>>(`${this.apiUrl}/license-plates`)
-    .pipe(
-      catchError(this.handleError)
-    );
-}
+  searchLicensePlates(): Observable<ApiResponse<Set<string>>> {
+    return this.http.get<ApiResponse<Set<string>>>(`${this.apiUrl}/license-plates`)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
 
   /**
    * Sends a PUT request to update an existing booking.

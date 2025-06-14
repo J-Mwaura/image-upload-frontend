@@ -2,7 +2,7 @@
 
 <div class="booking-form">
   <h3>Create New Booking</h3>
-  <form [formGroup]="bookingForm" (ngSubmit)="createBooking()">
+  <!-- <form [formGroup]="bookingForm" (ngSubmit)="createBooking()">
     <div class="form-group">
       <label for="productId">Product ID:</label>
       <input type="number" id="productId" formControlName="productId" required>
@@ -70,7 +70,7 @@
 
     <button type="submit" [disabled]="bookingForm.invalid">Create Booking</button>
     <button type="button" (click)="resetForm()">Reset Form</button>
-  </form>
+  </form> -->
 
   <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
   <div *ngIf="successMessage" class="success-message">{{ successMessage }}</div>
@@ -126,56 +126,6 @@
     </div>
     <div *ngIf="searchVehiclePlateBox.value.trim().length < 2 && searchVehiclePlateBox.value.trim().length > 0">
       <p>Enter at least 2 characters to search.</p>
-    </div>
-  </div>
-</div>
-
-<hr>
-
-<div class="booking-list">
-  <h3>All Bookings</h3>
-  <button (click)="loadAllBookings()">Refresh List</button>
-  <span *ngIf="loadingBookings">Loading...</span>
-
-  <div *ngIf="(bookings$ | async) as response">
-    <div *ngIf="response.data && response.data.length > 0">
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Product ID</th>
-            <th>Customer ID</th>
-            <th>Customer Name</th>
-            <th>Vehicle ID</th>
-            <th>License Plate</th>
-            <th>Staff ID</th>
-            <th>Price</th>
-            <th>Status</th>
-            <th>Payment Status</th>
-            <th>Job Type</th>
-            <th>Created At</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let booking of response.data">
-            <td>{{ booking.bookingId }}</td>
-            <td>{{ booking.productId }}</td>
-            <td>{{ booking.customerId }}</td>
-            <td>{{ booking.customerName }}</td>
-            <td>{{ booking.vehicleId }}</td>
-            <td>{{ booking.licensePlate }}</td>
-            <td>{{ booking.staffId }}</td>
-            <td>{{ booking.priceCharged }}</td>
-            <td>{{ booking.status }}</td>
-            <td>{{ booking.paymentStatus }}</td>
-            <td>{{ booking.jobType }}</td>
-            <td>{{ booking.createdAt | date:'short' }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div *ngIf="response.data && response.data.length === 0 && !loadingBookings">
-      <p>No bookings found.</p>
     </div>
   </div>
 </div>

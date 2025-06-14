@@ -2,11 +2,11 @@
 import { UserDTO } from "./user-dto";
 
 export interface StaffDTO {
-  id?: number;
+  id: number;
   user: UserDTO;
   firstName: string;
   lastName: string;
-  fullName?: string;  // Convenience field for UI
+  fullName?: string;
   phone: string;
   staffType: StaffType;
   hireDate: string;    // ISO format date

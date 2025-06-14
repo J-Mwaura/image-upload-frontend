@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 import { UserProductComponent } from "../../user/product/product.component";
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'user-navbar',
@@ -22,7 +23,8 @@ import { UserProductComponent } from "../../user/product/product.component";
     MatListModule,
     MatIconModule,
     AsyncPipe,
-    UserProductComponent
+    UserProductComponent,
+    RouterLink
 ]
 })
 export class NavbarComponent {

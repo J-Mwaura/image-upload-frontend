@@ -1,5 +1,5 @@
 import {CommonModule, NgOptimizedImage} from '@angular/common';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit, ViewChild, ElementRef  } from '@angular/core';
 import {NgForm,
   FormBuilder, FormGroup, FormsModule,
@@ -8,7 +8,6 @@ import {NgForm,
 } from '@angular/forms';
 import { ProductImage } from '../../../model/ProductImage.model';
 import { ImageService } from '../../../services/image.service';
-import { Subscription } from 'rxjs';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
@@ -52,7 +51,7 @@ export class ImageComponent implements OnInit {
 
   @ViewChild('editModal') editModal!: ElementRef;
 
-  constructor(private imageService: ImageService, private http: HttpClient,
+  constructor(private imageService: ImageService,
     private dialog: MatDialog, private fb: FormBuilder, private snackBar: SnackbarService
   )
   {
