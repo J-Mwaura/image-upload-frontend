@@ -2,22 +2,28 @@
   <div class="container">
     <div class="screen">
       <div class="screen__content">
-<!--        <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>-->
+        <!--        <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>-->
 
         <form class="login" [formGroup]="loginForm" (ngSubmit)="login()">
 
           <mat-form-field class="example-full-width">
             <mat-label>Username</mat-label>
-            <input matInput placeholder="Username" formControlName="username" required>  <mat-error *ngIf="loginForm.get('username')?.invalid && (loginForm.get('username')?.dirty || loginForm.get('username')?.touched)">
+            <input matInput placeholder="Username" formControlName="username" required appLowercaseTrim>
+            <mat-error
+              *ngIf="loginForm.get('username')?.invalid && (loginForm.get('username')?.dirty || loginForm.get('username')?.touched)">
               Username is required
             </mat-error>
           </mat-form-field>
 
           <mat-form-field class="example-full-width">
             <mat-label>Password</mat-label>
-            <input matInput type="password" placeholder="Password" formControlName="password" required minlength="6">  <mat-error *ngIf="loginForm.get('password')?.invalid && (loginForm.get('password')?.dirty || loginForm.get('password')?.touched)">
+            <input matInput type="password" placeholder="Password" formControlName="password" required minlength="6"
+              appTrimTrailingSpaces  >
+            <mat-error
+              *ngIf="loginForm.get('password')?.invalid && (loginForm.get('password')?.dirty || loginForm.get('password')?.touched)">
               <ng-container *ngIf="loginForm.get('password')?.errors?.['required']">Password is required</ng-container>
-              <ng-container *ngIf="loginForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters</ng-container>
+              <ng-container *ngIf="loginForm.get('password')?.errors?.['minlength']">Password must be at least 6
+                characters</ng-container>
             </mat-error>
           </mat-form-field>
 

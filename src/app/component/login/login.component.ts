@@ -17,13 +17,15 @@ import { take } from 'rxjs/operators';
 import { JwtResponse } from '../../model/response/JwtResponse ';
 import { mapJwtResponseToUser } from '../../model/utils/mapJwtResponseToUser';
 import { SnackbarService } from '../../services/snackbar.service';
+import { LowercaseTrimDirective } from '../directives/lowercase.directive';
+import { TrimTrailingSpacesDirective } from '../directives/trim-trailing-spaces.directive';
 
 @Component({
     standalone: true,
     selector: 'app-login',
     templateUrl: './login.component.html',
     styleUrls: ['./login.component.css'],
-    imports: [ReactiveFormsModule, FormsModule, MatFormFieldModule, MatInputModule, CommonModule]
+    imports: [ReactiveFormsModule, FormsModule, MatFormFieldModule, MatInputModule, CommonModule, TrimTrailingSpacesDirective, LowercaseTrimDirective]
 })
 export class LoginComponent implements OnInit {
     color = "primary";

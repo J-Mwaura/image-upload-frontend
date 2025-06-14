@@ -5,13 +5,14 @@ import {FormBuilder, FormGroup, FormsModule,
   Validators,
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { LowercaseTrimDirective } from '../component/directives/lowercase.directive';
 
 @Component({
   standalone: true,
   selector: 'app-register',
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css'],
-  imports: [ReactiveFormsModule, FormsModule, CommonModule]
+  imports: [ReactiveFormsModule, FormsModule, CommonModule, LowercaseTrimDirective ]
 })
 export class RegisterComponent implements OnInit {
 
@@ -33,28 +34,9 @@ export class RegisterComponent implements OnInit {
     });
   }
 
-  // onSubmit() {
-  //   if (this.registrationForm.valid) {
-  //     this.authService.register(this.registrationForm.value).subscribe({
-  //       next: (response) => {
-  //         console.log('Registration successful!', response);
-  //         // Handle successful registration (e.g., redirect to login page)
-  //         this.successMessage = 'Registration successful! Please check your email to activate your account.'; // Set the success message
-  //       this.errorMessage = null; // Clear any previous errors
-  //       this.registrationForm.reset(); // Optional: Reset the form after successful registration
-  //       },
-  //       error: (error: HttpErrorResponse) => { // Type the error as HttpErrorResponse
-  //         console.error('Registration failed!', error);
-  //         this.errorMessage = this.getErrorMessage(error); // Call the helper function (see below)
-  //         this.successMessage = null; // Clear any previous success messages
-  //         this.isLoading = false;
-  //     }       
-  //     });
-  //   } 
-  // }
-
   onSubmit() {
-
+    const formData = this.registrationForm.value;
+    formData.username = formData.username.toLowerCase();
     this.authService.register(this.registrationForm.value).subscribe({
       next: (response) => {
         //console.log('Registration successful:', response);
