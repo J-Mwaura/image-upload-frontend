@@ -146,17 +146,18 @@ export class ListBookingsComponent implements OnInit {
    * Changes the sorting field and direction, then reloads bookings.
    * @param field The field to sort by.
    */
-  changeSort(field: string): void {
-    console.log('Sorting by:', field);
+   changeSort(field: string): void {
+    console.log('ListBookingsComponent: Sorting by:', field);
     if (this.sortField === field) {
       // If clicking the same field, toggle sort direction
       this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+      // Do NOT reset currentPage to 0 here to prevent jumping if only direction changes
     } else {
       // If clicking a new field, set it as primary sort and default to 'desc'
       this.sortField = field;
       this.sortDirection = 'desc';
+      this.currentPage = 0; // ONLY reset to first page when changing to a new sort field
     }
-    this.currentPage = 0; // Reset to first page when changing sort
     this.loadBookings(); // Reload bookings with new sort
   }
 

@@ -51,7 +51,6 @@ import { BookingStatus, PaymentMethodType, PaymentStatus } from '../../../model/
     MatProgressSpinnerModule,
     MatPaginatorModule,
     NgOptimizedImage,
-    CurrencyPipe, // Added CurrencyPipe to imports
     MatTableModule,
     MatExpansionModule,
     MatFormFieldModule,
