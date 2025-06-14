@@ -56,6 +56,12 @@ export class BookingServiceImpl implements BookingService { // Implement the int
     return this.http.get<ApiResponse<Page<BookingDTO>>>(this.apiUrl, { params });
   }
 
+  getTotalBookingsForToday(): Observable<ApiResponse<number>> {
+    return this.http.get<ApiResponse<number>>(`${this.apiUrl}/total-today`).pipe(
+      catchError(this.handleError)
+    );
+  }
+
   /**
    * Sends a GET request to retrieve a booking by its ID.
    * @param bookingId The ID of the booking to retrieve.

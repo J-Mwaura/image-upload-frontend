@@ -20,6 +20,9 @@ export interface BookingService {
    * @returns An Observable of the API response containing a list of BookingDTOs.
    */
   getAllBookings(): Observable<ApiResponse<Page<BookingDTO>>>;
+
+  getTotalBookingsForToday(): Observable<ApiResponse<number>>;
+
   /**
    * Sends a request to retrieve a booking by its ID.
    * @param bookingId The ID of the booking to retrieve.

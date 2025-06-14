@@ -56,6 +56,7 @@ export class ListBookingsComponent implements OnInit {
   // Pagination metadata from the API response
   totalPages = 0;
   totalElements = 0;
+  totalBookingsToday: number = 0;
 
   // Define columns to be displayed in the MatTable
   displayedColumns: string[] = [
@@ -78,6 +79,7 @@ export class ListBookingsComponent implements OnInit {
    */
   ngOnInit(): void {
     this.loadBookings();
+    this.fetchTotalBookingsToday();
   }
 
   loadBookings(): void {
@@ -130,6 +132,30 @@ export class ListBookingsComponent implements OnInit {
 
     console.log('ListBookingsComponent: Subscribe method called. Request initiated.');
   }
+
+  fetchTotalBookingsToday(): void {
+    this.bookingService.getTotalBookingsForToday().subscribe({
+      next: (response) => {
+        if (response.success && response.data !== null) {
+          this.totalBookingsToday = response.data;
+          console.log('Total bookings for today fetched:', this.totalBookingsToday);
+        } else {
+          console.error('Failed to get total bookings for today:', response.message);
+          this.totalBookingsToday = 0; // Default to 0 on error
+        }
+      },
+      error: (err) => {
+        console.error('Error fetching total bookings for today:', err);
+        this.snackbar.error('Failed to fetch total bookings for today.');
+        this.totalBookingsToday = 0; // Default to 0 on error
+      }
+    });
+  }
+
+  get totalBookingsInDatabase(): string {
+    return `(${this.totalElements})`;
+  }
+
 
   /**
    * Handles page changes from MatPaginator.
