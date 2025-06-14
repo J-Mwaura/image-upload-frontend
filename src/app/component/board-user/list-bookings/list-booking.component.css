@@ -1,19 +1,42 @@
-/* Add these styles to your CSS */
+/* Your provided CSS with enhancements */
 .compact-col {
-  padding: 0.5rem 0.3rem !important;  /* Reduced side padding */
+  padding: 0.5rem 0.3rem !important;
   min-width: auto !important;
 }
 
-/* Specific column width adjustments */
-/* .mat-column-bookingId {
-  width: 70px;
-  max-width: 80px;
+/* Sortable header styles */
+.sortable-header {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  user-select: none;
 }
 
-.mat-column-customerName {
-  width: 110px;
-  max-width: 130px;
-} */
+.sortable-header:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+/* Sort indicator styles */
+.sort-indicator {
+  display: inline-flex;
+  margin-left: 4px;
+}
+
+.sort-indicator mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  opacity: 0.6;
+  transition: all 0.2s ease;
+}
+
+.sortable-header:hover .sort-indicator mat-icon {
+  opacity: 0.9;
+}
+
+.sort-indicator .mat-icon[class*="arrow_"] {
+  color: #3f51b5;
+  opacity: 1;
+}
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
@@ -39,10 +62,12 @@
   .mat-column-bookingId {
     width: 50px;
   }
-  .mat-column-staffName{
+  
+  .mat-column-staffName {
     width: 50px;
   }
-  .mat-column-licensePlate{
+  
+  .mat-column-licensePlate {
     width: 50px;
   }
   
@@ -50,9 +75,18 @@
     width: 80px;
   }
   
-  /* Shorten header labels on very small screens */
   .header-content {
     flex-direction: column;
     line-height: 1.2;
+  }
+  
+  .sort-indicator {
+    margin-left: 2px;
+  }
+  
+  .sort-indicator mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
   }
 }

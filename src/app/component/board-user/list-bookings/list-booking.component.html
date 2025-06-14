@@ -7,14 +7,23 @@
 
   <!-- Booking List Section -->
   <div *ngIf="!isLoading && allBookings.length > 0" class="booking-list-container">
-
     <div class="table-wrapper">
       <table mat-table [dataSource]="allBookings" class="booking-table">
-        <!-- Booking ID Column - Compact -->
+        <!-- Booking ID Column -->
         <ng-container matColumnDef="bookingId">
-          <th mat-header-cell *matHeaderCellDef (click)="changeSort('id')" class="compact-col">
+          <th mat-header-cell *matHeaderCellDef 
+              (click)="changeSort('id')" 
+              class="compact-col sortable-header"
+              matTooltip="Click to sort"
+              matTooltipPosition="after">
             <div class="header-content">
-              ID <span>{{ getSortIcon('id') }}</span>
+              ID
+              <div class="sort-indicator">
+                <mat-icon *ngIf="sortField !== 'id'" class="sort-hint">unfold_more</mat-icon>
+                <mat-icon *ngIf="sortField === 'id'" class="sort-active">
+                  {{ sortDirection === 'asc' ? 'arrow_upward' : 'arrow_downward' }}
+                </mat-icon>
+              </div>
             </div>
           </th>
           <td mat-cell *matCellDef="let booking" class="compact-col">{{ booking.id }}</td>
@@ -22,9 +31,19 @@
 
         <!-- Staff Name Column -->
         <ng-container matColumnDef="staffName">
-          <th mat-header-cell *matHeaderCellDef (click)="changeSort('staff.firstName')" class="compact-col">
+          <th mat-header-cell *matHeaderCellDef 
+              (click)="changeSort('staff.firstName')" 
+              class="compact-col sortable-header"
+              matTooltip="Click to sort"
+              matTooltipPosition="after">
             <div class="header-content">
-              Staff <span>{{ getSortIcon('staff.firstName') }}</span>
+              Staff
+              <div class="sort-indicator">
+                <mat-icon *ngIf="sortField !== 'staff.firstName'" class="sort-hint">unfold_more</mat-icon>
+                <mat-icon *ngIf="sortField === 'staff.firstName'" class="sort-active">
+                  {{ sortDirection === 'asc' ? 'arrow_upward' : 'arrow_downward' }}
+                </mat-icon>
+              </div>
             </div>
           </th>
           <td mat-cell *matCellDef="let booking" class="compact-col">
@@ -32,30 +51,61 @@
           </td>
         </ng-container>
 
-        <!-- Customer Name Column - Compact -->
+        <!-- Customer Name Column -->
         <ng-container matColumnDef="customerName">
-          <th mat-header-cell *matHeaderCellDef (click)="changeSort('customerName')" class="compact-col">
+          <th mat-header-cell *matHeaderCellDef 
+              (click)="changeSort('customerName')" 
+              class="compact-col sortable-header"
+              matTooltip="Click to sort"
+              matTooltipPosition="after">
             <div class="header-content">
-              Customer <span>{{ getSortIcon('customerName') }}</span>
+              Customer
+              <div class="sort-indicator">
+                <mat-icon *ngIf="sortField !== 'customerName'" class="sort-hint">unfold_more</mat-icon>
+                <mat-icon *ngIf="sortField === 'customerName'" class="sort-active">
+                  {{ sortDirection === 'asc' ? 'arrow_upward' : 'arrow_downward' }}
+                </mat-icon>
+              </div>
             </div>
           </th>
           <td mat-cell *matCellDef="let booking" class="compact-col">{{ booking.customerName }}</td>
         </ng-container>
 
-        <!-- Other columns remain unchanged -->
+        <!-- License Plate Column -->
         <ng-container matColumnDef="licensePlate">
-          <th mat-header-cell *matHeaderCellDef (click)="changeSort('licensePlate')">
+          <th mat-header-cell *matHeaderCellDef 
+              (click)="changeSort('licensePlate')" 
+              class="sortable-header"
+              matTooltip="Click to sort"
+              matTooltipPosition="after">
             <div class="header-content">
-              Plate <span>{{ getSortIcon('licensePlate') }}</span>
+              Plate
+              <div class="sort-indicator">
+                <mat-icon *ngIf="sortField !== 'licensePlate'" class="sort-hint">unfold_more</mat-icon>
+                <mat-icon *ngIf="sortField === 'licensePlate'" class="sort-active">
+                  {{ sortDirection === 'asc' ? 'arrow_upward' : 'arrow_downward' }}
+                </mat-icon>
+              </div>
             </div>
           </th>
           <td mat-cell *matCellDef="let booking">{{ booking.licensePlate }}</td>
         </ng-container>
 
+        <!-- Price Column -->
         <ng-container matColumnDef="priceCharged">
-          <th mat-header-cell *matHeaderCellDef (click)="changeSort('priceCharged')">
+          <th mat-header-cell *matHeaderCellDef 
+              (click)="changeSort('priceCharged')" 
+              class="sortable-header"
+              matTooltip="Click to sort"
+              matTooltipPosition="after">
             <div class="header-content">
-              Price <span>{{ getSortIcon('priceCharged') }}</span>
+              Price
+              <div class="sort-indicator">
+                <mat-icon *ngIf="sortField !== 'priceCharged'" class="sort-hint">unfold_more</mat-icon>
+                <mat-icon *ngIf="sortField === 'priceCharged'" class="sort-active">
+                  {{ sortDirection === 'asc' ? 'arrow_upward' : 'arrow_downward' }}
+                </mat-icon>
+              </div>
             </div>
           </th>
           <td mat-cell *matCellDef="let booking">
@@ -63,10 +113,21 @@
           </td>
         </ng-container>
 
+        <!-- Created At Column -->
         <ng-container matColumnDef="createdAt">
-          <th mat-header-cell *matHeaderCellDef (click)="changeSort('createdAt')">
+          <th mat-header-cell *matHeaderCellDef 
+              (click)="changeSort('createdAt')" 
+              class="sortable-header"
+              matTooltip="Click to sort"
+              matTooltipPosition="after">
             <div class="header-content">
-              Created <span>{{ getSortIcon('createdAt') }}</span>
+              Created
+              <div class="sort-indicator">
+                <mat-icon *ngIf="sortField !== 'createdAt'" class="sort-hint">unfold_more</mat-icon>
+                <mat-icon *ngIf="sortField === 'createdAt'" class="sort-active">
+                  {{ sortDirection === 'asc' ? 'arrow_upward' : 'arrow_downward' }}
+                </mat-icon>
+              </div>
             </div>
           </th>
           <td mat-cell *matCellDef="let booking">
@@ -79,8 +140,9 @@
       </table>
     </div>
 
-    <mat-paginator [length]="totalElements" [pageSize]="pageSize" [pageIndex]="currentPage"
-      [pageSizeOptions]="[5, 10, 20, 50]" (page)="onPageChange($event)" class="booking-paginator">
+    <mat-paginator [length]="totalElements" [pageSize]="pageSize" 
+                  [pageIndex]="currentPage" [pageSizeOptions]="[5, 10, 20, 50]" 
+                  (page)="onPageChange($event)" class="booking-paginator">
     </mat-paginator>
     <p class="page-info">{{ pageInfo }}</p>
   </div>
