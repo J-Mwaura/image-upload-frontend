@@ -83,13 +83,7 @@ export class ListBookingsComponent implements OnInit {
   }
 
   loadBookings(): void {
-    console.log('ListBookingsComponent: loadBookings method entered.');
-    console.log('ListBookingsComponent: Current fetch parameters:', { page: this.currentPage, size: this.pageSize, sortBy: this.sortField, sortOrder: this.sortDirection });
     this.isLoading = true;
-
-    console.log('ListBookingsComponent: About to call bookingService.getAllBookings() and subscribe.');
-
-    // Directly subscribe to the Observable returned by the service
     this.bookingService.getAllBookings(
       this.currentPage,
       this.pageSize,
@@ -97,8 +91,6 @@ export class ListBookingsComponent implements OnInit {
       this.sortDirection
     ).subscribe({
       next: (response) => {
-        console.log('ListBookingsComponent: API response received (next callback).', response);
-        // Corrected data access based on ApiResponse<Page<BookingDTO>> structure
         if (response?.success && response?.data) {
           this.allBookings = response.data.content;
           this.totalPages = response.data.page?.totalPages ?? 0; // Access totalPages from nested 'page'
@@ -114,23 +106,18 @@ export class ListBookingsComponent implements OnInit {
           this.allBookings = [];
         }
         this.isLoading = false; // Set loading to false on success
-        console.log('ListBookingsComponent: loadBookings next callback finalized. isLoading:', this.isLoading);
       },
       error: (err) => {
-        console.error('ListBookingsComponent: API error (error callback).', err);
         // Improved error message for snackbar consistency
         const errorMessage = err.message || (err.error?.message ? JSON.parse(err.error.message) : 'Failed to load bookings.');
         this.snackbar.error(errorMessage);
         this.allBookings = [];
         this.isLoading = false; // Set loading to false on error
-        console.log('ListBookingsComponent: loadBookings error callback finalized. isLoading:', this.isLoading);
       },
       complete: () => {
-        console.log('ListBookingsComponent: Observable completed.');
       }
     });
 
-    console.log('ListBookingsComponent: Subscribe method called. Request initiated.');
   }
 
   fetchTotalBookingsToday(): void {
@@ -138,14 +125,11 @@ export class ListBookingsComponent implements OnInit {
       next: (response) => {
         if (response.success && response.data !== null) {
           this.totalBookingsToday = response.data;
-          console.log('Total bookings for today fetched:', this.totalBookingsToday);
         } else {
-          console.error('Failed to get total bookings for today:', response.message);
           this.totalBookingsToday = 0; // Default to 0 on error
         }
       },
       error: (err) => {
-        console.error('Error fetching total bookings for today:', err);
         this.snackbar.error('Failed to fetch total bookings for today.');
         this.totalBookingsToday = 0; // Default to 0 on error
       }
@@ -173,7 +157,6 @@ export class ListBookingsComponent implements OnInit {
    * @param field The field to sort by.
    */
    changeSort(field: string): void {
-    console.log('ListBookingsComponent: Sorting by:', field);
     if (this.sortField === field) {
       // If clicking the same field, toggle sort direction
       this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';

@@ -19,13 +19,15 @@ import { mapJwtResponseToUser } from '../../model/utils/mapJwtResponseToUser';
 import { SnackbarService } from '../../services/snackbar.service';
 import { LowercaseTrimDirective } from '../directives/lowercase.directive';
 import { TrimTrailingSpacesDirective } from '../directives/trim-trailing-spaces.directive';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
     standalone: true,
     selector: 'app-login',
     templateUrl: './login.component.html',
     styleUrls: ['./login.component.css'],
-    imports: [ReactiveFormsModule, FormsModule, MatFormFieldModule, MatInputModule, CommonModule, TrimTrailingSpacesDirective, LowercaseTrimDirective]
+    imports: [ReactiveFormsModule, FormsModule, MatFormFieldModule, MatInputModule, 
+        CommonModule, TrimTrailingSpacesDirective, LowercaseTrimDirective, MatProgressSpinnerModule ]
 })
 export class LoginComponent implements OnInit {
     color = "primary";

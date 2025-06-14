@@ -18,7 +18,7 @@
           <mat-form-field class="example-full-width">
             <mat-label>Password</mat-label>
             <input matInput type="password" placeholder="Password" formControlName="password" required minlength="6"
-              appTrimTrailingSpaces  >
+              appTrimTrailingSpaces>
             <mat-error
               *ngIf="loginForm.get('password')?.invalid && (loginForm.get('password')?.dirty || loginForm.get('password')?.touched)">
               <ng-container *ngIf="loginForm.get('password')?.errors?.['required']">Password is required</ng-container>
@@ -29,10 +29,14 @@
 
           <section>
             <div class="example-button-row">
-              <button class="login_button" mat-raised-button [disabled]="loginForm.invalid || isLoading">
-                <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2" role="status"></span> Login
+              <button class="login_button" mat-raised-button color="primary"
+                [disabled]="loginForm.invalid || isLoading">
+                <div class="button-content">
+                  <mat-spinner *ngIf="isLoading" diameter="20" strokeWidth="3" mode="indeterminate"
+                    class="login-spinner"></mat-spinner>
+                  <span>Login</span>
+                </div>
               </button>
-              <button class="rest_button" mat-button type="button" (click)="resetForm()">Reset</button>
             </div>
           </section>
 
