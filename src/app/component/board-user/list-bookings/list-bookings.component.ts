@@ -80,33 +80,6 @@ export class ListBookingsComponent implements OnInit {
     this.loadBookings();
   }
 
-  /**
-   * Fetches bookings from the backend based on current pagination and sorting parameters.
-   * Updates component state with fetched data and displays messages.
-   */
-  // loadBookings(): void {
-  //   console.log('loadBookings called. Fetching with:', { page: this.currentPage, size: this.pageSize, sortBy: this.sortField, sortOrder: this.sortDirection });
-  //   this.isLoading = true; // Set loading state to true
-  //   // Call the booking service to get all bookings
-  //   this.bookingService.getAllBookings(
-  //     this.currentPage,
-  //     this.pageSize,
-  //     this.sortField,
-  //     this.sortDirection
-  //   ).subscribe({
-  //     next: (response: any) => {
-  //       this.allBookings = response.content;
-  //       this.totalElements = response.totalElements;
-  //       this.isLoading = false;
-  //     },
-  //     error: (err) => {
-  //       console.error('Error loading staff:', err); 
-  //       this.snackbar.error('Error loading staff members.');
-  //       this.isLoading = false;
-  //     }
-  //   });
-  // }
-
   loadBookings(): void {
     console.log('ListBookingsComponent: loadBookings method entered.');
     console.log('ListBookingsComponent: Current fetch parameters:', { page: this.currentPage, size: this.pageSize, sortBy: this.sortField, sortOrder: this.sortDirection });
