@@ -13,20 +13,23 @@ import { AdminAreaComponent } from './component/admin/board-admin.component';
 import { StaffComponent } from './component/admin/staff/list/staff.component';
 import { BookingComponent } from './component/board-user/booking/booking.component';
 import { ListBookingsComponent } from './component/board-user/list-bookings/list-bookings.component';
+import { UserProductComponent } from './component/user/product/product.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
 
- {
-  path: 'user', 
-  component: UserAreaComponent, 
-  canActivate: [authGuard],
-  children: [
-    { path: 'list-booking', component: ListBookingsComponent }
-  ]
-},
+  {
+    path: 'user',
+    component: UserAreaComponent,
+    canActivate: [authGuard],
+    children: [
+      { path: '', redirectTo: 'booking', pathMatch: 'full' },
+      { path: 'booking', component: UserProductComponent },
+      { path: 'list-booking', component: ListBookingsComponent }
+    ]
+  },
 
   {
     path: 'admin',
@@ -43,8 +46,10 @@ export const routes: Routes = [
       { path: 'list-booking', component: ListBookingsComponent },
       {
         path: 'user',
-        component: UserAreaComponent, 
+        component: UserAreaComponent,
         children: [
+          { path: '', redirectTo: 'booking', pathMatch: 'full' },
+          { path: 'booking', component: UserProductComponent },
           { path: 'list-booking', component: ListBookingsComponent }
         ]
       },

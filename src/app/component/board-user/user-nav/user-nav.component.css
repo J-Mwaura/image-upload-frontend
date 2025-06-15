@@ -2,12 +2,12 @@
 .sidenav-container {
   height: 100vh;
   background-color: #e6f7ff; /* Very light blue background */
-  /* margin-top: 5px; */
+  /* margin-top: 5px; - Removed as it can cause unwanted space */
 }
 
 /* Sidenav styling */
 .sidenav {
-  margin-top: 100px;
+  margin-top: 10px; /* Aligns with the overall header structure */
   width: 240px;
   background-color: #b3e0ff; /* Light blue */
   border-right: none;
@@ -30,7 +30,12 @@
 
 /* Main content area */
 .mat-sidenav-content {
+  display: flex; /* Make sidenav content a flex container */
+  flex-direction: column; /* Arrange its children (toolbar, content) in a column */
+  /* Removed padding-top here as the .header-spacer element and sticky toolbar handle spacing */
   background-color: #e6f7ff; /* Very light blue */
+  box-sizing: border-box; /* Include padding/borders in element's total height */
+  flex: 1; /* Allow content to grow and fill available space */
 }
 
 /* Header spacer for the 40px drop */
@@ -41,30 +46,36 @@
 
 /* Main toolbar */
 .main-toolbar {
-  position: sticky;
-  top: 40px; /* Matches spacer height */
-  z-index: 2;
+  position: sticky; /* Toolbar sticks to the top of its parent scrollable area */
+  top: 40px; /* Toolbar starts after the 40px header-spacer */
+  z-index: 2; /* Ensure it stays above other content */
   background-color: #4da6ff !important; /* Medium blue */
   color: white;
+  height: 64px; /* Set a consistent height for the toolbar */
 }
 
 /* Content container */
 .content-container {
-  padding: 20px;
-  margin-top: 20px;
+  flex: 1; /* Make this div take all available vertical space below toolbar */
+  overflow-y: auto; /* Enable scrolling if content overflows */
+  padding: 20px; /* Add some padding around your routed content */
+  margin-top: 20px; /* Adds space below the toolbar and before the actual content */
+  box-sizing: border-box;
 }
 
 /* Responsive adjustments */
 @media (max-width: 599px) {
   .header-spacer {
-    height: 56px; /* Adjust for mobile header */
+    height: 56px; /* Adjust for mobile header toolbar height */
   }
-  
+
   .main-toolbar {
-    top: 56px;
+    top: 56px; /* Adjust sticky top position for mobile */
+    height: 56px; /* Mobile toolbar height */
   }
-  
+
   .sidenav {
     width: 200px;
+    margin-top: 56px; /* Adjust sidenav margin-top for mobile toolbar height */
   }
 }
