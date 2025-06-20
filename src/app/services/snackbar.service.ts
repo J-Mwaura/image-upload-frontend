@@ -2,7 +2,6 @@
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSnackBarConfig } from '@angular/material/snack-bar';
-import { info } from 'console';
 
 @Injectable({ providedIn: 'root' })
 export class SnackbarService {
@@ -17,28 +16,56 @@ export class SnackbarService {
   success(message: string) {
     this.snackBar.open(message, 'Dismiss', {
       ...this.defaultConfig,
-      panelClass: ['success-snackbar', 'top']
+      panelClass: ['success-snackbar', 'top', 'top-offset']
     });
   }
 
   info(message: string) {
     this.snackBar.open(message, 'Dismiss', {
       ...this.defaultConfig,
-      panelClass: ['info-snackbar', 'top']
+      panelClass: ['info-snackbar', 'top', 'top-offset'] 
     });
   }
 
   warning(message: string) {
     this.snackBar.open(message, 'Dismiss', {
       ...this.defaultConfig,
-      panelClass: ['warning-snackbar', 'top']
+      panelClass: ['warning-snackbar', 'top', 'top-offset'] 
     });
   }
 
   error(message: string) {
     this.snackBar.open(message, 'Dismiss', {
       ...this.defaultConfig,
-      panelClass: ['error-snackbar', 'top']
+      panelClass: ['error-snackbar', 'top', 'top-offset']
     });
   }
+
+  // success(message: string) {
+  //   this.snackBar.open(message, 'Dismiss', {
+  //     ...this.defaultConfig,
+  //     panelClass: ['success-snackbar', 'top']
+  //   });
+  // }
+
+  // info(message: string) {
+  //   this.snackBar.open(message, 'Dismiss', {
+  //     ...this.defaultConfig,
+  //     panelClass: ['info-snackbar', 'top']
+  //   });
+  // }
+
+  // warning(message: string) {
+  //   this.snackBar.open(message, 'Dismiss', {
+  //     ...this.defaultConfig,
+  //     panelClass: ['warning-snackbar', 'top']
+  //   });
+  // }
+
+  // error(message: string) {
+  //   this.snackBar.open(message, 'Dismiss', {
+  //     ...this.defaultConfig,
+  //     panelClass: ['error-snackbar', 'top']
+  //   });
+  // }
 }

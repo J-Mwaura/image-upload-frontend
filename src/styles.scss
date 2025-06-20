@@ -18,7 +18,8 @@ body {
 /* Remove conflicting positioning rules from here */
 .cdk-global-overlay-wrapper {
    align-items: flex-start;
-  /* padding-top: 50px !important;  <-- REMOVE THIS */
+  padding-top: 50px !important; 
+  top: 80px !important;
 }
 
 /* Base snackbar container styling */
@@ -76,6 +77,15 @@ body {
   /* REMOVE these problematic lines entirely */
   /* position: relative !important; */
   /* top: 20px !important; */
+}
+.top-offset.mat-mdc-snack-bar-container .mdc-snackbar__surface {
+  position: relative !important;
+  //top: 80px !important; /* Adjust this value as needed */
+}
+
+/* Ensure proper positioning context */
+.mat-mdc-snack-bar-container.top-offset {
+  position: static !important;
 }
 
 /* css for snackbar */
